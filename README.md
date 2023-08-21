@@ -1,4 +1,4 @@
-# root-dash
+# root-dash!
 
 This is a template repository for creating a simple data-science dashboard for a userbase with widely-varying technical backgrounds.
 Data is processed using [Python notebooks](https://jupyter.org/) and then explored using [Streamlit](https://streamlit.io/).
