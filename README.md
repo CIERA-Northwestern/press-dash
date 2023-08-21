@@ -1,37 +1,18 @@
-# root-dash
+# CIERA Press Dashboard
 
-This is a template repository for creating a simple data-science dashboard for a userbase with widely-varying technical backgrounds.
-Data is processed using [Python notebooks](https://jupyter.org/) and then explored using [Streamlit](https://streamlit.io/).
-This template repository uses a blend of real and fake data---any analysis contained within is for demonstration purposes only.
+[![Installation and Tests](https://github.com/CIERA-Northwestern/press-dash/actions/workflows/installation_and_tests.yml/badge.svg)](https://github.com/CIERA-Northwestern/press-dash/actions/workflows/installation_and_tests.yml)
 
-Steps to adapt the template as your own:
-1. **Fork** the repository.
-2. **Verify** functionality and understanding of the repository as is by going through the existing template readme below, including running tests.
-3. **Rename** `./root_dash_lib` to an appropriate name, e.g. `./revolutionary_dash_lib`.
-4. **Update** `./setup.py` with the new library name, author name, repository location, etc.
-5. **Modify** the modules in the directory formerly known as `root_dash_lib` for your use case. It is very likely you need to edit the renamed `root_dash_lib/user_utils`, but you may not need to update the other modules.
-6. **Update the README** (found below) and remove everything above the double lines (including this sentence).
-
----
----
-
-# <**Title**>
-
-[![Installation and Tests](https://github.com/zhafen/root-dash/actions/workflows/installation_and_tests.yml/badge.svg)](https://github.com/zhafen/root-dash/actions/workflows/installation_and_tests.yml)
-
-<**root-dash**: The above button tracks the status of code tests for the repository. You need to replace the URLs in the markdown with your own URLs.>
-
-This <**data-science dashboard**> provides a way for interested individuals to explore data regarding <**your data source**>.
+This dashboard provides a way for interested individuals to explore data regarding press and news related to CIERA.
 
 Instructions are provided below for various levels of usage.
-Even if you have never edited code before, the goal of the instructions in [Level 1](#level-1-using-the-dashboard-on-your-computer) is for you to run the dashboard on your computer.
+Even if you have never edited code before, the goal of the instructions in [Level 2](#level-2-using-the-dashboard-on-your-computer) is for you to run the dashboard on your computer.
 On the other end of things, if you are comfortable with routine use of git, code testing, etc., then jump to [Level 4](#level-4-significant-customization-and-editing) to get an overview of how the dashboard works and what you might want to edit.
 
 ## Table of Contents
 
 - [Level 0: Using the Dashboard Online](#level-0-using-the-dashboard-online)
-- [Level 1: Changing the Configuration and Data](#level-2-changing-the-configuration-and-data)
-- [Level 2: Using the Dashboard on your Computer](#level-1-using-the-dashboard-on-your-computer)
+- [Level 1: Changing the Configuration and Data](#level-1-changing-the-configuration-and-data)
+- [Level 2: Using the Dashboard on your Computer](#level-2-using-the-dashboard-on-your-computer)
 - [Level 3: Making Some Edits to the Code](#level-3-making-some-edits-to-the-code)
 - [Level 4: Significant Customization and Editing](#level-4-significant-customization-and-editing)
 - [Level 5: Additional Features](#level-5-additional-features)
@@ -39,7 +20,7 @@ On the other end of things, if you are comfortable with routine use of git, code
 ## Level 0: Using the Dashboard Online
 
 The dashboard has a plethora of features that can be interacted with via a web interface.
-If the dashboard is currently live at [<**streamlit app**>](https://root-dash.streamlit.app), you can use the dashboard without any additional effort.
+If the dashboard is currently live at [ciera-press-zach](https://ciera-press-zach.streamlit.app), you can use the dashboard without any additional effort.
 One of the main features is the application of filters and the ability to download the edited data and images.
 
 ## Level 1: Updating the Configuration and Data
@@ -49,13 +30,13 @@ If the dashboard is also hosted on the web you can edit the configuration and da
 
 ### Editing the Config
 
-Some options are only available in the `config.yml` file found in the `src` directory (`./src/config.yml` if you are in the root directory, i.e. [here](https://github.com/zhafen/root-dash/blob/main/src/config.yml)).
+Some options are only available in the `config.yml` file found in the `src` directory (`./src/config.yml` if you are in the root directory, i.e. [here](https://github.com/CIERA-Northwestern/press-dash/blob/main/src/config.yml)).
 You can edit this on github by clicking on the edit button in the upper right, provided you are logged in with an account that has the necessary permissions.
 Locally this can be edited with TextEdit (mac), Notepad (Windows), or your favorite code editor.
 
 ### Updating the Data
 
-The raw data lives in [the `data/raw_data` folder](https://github.com/zhafen/root-dash/tree/main/data/raw_data).
+The raw data lives in [the `data/raw_data` folder](https://github.com/CIERA-Northwestern/press-dash/tree/main/data/raw_data).
 To update the data used, add and/or replace the data in this folder.
 You can do this on github by clicking the "Add file" button in the upper right hand corner.
 The pipeline will automatically select the most recent data.
@@ -69,10 +50,10 @@ If you need a private dashboard or you need to run more-intensive data processin
 The code lives in a git repository, but you don't have to know git to retrieve and use it.
 The process for downloading the code is as follows:
 
-1. Click on the green "Code" button on [the GitHub repository](https://github.com/zhafen/root-dash), near the top of the page.
+1. Click on the green "Code" button on [the GitHub repository](https://github.com/CIERA-Northwestern/press-dash), near the top of the page.
 2. Select "Download ZIP."
 3. Extract the downloaded ZIP file.
-4. Optional: Move the extracted folder (`<repository-name>`; referred to as the code's "root directory") to a more-permanent location.
+4. Optional: Move the extracted folder (`press-dash`; referred to as the code's "root directory") to a more-permanent location.
 
 ### Installing the Dashboard
 
@@ -100,7 +81,6 @@ This does not require internet access.
 
 ### Running the Data Pipeline
 
-<**Some analyses require additional data processing. This template comes with a built-in template for your own data pipeline.**>
 To run the data-processing pipeline, while in the root directory run the following command in your terminal:
 ```
 ./src/pipeline.sh ./src/config.yml
@@ -123,7 +103,7 @@ There are many good tutorials available (e.g.
 [Git Basics](https://git-scm.com/book/en/v2/Getting-Started-Git-Basics)).
 For convenience, the main command you need to download the code with git is
 ```
-git clone git@github.com:zhafen/root-dash.git`
+git clone git@github.com:CIERA-Northwestern/press-dash.git`
 ```
 
 ### Editing the Pipeline
@@ -146,7 +126,7 @@ This enables editing the streamlit script to be almost exactly like an ordinary 
 If you know how to make plots in Python, then you know how to make interactive plots with Streamlit.
 
 If you want to change the Streamlit dashboard, edit `src/dashboard.py`.
-Much of the Streamlit functionality is also encapsulated in utility functions inside the `<short name>_dash_lib/` directory, particularly in `<short name>_dash_lib/streamlit_utils.py`.
+Much of the Streamlit functionality is also encapsulated in utility functions inside the `press_dash_lib/` directory, particularly in `press_dash_lib/streamlit_utils.py`.
 Streamlit speeds up calculations by caching calls to functions.
 If a particular combination of arguments has been passed to the function
 (and the function is wrapped in the decorator `st.cache_data` or `st.cache_resource`)
@@ -161,7 +141,7 @@ This will enable you to share your edits as a pull request.
 ### Repository Structure
 The repository is structured as follows:
 ```
-<root-directory>/
+press-dash/
 │
 ├── README.md                  # Documentation for the project
 ├── __init__.py
@@ -178,11 +158,7 @@ The repository is structured as follows:
 ├── requirements.txt           # List of project dependencies
 ├── data                       # Data storage directory
 │   ├── raw_data                # Raw data directory
-│   |   ├── <your raw data>.csv 
-│   |   └── <your additional raw data>.xlsx
 │   └── processed_data          # Processed data directory
-│       ├── <your processed data>.csv
-│       └── <your additional processed data>.csv
 ├── test                       # Test directory
 │   ├── __init__.py
 │   ├── test_pipeline.py        # Unit tests for data pipeline
