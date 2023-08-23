@@ -2,53 +2,64 @@
 # Options
 ###############################################################################
 
-page_title: 'Press Data'
-
-# What day of the year to start on.
-# Default is September 1st, start of the Northwestern Financial Year
-start_of_year: September 1
 
 # Location of the data relative to the config
 data_dir: ../data
 # Location of the figures relative to the config
 figure_dir: ../data/figures
 
+# What day of the year to start on.
+# Default is September 1st, start of the Northwestern Financial Year
+start_of_year: September 1
+
+# Aesthetic options
+page_title: 'Press Data'
 # Seaborn color palette to use. More options at https://seaborn.pydata.org/tutorial/color_palettes.html
 color_palette: deep
 
+###############################################################################
+# Advanced Options
+###############################################################################
+# The below options must be modified to adapt the dashboard to your own purposes,
+# but most users of the completed dashboard will not need to modify them.
+
+# Filetree options
+input_dirname: raw_data
+output_dirname: processed_data
+website_data_file_pattern: News_Report*.csv
+press_office_data_file_pattern: press_office*.xls*
+combined_filename: press.csv
+
 # What to group by
-# If you add additional numeric columns to the data, you can specify them here and they will be added to the dashboard.
+# If you add additional categorical columns to the data, you can specify them here and they will be added to the dashboard.
 groupings:
   - Research Topics
   - Press Types
   - Categories
 
-###############################################################################
-# Advanced Options
-###############################################################################
-
-# Classifications for different columns
-id_columns:
+## Column Classifications
+# The anything that's in a given grouping can be analyzed similarly.
+id_columns: # Unique identifiers
   - id
-  - Title # Unique identifiers can also act as IDs
-weight_columns:
+  - Title
+weight_columns: # Numeric columns that can be summed
   - Press Mentions
   - People Reached
-date_columns:
+date_columns: # Dates
   - Date
-year_columns:
-  - Year
-categorical_columns:
+time_bin_columns: # The value of these columns indicates what time bin the data should be grouped into
+  - Year # For example, a value of 2019 would be grouped into the 2019-2020 financial year
+categorical_columns: # Categorical columns that can be grouped, e.g. all Press Types=="Science" articles
   - Research Topics
   - Press Types
   - Categories
-text_columns:
+text_columns: # Text columns that can be searched
   - Title
   - Permalink
   - Top Outlets
   - Notes
 
-# Custom categories
+## Custom Categories
 # Use boolean logic to define categories.
 # In addition to boolean logic, preceeding the definition with 'only' will restrict the category to only the tags that show up in the proceeding definition.
 # Any categories not defined here will be left as is if they are the sole tag, or added to an 'Other' category if they are one of multiple tags.
@@ -67,12 +78,6 @@ new_categories:
     'Research': "('Science' | 'Data Science & Computing') & ( not ( 'Education' | 'Outreach' ) )"
     'Outreach': "('Education' | 'Outreach' ) & ( not ( 'Science' | 'Data Science & Computing' ) )"
     'Achievements & Events': "only ('Achievement' | 'Event' | 'Interdisciplinary')"
-
-# Filetree options
-input_dirname: raw_data
-output_dirname: processed_data
-website_data_file_pattern: News_Report*.csv
-press_office_data_file_pattern: press_office*.xls*
-combined_filename: press.csv
-transform_nb_fp: default # Defaults to src/transform.ipynb
-dashboard_nb_fp: default # Defaults to src/dashboard.ipynb
+  # You can use the same source category for multiple new categories by placing the source column in brackets.
+  "Multi-messenger Astro vs everything else [Research Topics]":
+    'GW': "'Gravitational Waves & Multi-Messenger Astronomy'" # Anything tagged as GW will be included in this category

@@ -23,7 +23,7 @@ import seaborn as sns
 src_dir = os.path.dirname( os.path.dirname( __file__ ) )
 if src_dir not in sys.path:
     sys.path.append( src_dir )
-from g_and_p_dash_lib import dash_utils, data_utils, time_series_utils
+from root_dash_lib import dash_utils, data_utils, time_series_utils
 
 # Streamlit works by repeatedly rerunning the code,
 # so if we want to propogate changes to the library we need to reload it.
@@ -119,8 +119,8 @@ with data_settings_tab:
                 key='{}:y_column'.format( tag ),
             )
         data_kw['year_column'] = st.selectbox(
-            'What do you want to use as the year of record?',
-            config['year_columns'], # CUSTOMIZE
+            'How do you want to bin the data in time?',
+            config['time_bin_columns'], # CUSTOMIZE
             index=0, # CUSTOMIZE
             key='{}:year_column'.format( tag ),
         )
@@ -357,8 +357,8 @@ with data_settings_tab:
                 key='{}:y_column'.format( tag ),
             )
         data_kw['year_column'] = st.selectbox(
-            'What do you want to use as the year of record?',
-            config['year_columns'], # CUSTOMIZE
+            'How do you want to bin the data in time?',
+            config['time_bin_columns'], # CUSTOMIZE
             index=0, # CUSTOMIZE
             key='{}:year_column'.format( tag ),
         )

@@ -100,8 +100,8 @@ def main( config_fp ):
             key='{}:y_column'.format( tag ),
         )
     data_kw['year_column'] = st.selectbox(
-        'What do you want to use as the year of record?',
-        config['year_columns'], # CUSTOMIZE
+        'How do you want to bin the data in time?',
+        config['time_bin_columns'], # CUSTOMIZE
         index=0, # CUSTOMIZE
         key='{}:year_column'.format( tag ),
     )

@@ -164,8 +164,8 @@ def setup_data_axes(
             )
     if 'year_column' in include:
         data_axes_kw['year_column'] = st_loc.selectbox(
-            'What do you want to use as the year of record?',
-            options.get( 'year_column', config['year_columns'] ),
+            'How do you want to bin the data in time?',
+            options.get( 'year_column', config['time_bin_columns'] ),
             index=defaults.get( 'year_column', 0 ),
         )
     if 'groupby_column' in include:
@@ -472,7 +472,7 @@ def setup_filters(
             multiselect_default = list( numerical_filter_defaults.keys() )
         numerical_filter_columns = st_loc.multiselect(
             'What numerical columns do you want to filter on?',
-            options = config['weight_columns'] + config['year_columns'],
+            options = config['weight_columns'] + config['time_bin_columns'],
             default = multiselect_default,
             key='{}select_numerical_columns'.format( tag ),
         )
