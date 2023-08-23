@@ -49,8 +49,7 @@ This does require additional steps for the user, compared to viewing the dashboa
 <details>
 <summary><b>Easily shared</b></summary>
 
-Public dashboards should be able to be shared widely.
-Streamlit provides a free service for hosting streamlit apps, and if that is retired there are other options to host the application.
+Streamlit provides a [free service for hosting streamlit apps](https://streamlit.io/cloud), and if that is retired there are other options to host the application.
 </details>
 
 <details>
@@ -74,8 +73,7 @@ As such, the dashboard template is widely applicable to the common scenario of c
 
 <details>
 <summary><b>Robust dependencies</b></summary>
-The dashboard should use dependencies that are as robust as possible.
-To this end, the dashboard exclusively uses libraries that are supported by a broad community.
+The dashboard exclusively uses libraries that are supported by a broad community.
 </details>
 
 ---

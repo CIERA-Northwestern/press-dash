@@ -18,7 +18,6 @@ setuptools.setup(
         'openpyxl',
         'matplotlib',
         'seaborn',
-        'sympy',
         'nbconvert',
         'nbformat',
         'PyYAML',
