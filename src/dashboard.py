@@ -11,16 +11,10 @@ root_dir = os.path.dirname( os.path.dirname( __file__ ) )
 if root_dir not in sys.path:
     sys.path.append( root_dir )
 
-# Process any user arguments
-import argparse
-parser = argparse.ArgumentParser(description="Dashboard script.")
-parser.add_argument( '--pagetype', type=str, default='blank_page', help='The type of page to display.' )
-args = parser.parse_args()
-page_type = args.pagetype
 
 # Call the main function.
+# Change the import here to whatever page you want to load.
 import importlib
-import root_dash_lib.pages
-page_module = getattr( root_dash_lib.pages, page_type )
-importlib.reload( page_module )
-page_module.main( os.path.join( config_dir, config_fn ) )
+from root_dash_lib.pages import blank_page
+importlib.reload( blank_page )
+blank_page.main( os.path.join( config_dir, config_fn ) )
