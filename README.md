@@ -8,7 +8,7 @@ Steps to adapt the template as your own:
 1. **Fork** the repository.
 2. **Verify** functionality and understanding of the repository as is by going through the existing template readme below, including running tests.
 3. **Rename** `./root_dash_lib` to an appropriate name, e.g. `./revolutionary_dash_lib`.
-4. **Update** `./setup.py` with the new library name, author name, repository location, etc.
+4. **Update** `./setup.py` with the new library name and both `./setup.py` and `./requirements.txt` with any new packages that your dashboard requires.
 5. **Modify** the modules in the directory formerly known as `root_dash_lib` for your use case. It is very likely you need to edit the renamed `root_dash_lib/user_utils`, but you may not need to update the other modules.
 6. **Update the README** (found below) and remove everything above the double lines (including this sentence).
 
@@ -22,6 +22,9 @@ Steps to adapt the template as your own:
 <**root-dash**: The above button tracks the status of code tests for the repository. You need to replace the URLs in the markdown with your own URLs.>
 
 This <**data-science dashboard**> provides a way for interested individuals to explore data regarding <**your data source**>.
+This dashboard setup is primarily for exploratory or explanatory data analysis common in academia,
+whereas preditive data analysis is more common outside academia.
+Predictive data science dashboards may differ in usage and structure.
 
 Instructions are provided below for various levels of usage.
 Even if you have never edited code before, the goal of the instructions in [Level 1](#level-1-using-the-dashboard-on-your-computer) is for you to run the dashboard on your computer.
@@ -41,6 +44,7 @@ On the other end of things, if you are comfortable with routine use of git, code
 The dashboard has a plethora of features that can be interacted with via a web interface.
 If the dashboard is currently live at [<**streamlit app**>](https://root-dash.streamlit.app), you can use the dashboard without any additional effort.
 One of the main features is the application of filters and the ability to download the edited data and images.
+Two helpful tips: you can clear the cache by pressing <kbd>c</kbd>, and reset you can reset your choices by refreshing the page. 
 
 ## Level 1: Updating the Configuration and Data
 
@@ -78,8 +82,10 @@ The process for downloading the code is as follows:
 
 Running the dashboard requires Python.
 If you do not have Python on your computer it is recommended you download and install [Miniconda](https://docs.conda.io/en/main/miniconda.html).
+Note that macs typically have a pre-existing Python installation, but this installation is not setup to install new packages easily.
+Therefore it is still recommended that you install via miniconda even if your system has Python pre-installed.
 
-With Python installed, 
+With Python and pip installed, 
 open the directory containing the code (the root directory) in your terminal or command prompt.
 If youre a mac user and you've never used a terminal or command prompt before
 you can do this by right clicking the extracted folder and selecting "New Terminal at Folder" ([more info](https://support.apple.com/guide/terminal/open-new-terminal-windows-and-tabs-trmlb20c7888/mac); [Windows Terminal is the windows equivalent](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/windows-commands)).
@@ -199,6 +205,7 @@ To run the tests, simply navigate to the code's root directory and enter
 ```
 pytest
 ```
+These tests will run automatically after every commit _if_ you enable GitHub Actions (visit the `Actions` tab at the top of your repository and accept the "Enable GitHub actions" prompt). 
 
 ### Updating the Usage and Installation Instructions
 
@@ -209,7 +216,54 @@ You may also consider changing the metadata in `setup.py`.
 You can deploy your app on the web using Streamlit sharing.
 Visit [Streamlit Sharing](https://streamlit.io/sharing) for more information.
 
+**Note:** you cannot deploy a streamlit app where the source is a repository owned by the organization, unless you can log into that organization's github account.
+This is true even if you have full read/write access to the organization's repositories.
+Instead you must create a fork of the repository you want to deploy, and point streamlit.io to that fork.
+
 ## Level 5: Additional Features
+
+### Using and Editing Multiple Dashboards
+
+It is recommended that your repositories that use this dashboard template are a fork of the template.
+Unfortunately you cannot have multiple official forks of a single repository, nor can you have a private fork, which is necessary for dashboards with sensitive data.
+However, you can create a "manual" fork in both cases, as described below.
+The process is described below.
+
+1. **Create a New Repository**: In your GitHub/Atlassian account, create a new repository. The repository can be set to "Private" if you wish.
+
+2. **Clone the Original Repository**: Clone the public repository to your local machine and navigate to the cloned repository directory.
+
+   ```bash
+   git clone https://github.com/zhafen/root-dash.git
+   cd your-public-repo
+   ```
+
+3. **Change the setup for the remote repositories**: Designate the repository you cloned from as `upstream`, and create a new origin with the url of your private repository.
+
+   ```bash
+   git remote rename origin upstream
+   git remote add origin https://github.com/<your-username>/<your-private-repo>.git
+   ```
+
+4. **Check the result**: If done correctly, the output of `git remote -v` should be
+
+    ```bash
+    git remote -v
+    ```
+
+    > ```
+    > origin  git@github.com:<your-username>.git (fetch)
+    > origin  git@github.com:<your-username>.git (push)
+    > upstream        git@github.com:zhafen/root-dash.git (fetch)
+    > upstream        git@github.com:zhafen/root-dash.git (push)
+    > ```
+
+4. **Push to the Private Repository**: Push all branches and tags to your new private repository:
+
+   ```bash
+   git push origin --all
+   git push origin --tags
+   ```
 
 ### Continuous Integration
 
@@ -222,6 +276,5 @@ and are disabled until the underlying issues are addressed.
 ### Deploying a Private App
 Streamlit has the option to deploy your code without sharing it publicly.
 More information can be found [in this section of the Streamlit Sharing documentation](https://docs.streamlit.io/streamlit-community-cloud/share-your-app#make-your-app-public-or-private).
-
 
 ChatGPT was used in the construction of this document.
