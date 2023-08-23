@@ -1,7 +1,10 @@
 # root-dash!
 
-This is a template repository for creating a simple data-science dashboard for a userbase with widely-varying technical backgrounds.
-Data is processed using [Python notebooks](https://jupyter.org/) and then explored using [Streamlit](https://streamlit.io/).
+This is a template repository for creating a simple exploratory data-science dashboard for a userbase with widely-varying technical backgrounds.
+Data is explored using [Streamlit](https://streamlit.io/).
+Preprocessing is wrapped into streamlit for lightweight datasets,
+while for ones requiring more processing there is data pipeline functionality,
+including automating the use of [Python notebooks](https://jupyter.org/).
 This template repository uses a blend of real and fake data---any analysis contained within is for demonstration purposes only.
 
 Steps to adapt the template as your own:
@@ -27,14 +30,15 @@ whereas preditive data analysis is more common outside academia.
 Predictive data science dashboards may differ in usage and structure.
 
 Instructions are provided below for various levels of usage.
-Even if you have never edited code before, the goal of the instructions in [Level 1](#level-1-using-the-dashboard-on-your-computer) is for you to run the dashboard on your computer.
-On the other end of things, if you are comfortable with routine use of git, code testing, etc., then jump to [Level 4](#level-4-significant-customization-and-editing) to get an overview of how the dashboard works and what you might want to edit.
+Even if you have never edited code before, the goal of the instructions in [Level 1](#level-1-changing-the-configuration-and-data) is for you to update the data and settings of a pre-existing dashboard running online.
+On the other end of things, if you are comfortable with routine use of git, code testing, etc., [Level 4](#level-4-significant-customization-and-editing) provides an overview of how the dashboard works and what you might want to edit.
+It is still recommended you briefly skim through the previous sections, even if you are comfortable with a higher level, as they describe general use.
 
 ## Table of Contents
 
 - [Level 0: Using the Dashboard Online](#level-0-using-the-dashboard-online)
-- [Level 1: Changing the Configuration and Data](#level-2-changing-the-configuration-and-data)
-- [Level 2: Using the Dashboard on your Computer](#level-1-using-the-dashboard-on-your-computer)
+- [Level 1: Changing the Configuration and Data](#level-1-changing-the-configuration-and-data)
+- [Level 2: Using the Dashboard on your Computer](#level-2-using-the-dashboard-on-your-computer)
 - [Level 3: Making Some Edits to the Code](#level-3-making-some-edits-to-the-code)
 - [Level 4: Significant Customization and Editing](#level-4-significant-customization-and-editing)
 - [Level 5: Additional Features](#level-5-additional-features)
@@ -44,12 +48,12 @@ On the other end of things, if you are comfortable with routine use of git, code
 The dashboard has a plethora of features that can be interacted with via a web interface.
 If the dashboard is currently live at [<**streamlit app**>](https://root-dash.streamlit.app), you can use the dashboard without any additional effort.
 One of the main features is the application of filters and the ability to download the edited data and images.
-Two helpful tips: you can clear the cache by pressing <kbd>c</kbd>, and reset you can reset your choices by refreshing the page. 
+While the interface should be relatively intuitive, a helpful tip is that you can reset your choices by refreshing the page.
 
 ## Level 1: Updating the Configuration and Data
 
-For many applications the data is light-weight enough that you can do the pre-processing as part of running the dashboard.
-If the dashboard is also hosted on the web you can edit the configuration and data without ever needing to download anything.
+When the dashboard is hosted on the web in some cases you can edit the configuration and data without ever needing to download anything and view the updated dashboard without ever needing to download anything.
+This is possible for dashboards where the computations are sufficiently light to be wrapped into the interactive dashboard.
 
 ### Editing the Config
 
@@ -82,11 +86,10 @@ The process for downloading the code is as follows:
 
 Running the dashboard requires Python.
 If you do not have Python on your computer it is recommended you download and install [Miniconda](https://docs.conda.io/en/main/miniconda.html).
-Note that macs typically have a pre-existing Python installation, but this installation is not setup to install new packages easily.
+Note that macs typically have a pre-existing Python installation, but this installation is not set up to install new packages easily, and the below instructions may not work.
 Therefore it is still recommended that you install via miniconda even if your system has Python pre-installed.
 
-With Python and pip installed, 
-open the directory containing the code (the root directory) in your terminal or command prompt.
+Open the directory containing the code (the root directory) in your terminal or command prompt.
 If youre a mac user and you've never used a terminal or command prompt before
 you can do this by right clicking the extracted folder and selecting "New Terminal at Folder" ([more info](https://support.apple.com/guide/terminal/open-new-terminal-windows-and-tabs-trmlb20c7888/mac); [Windows Terminal is the windows equivalent](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/windows-commands)).
 
@@ -129,12 +132,21 @@ There are many good tutorials available (e.g.
 [Git Basics](https://git-scm.com/book/en/v2/Getting-Started-Git-Basics)).
 For convenience, the main command you need to download the code with git is
 ```
-git clone git@github.com:zhafen/root-dash.git`
+git clone git@github.com:zhafen/root-dash.git
 ```
+
+### If you edit anything, edit `<short name>_dash_lib/user_utils.py`
+
+This file contains two functions essential to working with arbitrary data:
+
+1. `load_data`, which the user must edit to ensure it loads the data into a DataFrame.
+2. `preprocess_data`, which will make alterations to the loaded data.
+
+Just by changing these two functions and the config you can adapt the pipeline to a wide variety of purposes.
 
 ### Editing the Pipeline
 
-If you want to change how the data is processed, edit `src/transform.ipynb`.
+If you want to change the more intensive data-processing, edit `src/transform.ipynb`.
 The data-processing pipeline runs this notebook when you execute the bash script `./src/pipeline.sh`,
 and saves the output in the logs.
 It is recommended to use the config whenever possible for any new variables introduced.
@@ -151,8 +163,12 @@ Streamlit is built on a very simple idea---to make something interactive, just r
 This enables editing the streamlit script to be almost exactly like an ordinary Python script.
 If you know how to make plots in Python, then you know how to make interactive plots with Streamlit.
 
-If you want to change the Streamlit dashboard, edit `src/dashboard.py`.
-Much of the Streamlit functionality is also encapsulated in utility functions inside the `<short name>_dash_lib/` directory, particularly in `<short name>_dash_lib/streamlit_utils.py`.
+The basic streamlit dashboard that starts up is a general-purpose dashboard,
+for which the majority of the code exists in `<short name>_dash_lib/pages/blank_page.py`
+The file `src/dashboard.py`calls the main function in `blank_page.py` by default,
+but can be edited to call the main function of a different file by default instead.
+Much of the Streamlit functionality is also encapsulated in utility functions inside the `<short name>_dash_lib/` directory.
+
 Streamlit speeds up calculations by caching calls to functions.
 If a particular combination of arguments has been passed to the function
 (and the function is wrapped in the decorator `st.cache_data` or `st.cache_resource`)
@@ -217,7 +233,6 @@ To run the tests, simply navigate to the code's root directory and enter
 ```
 pytest
 ```
-These tests will run automatically after every commit _if_ you enable GitHub Actions (visit the `Actions` tab at the top of your repository and accept the "Enable GitHub actions" prompt). 
 
 ### Updating the Usage and Installation Instructions
 
@@ -239,7 +254,6 @@ Instead you must create a fork of the repository you want to deploy, and point s
 It is recommended that your repositories that use this dashboard template are a fork of the template.
 Unfortunately you cannot have multiple official forks of a single repository, nor can you have a private fork, which is necessary for dashboards with sensitive data.
 However, you can create a "manual" fork in both cases, as described below.
-The process is described below.
 
 1. **Create a New Repository**: In your GitHub/Atlassian account, create a new repository. The repository can be set to "Private" if you wish.
 
@@ -280,13 +294,18 @@ The process is described below.
 ### Continuous Integration
 
 Continuous integration (automated testing) is an excellent way to check if your dashboard is likely to function for other users.
-You can enable continuous integration [via GitHub Actions](https://docs.github.com/en/actions/automating-builds-and-tests/about-continuous-integration), including adding a badge showing the status of your tests.
-Continuous integration can be tested locally using [act](https://github.com/nektos/act).
+You can enable continuous integration [via GitHub Actions](https://docs.github.com/en/actions/automating-builds-and-tests/about-continuous-integration) (also available in a tab at the top of your github repo), including adding a badge showing the status of your tests
+(shown at the top of this page).
 Some tests don't work on continuous integration,
 and are disabled until the underlying issues are addressed.
+Continuous integration can be tested locally using [act](https://github.com/nektos/act),
+which may be helpful if the issues that occur during continuous integration are system specific.
 
 ### Deploying a Private App
 Streamlit has the option to deploy your code without sharing it publicly.
 More information can be found [in this section of the Streamlit Sharing documentation](https://docs.streamlit.io/streamlit-community-cloud/share-your-app#make-your-app-public-or-private).
+
+
+---
 
 ChatGPT was used in the construction of this document.
