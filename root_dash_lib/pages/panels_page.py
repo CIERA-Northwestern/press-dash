@@ -1,6 +1,7 @@
 '''This page is a template for creating a customized page with multiple panels.
 This page deliberately avoids using too many functions to make it easier to
-understand how to use streamlit.
+understand how to use streamlit. For an alternative approach, see
+../panels_utils.py.
 '''
 # Computation imports
 import copy
