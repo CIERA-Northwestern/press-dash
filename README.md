@@ -1,11 +1,61 @@
-# root-dash!
+# root-dash
 
 This is a template repository for creating a simple exploratory data-science dashboard for a userbase with widely-varying technical backgrounds.
 Data is explored using [Streamlit](https://streamlit.io/).
-Preprocessing is wrapped into streamlit for lightweight datasets,
+Preprocessing is wrapped into the Streamlit dashboard for lightweight datasets,
 while for ones requiring more processing there is data pipeline functionality,
 including automating the use of [Python notebooks](https://jupyter.org/).
 This template repository uses a blend of real and fake data---any analysis contained within is for demonstration purposes only.
+
+This repository was originally built for the [Center for Interdisciplinary Exploration and Research in Astrophysics (CIERA)](https://ciera.northwestern.edu/) at Northwestern University,
+according to the design specifications listed below.
+
+1. **Internally maintained**: CIERA should be able to maintain existing dashboards without external expertise.  CIERA is home to a deep pool of technical expertise, both due to its nature as an astrophysics research center and due to years of work by its leadership and community. If the right tools are selected when building the dashboard, the necessary expertise to maintain it should be on hand.
+
+    Accordingly, the dashboard is built on
+    Python and shell scripting.
+    Streamlit was selected as the dashboard framework because Streamlit is compatible with matplotlib,
+    and a Streamlit dashboard script differs from a traditional plot-generation script by only a few lines of Python.
+
+    We evaluated the Cognos Analytics Business Intelligence System as an alternative dashboard platform.
+    Cognos is widely used by the Northwestern data community, and is the platform through which most of the official data is accessed.
+    However, creating a Cognos dashboard depends on utilizing a graphical UI which no one at CIERA is familiar with,
+    rather than techniques used day-in and day-out.
+
+2. **Accessiblity:** CIERA staff, who do not necessarily have a coding background, should be able to use existing dashboards with as little effort as possible. In particular, CIERA staff should be able to perform extensive plot tuning, explore the data, upload new data, and modify the config.
+
+    For most dashboards built via this template the dashboard is accessible online, and all of those features are possible to complete in the web browser with only a few clicks.
+    This avoids many users ever needing to use git or navigate their computer with command line.
+
+    Another reason we did not select Cognos is because of accessibility---gaining access to data and a Cognos dashboard can require working through several layers of permission.
+
+3. **Privacy and offline functionality:** There should be a way to create and share private dashboards, including on closed-networks.
+
+    Fortunately, streamlit is compatible with this: it can be run locally even more-easily than it can be hosted online.
+    This does require additional steps for the user, compared to viewing the dashboard on the web, but those steps are well-defined and brief.
+
+4. **Easy sharing:** Public dashboards should be able to be shared widely.
+
+    Streamlit provides a free service for hosting streamlit apps, and if that is retired there are other options to host the application.
+
+5. **Clarity:** If there is a choice between two comparable solutions, one of which is more robust and the other of which is easier to understand, the more-understandable option is preferred. This goes hand-in-hand with maintenance.
+
+    This is possible because there is an emphasis on being a template, not a library.
+    While the template comes with a solid library, users are encouraged to modify the code for their own purposes,
+    and the code is simple enough to not require a class-centric approach.
+
+6. **Applicability:** The dashboard template should be applicable to new datasets used by CIERA staff with minimal work.
+
+    Fortunately, much of the data employed by CIERA staff follow a common format:
+    categorized time-series data.
+    Examples include news articles over time, grants and proposals per year, and outreach activities over time.
+    The default dashboard library comes with tools to visualize such data straightforwardly.
+
+7. **Robust dependencies:** The dashboard should use dependencies that are as robust as possible.
+
+    To this end, the dashboard exclusively uses libraries that are supported by a broad community.
+
+---
 
 Steps to adapt the template as your own:
 1. **Fork** the repository.
