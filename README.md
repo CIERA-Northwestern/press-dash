@@ -169,31 +169,43 @@ The repository is structured as follows:
 ```
 <root-directory>/
 │
-├── README.md                  # Documentation for the project
+├── README.md                   # Documentation for the project
 ├── __init__.py
-├── src                        # Source code directory
+├── src                         # Source code directory
 │   ├── __init__.py
 |   ├── config.yml              # Configuration file for the dashboard
 │   ├── dashboard.py            # Script for interactive dashboard
 │   ├── pipeline.sh             # Shell script for running data pipeline
 │   └── transform.ipynb         # Jupyter notebook for data transformation
-├── root_dash_lib              # Custom library directory
+├── root_dash_lib               # Custom library directory
 │   ├── __init__.py
-│   └── streamlit_utils.py      # Utility functions for the dashboard
-├── setup.py                   # Script for packaging the project
-├── requirements.txt           # List of project dependencies
-├── data                       # Data storage directory
+│   ├── user_utils.py           # Utilities specific to the dashboard. Must be edited.
+│   ├── dash_utils.py           # Utilities for creating widgets and accepting input.
+│   ├── data_utils.py           # Utilities for general-purpose data handling
+│   ├── plot_utils.py           # Utilities for plotting data.
+│   ├── time_series_utils.py    # Utilities for working with time series.
+│   └── pages                   # Dashboard page templates.
+│       ├── __init__.py
+│       ├── blank_page.py       # The default dashboard setup. High flexibility.
+│       └── panels_page.py      # A multi-panel dashboard example.
+├── setup.py                    # Script for packaging the project
+├── requirements.txt            # List of project dependencies
+├── data                        # Data storage directory
 │   ├── raw_data                # Raw data directory
 │   |   ├── <your raw data>.csv 
-│   |   └── <your additional raw data>.xlsx
+│   |   └── <more raw data>.xlsx
 │   └── processed_data          # Processed data directory
 │       ├── <your processed data>.csv
-│       └── <your additional processed data>.csv
-├── test                       # Test directory
+│       └── <more processed data>.csv
+├── test                        # Test directory
 │   ├── __init__.py
+|   ├── config.yml              # Configuration file for the tests.
 │   ├── test_pipeline.py        # Unit tests for data pipeline
-│   └── test_streamlit.py       # Unit tests for the dashboard
-├── conftest.py                # Configuration for test suite
+│   ├── test_streamlit.py       # Unit tests for the dashboard
+│   └── lib_for_tests           # Used to load the default test dataset,
+│       ├── __init__.py         # enabling users to change the code and check
+│       └── press_data_utils.py     # if their changes broke any functionality.
+├── conftest.py                 # Configuration for test suite
 └── test_data                   # Test datasets
 ```
 
