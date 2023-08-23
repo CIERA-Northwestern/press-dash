@@ -5,17 +5,8 @@ understand how to use streamlit.
 # Computation imports
 import copy
 import importlib
-import numpy as np
 import os
-import pandas as pd
 import streamlit as st
-import sys
-
-# Plotting imports
-import matplotlib
-import matplotlib.pyplot as plt
-import matplotlib.font_manager as font_manager
-import seaborn as sns
 
 # Import the custom library.
 from root_dash_lib import user_utils, dash_utils, data_utils, time_series_utils
@@ -99,11 +90,11 @@ def main( config_fp ):
             index=0, # CUSTOMIZE
             key='{}:y_column'.format( tag ),
         )
-    data_kw['year_column'] = st.selectbox(
+    data_kw['time_bin_column'] = st.selectbox(
         'How do you want to bin the data in time?',
         config['time_bin_columns'], # CUSTOMIZE
         index=0, # CUSTOMIZE
-        key='{}:year_column'.format( tag ),
+        key='{}:time_bin_column'.format( tag ),
     )
     data_kw['groupby_column'] = st.selectbox(
         'What do you want to group the data by?',
@@ -151,9 +142,9 @@ def main( config_fp ):
     )
 
     # Retrieve counts or sums
-    aggregated_df, total = st.cache_data( time_series_utils.count_or_sum )(
+    aggregated_df, total = st.cache_data( time_series_utils.aggregate )(
         selected_df,
-        data_kw['year_column'],
+        data_kw['time_bin_column'],
         data_kw['y_column'],
         data_kw['groupby_column'],
         data_kw['count_or_sum'],
@@ -174,7 +165,7 @@ def main( config_fp ):
     lineplot_kw.update({
         'x_label': st.sidebar.text_input(
             'lineplot x label',
-            value=data_kw['year_column'], # CUSTOMIZE
+            value=data_kw['time_bin_column'], # CUSTOMIZE
             key='{}:lineplot_x_label'.format( tag ),
         ),
         'y_label': st.sidebar.text_input(
@@ -223,7 +214,7 @@ def main( config_fp ):
     stackplot_kw.update({
         'x_label': st.sidebar.text_input(
             'stackplot x label',
-            value=data_kw['year_column'], # CUSTOMIZE
+            value=data_kw['time_bin_column'], # CUSTOMIZE
             key='{}:stackplot_x_label'.format( tag ),
         ),
         'y_label': st.sidebar.text_input(
@@ -268,7 +259,7 @@ def main( config_fp ):
                     columns_to_show = st.multiselect(
                         'Which columns do you want to show?',
                         show_df.columns,
-                        default=[ data_kw['year_column'], data_kw['y_column'], data_kw['groupby_column'] ],
+                        default=[ data_kw['time_bin_column'], data_kw['y_column'], data_kw['groupby_column'] ],
                     )
                 except:
                     columns_to_show = st.multiselect(

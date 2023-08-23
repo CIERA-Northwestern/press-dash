@@ -1,18 +1,12 @@
-import copy
+'''Functions for loading and preprocessing the data, specific to the user's data.
+If you are adapting the dashboard as your own, you likely need to alter these functions.
+'''
 import glob
 import numpy as np
 import os
 import pandas as pd
-import re
-import streamlit as st
-import yaml
 
-import matplotlib
-import matplotlib.pyplot as plt
-import matplotlib.patheffects as path_effects
-import seaborn as sns
-
-from root_dash_lib import data_utils
+from root_dash_lib import time_series_utils
 
 ################################################################################
 
@@ -98,7 +92,7 @@ def preprocess_data( df, config ):
         df[str_column] = df[str_column].str.replace( '&amp;', '&' )
 
     # Get the year, according to the config start date
-    df['Year'] = data_utils.get_year( df['Date'], config['start_of_year'] )
+    df['Year'] = time_series_utils.get_year( df['Date'], config['start_of_year'] )
 
     # Handle NaNs and such
     df[['Press Mentions', 'People Reached']] = df[['Press Mentions','People Reached']].fillna( value=0 )

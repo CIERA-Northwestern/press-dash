@@ -5,8 +5,6 @@ import copy
 import numpy as np
 import os
 import pandas as pd
-import re
-import streamlit as st
 import yaml
 
 import matplotlib
@@ -128,7 +126,7 @@ def setup_data_axes(
         config,
         defaults={},
         options={},
-        include=[ 'count_or_sum', 'y_column', 'year_column', 'groupby_column'],
+        include=[ 'count_or_sum', 'y_column', 'time_bin_column', 'groupby_column'],
         count_or_sum='Count',
     ):
     '''
@@ -162,11 +160,11 @@ def setup_data_axes(
                 options.get( 'y_column', config['weight_columns'] ),
                 index=defaults.get( 'y_column', 0 ),
             )
-    if 'year_column' in include:
-        data_axes_kw['year_column'] = st_loc.selectbox(
+    if 'time_bin_column' in include:
+        data_axes_kw['time_bin_column'] = st_loc.selectbox(
             'How do you want to bin the data in time?',
-            options.get( 'year_column', config['time_bin_columns'] ),
-            index=defaults.get( 'year_column', 0 ),
+            options.get( 'time_bin_column', config['time_bin_columns'] ),
+            index=defaults.get( 'time_bin_column', 0 ),
         )
     if 'groupby_column' in include:
         data_axes_kw['groupby_column'] = st_loc.selectbox(

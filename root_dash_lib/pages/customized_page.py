@@ -90,9 +90,9 @@ def add_tab(
             selected_df = st.cache_data( dash_utils.filter_data )( recategorized_df, search_str, search_col, categorical_filters, numerical_filters )
 
             # Retrieve counts or sums
-            aggregated_df, total = st.cache_data( time_series_utils.count_or_sum )(
+            aggregated_df, total = st.cache_data( time_series_utils.aggregate )(
                 selected_df,
-                data_kw['year_column'],
+                data_kw['time_bin_column'],
                 data_kw['y_column'],
                 data_kw['groupby_column'],
                 data_kw['count_or_sum'],

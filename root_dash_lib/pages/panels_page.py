@@ -118,11 +118,11 @@ with data_settings_tab:
                 index=0, # CUSTOMIZE
                 key='{}:y_column'.format( tag ),
             )
-        data_kw['year_column'] = st.selectbox(
+        data_kw['time_bin_column'] = st.selectbox(
             'How do you want to bin the data in time?',
             config['time_bin_columns'], # CUSTOMIZE
             index=0, # CUSTOMIZE
-            key='{}:year_column'.format( tag ),
+            key='{}:time_bin_column'.format( tag ),
         )
         data_kw['groupby_column'] = st.selectbox(
             'What do you want to group the data by?',
@@ -190,9 +190,9 @@ with data_settings_tab:
     )
 
     # Retrieve counts or sums
-    aggregated_df, total = st.cache_data( time_series_utils.count_or_sum )(
+    aggregated_df, total = st.cache_data( time_series_utils.aggregate )(
         selected_df,
-        data_kw['year_column'],
+        data_kw['time_bin_column'],
         data_kw['y_column'],
         data_kw['groupby_column'],
         data_kw['count_or_sum'],
@@ -220,7 +220,7 @@ with figure_settings_tab:
         lineplot_kw.update({
             'x_label': st.text_input(
                 'lineplot x label',
-                value=data_kw['year_column'], # CUSTOMIZE
+                value=data_kw['time_bin_column'], # CUSTOMIZE
                 key='{}:lineplot_x_label'.format( tag ),
             ),
             'y_label': st.text_input(
@@ -275,7 +275,7 @@ with figure_settings_tab:
         stackplot_kw.update({
             'x_label': st.text_input(
                 'lineplot x label',
-                value=data_kw['year_column'], # CUSTOMIZE
+                value=data_kw['time_bin_column'], # CUSTOMIZE
                 key='{}:stackplot_x_label'.format( tag ),
             ),
             'y_label': st.text_input(
@@ -356,11 +356,11 @@ with data_settings_tab:
                 index=0, # CUSTOMIZE
                 key='{}:y_column'.format( tag ),
             )
-        data_kw['year_column'] = st.selectbox(
+        data_kw['time_bin_column'] = st.selectbox(
             'How do you want to bin the data in time?',
             config['time_bin_columns'], # CUSTOMIZE
             index=0, # CUSTOMIZE
-            key='{}:year_column'.format( tag ),
+            key='{}:time_bin_column'.format( tag ),
         )
         data_kw['groupby_column'] = st.selectbox(
             'What do you want to group the data by?',
@@ -428,9 +428,9 @@ with data_settings_tab:
     )
 
     # Retrieve counts or sums
-    aggregated_df, total = st.cache_data( time_series_utils.count_or_sum )(
+    aggregated_df, total = st.cache_data( time_series_utils.aggregate )(
         selected_df,
-        data_kw['year_column'],
+        data_kw['time_bin_column'],
         data_kw['y_column'],
         data_kw['groupby_column'],
         data_kw['count_or_sum'],
@@ -458,7 +458,7 @@ with figure_settings_tab:
         lineplot_kw.update({
             'x_label': st.text_input(
                 'lineplot x label',
-                value=data_kw['year_column'], # CUSTOMIZE
+                value=data_kw['time_bin_column'], # CUSTOMIZE
                 key='{}:lineplot_x_label'.format( tag ),
             ),
             'y_label': st.text_input(
@@ -513,7 +513,7 @@ with figure_settings_tab:
         stackplot_kw.update({
             'x_label': st.text_input(
                 'lineplot x label',
-                value=data_kw['year_column'], # CUSTOMIZE
+                value=data_kw['time_bin_column'], # CUSTOMIZE
                 key='{}:stackplot_x_label'.format( tag ),
             ),
             'y_label': st.text_input(
