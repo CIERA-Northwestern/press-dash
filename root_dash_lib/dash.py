@@ -4,7 +4,7 @@ import os
 import yaml
 
 from . import user_utils as default_user_utils
-from . import dash, data_handler
+from . import data_handler
 
 
 class Dashboard:
