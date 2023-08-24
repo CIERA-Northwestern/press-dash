@@ -24,6 +24,9 @@ def load_data( config ):
     pattern = os.path.join( input_dir, config['data_file_pattern'] )
     data_fps = glob.glob( pattern )
 
+    if len( data_fps ) == 0:
+        raise IOError( 'No files found matching pattern {}'.format( pattern ) )
+
     # Select the most recent file
     ind_selected = np.argmax([ os.path.getctime( _ ) for _ in data_fps ])
     data_fp = data_fps[ind_selected]

@@ -6,7 +6,7 @@
 page_title: CIERA Grants
 
 # Location of the data relative to the config
-data_dir: /Users/zhafen/data/CIERA_grants_and_proposals/data
+data_dir: .
 input_dirname: raw_data
 output_dirname: processed_data
 data_file_pattern: CIERA_awards_data*.csv
@@ -56,10 +56,10 @@ time_bin_columns:
   - Award Start Fiscal Year (yyyy)
   - Award End Fiscal Year (yyyy)
 categorical_columns:
-  - Investigator Primary Function (myHR)
-  - Investigator Primary Appt Job Title (myHR)
-  - Investigator Academic Rank (myHR)
-  - Investigator Gender (myHR)
+  # - Investigator Primary Function (myHR)
+  # - Investigator Primary Appt Job Title (myHR)
+  # - Investigator Academic Rank (myHR)
+  # - Investigator Gender (myHR)
   - Award Dept Name
   - Award Dept ID
   - Prime Sponsor Name
@@ -71,9 +71,9 @@ categorical_columns:
   - Investigator HR Dept Name
   - Award Current PI HR Dept Name
   - Award Current PI Gender (myHR)
-  - Award Current PI Primary Appt Job Title (myHR)
-  - Award Current PI Primary Function (myHR)
-  - Award Current PI Academic Rank (myHR)
+  # - Award Current PI Primary Appt Job Title (myHR)
+  # - Award Current PI Primary Function (myHR)
+  # - Award Current PI Academic Rank (myHR)
 text_columns:
   - Long Title
   - Investigator First Name
@@ -97,10 +97,10 @@ new_categories:
     'CIERA only': "only 'CIERA - Ctr Int Exp Rsch Astr'" # Stuff with one department
     'P&A only': "only 'Physics & Astronomy'" # More stuff with one department
     'CIERA interdisciplinary': "not 'Physics & Astronomy'" # Anything with CIERA and something else
-  Investigator Primary Function (myHR):
-    'Faculty': "'Faculty' | 'Emeritus Faculty'"
-    'Staff': "'Staff' & ( not ( 'Faculty' | 'Emeritus Faculty' ) )"
-  Award Current PI Primary Function (myHR):
-    'Faculty': "'Faculty' | 'Emeritus Faculty'"
-    'Staff': "'Staff' & ( not ( 'Faculty' | 'Emeritus Faculty' ) )"
+  # Investigator Primary Function (myHR):
+  #   'Faculty': "'Faculty' | 'Emeritus Faculty'"
+  #   'Staff': "'Staff' & ( not ( 'Faculty' | 'Emeritus Faculty' ) )"
+  # Award Current PI Primary Function (myHR):
+  #   'Faculty': "'Faculty' | 'Emeritus Faculty'"
+  #   'Staff': "'Staff' & ( not ( 'Faculty' | 'Emeritus Faculty' ) )"
 

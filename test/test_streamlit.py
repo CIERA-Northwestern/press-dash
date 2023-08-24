@@ -473,7 +473,7 @@ class TestStreamlitGrants( unittest.TestCase ):
         # Get filepath info
         test_dir = os.path.abspath( os.path.dirname( __file__ ) )
         self.root_dir = os.path.dirname( test_dir )
-        self.data_dir = os.path.join( self.root_dir, 'test_data', 'test_data_complete', )
+        self.data_dir = os.path.join( self.root_dir, 'test_data', 'test_data_mock_grants_and_proposals', )
         root_config_fp = os.path.join( self.root_dir, 'test', 'config_grants.yml' )
         self.config_fp = os.path.join( self.data_dir, 'config.yml' )
 
