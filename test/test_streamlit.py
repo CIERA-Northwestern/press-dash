@@ -455,9 +455,9 @@ class TestStreamlit( unittest.TestCase ):
 
     def test_blank_page( self ):
 
-        import root_dash_lib.pages.blank_page as blank_page
+        import root_dash_lib.pages.base_page as base_page
 
-        blank_page.main( self.config_fp )
+        base_page.main( self.config_fp )
 
         # Set the environment variable to signal the app to stop
         os.environ["STOP_STREAMLIT"] = "1"
@@ -487,9 +487,9 @@ class TestStreamlitGrants( unittest.TestCase ):
 
     def test_blank_page( self ):
 
-        import root_dash_lib.pages.blank_page as blank_page
+        import root_dash_lib.pages.base_page as base_page
 
-        blank_page.main( self.config_fp, grants_user_utils )
+        base_page.main( self.config_fp, grants_user_utils )
 
         # Set the environment variable to signal the app to stop
         os.environ["STOP_STREAMLIT"] = "1"

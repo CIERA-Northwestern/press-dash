@@ -1,1 +1,1 @@
-import root_dash_lib.pages.blank_page
+import root_dash_lib.pages.base_page
