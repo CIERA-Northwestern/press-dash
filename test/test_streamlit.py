@@ -11,7 +11,7 @@ import subprocess
 import yaml
 
 from root_dash_lib import dash_utils, data_utils, time_series_utils
-from .lib_for_tests import press_data_utils
+from .lib_for_tests import press_user_utils, grants_user_utils
 
 def copy_config( root_config_fp, config_fp ):
 
@@ -57,7 +57,7 @@ class TestDashboardSetupPressData( unittest.TestCase ):
 
         config = dash_utils.load_config( self.config_fp )
 
-        original_df = press_data_utils.load_original_data( config )
+        original_df = press_user_utils.load_original_data( config )
 
         assert original_df.size > 0
 
@@ -67,7 +67,7 @@ class TestDashboardSetupPressData( unittest.TestCase ):
 
         config = dash_utils.load_config( self.config_fp )
 
-        df = press_data_utils.load_data( config )
+        df = press_user_utils.load_data( config )
 
         assert df.size > 0 
 
@@ -77,8 +77,8 @@ class TestDashboardSetupPressData( unittest.TestCase ):
 
         config = dash_utils.load_config( self.config_fp )
 
-        original_df = press_data_utils.load_original_data( config )
-        df = press_data_utils.load_data( config )
+        original_df = press_user_utils.load_original_data( config )
+        df = press_user_utils.load_data( config )
 
         for groupby_column in config['groupings']:
             subset_df = df[['id',groupby_column]].fillna( 'N/A' )
@@ -110,8 +110,8 @@ class TestDataUtils( unittest.TestCase ):
 
         self.group_by = 'Research Topics'
         self.config = dash_utils.load_config( self.config_fp )
-        self.original_df = press_data_utils.load_original_data( self.config )
-        self.df = press_data_utils.load_data( self.config )
+        self.original_df = press_user_utils.load_original_data( self.config )
+        self.df = press_user_utils.load_data( self.config )
 
     def tearDown( self ):
         if os.path.isfile( self.config_fp ):
@@ -321,8 +321,8 @@ class TestTimeSeriesUtils( unittest.TestCase ):
 
         self.group_by = 'Research Topics'
         self.config = dash_utils.load_config( self.config_fp )
-        self.original_df = press_data_utils.load_original_data( self.config )
-        self.df = press_data_utils.load_data( self.config )
+        self.original_df = press_user_utils.load_original_data( self.config )
+        self.df = press_user_utils.load_data( self.config )
 
     def tearDown( self ):
         if os.path.isfile( self.config_fp ):
@@ -463,4 +463,37 @@ class TestStreamlit( unittest.TestCase ):
         os.environ["STOP_STREAMLIT"] = "1"
 
         del os.environ["STOP_STREAMLIT"]
+
+###############################################################################
+
+class TestStreamlitGrants( unittest.TestCase ):
+
+    def setUp( self ):
+
+        # Get filepath info
+        test_dir = os.path.abspath( os.path.dirname( __file__ ) )
+        self.root_dir = os.path.dirname( test_dir )
+        self.data_dir = os.path.join( self.root_dir, 'test_data', 'test_data_complete', )
+        root_config_fp = os.path.join( self.root_dir, 'test', 'config_grants.yml' )
+        self.config_fp = os.path.join( self.data_dir, 'config.yml' )
+
+        copy_config( root_config_fp, self.config_fp )
+
+    def tearDown( self ):
+        if os.path.isfile( self.config_fp ):
+            os.remove( self.config_fp )
+
+    ###############################################################################
+
+    def test_blank_page( self ):
+
+        import root_dash_lib.pages.blank_page as blank_page
+
+        blank_page.main( self.config_fp, grants_user_utils )
+
+        # Set the environment variable to signal the app to stop
+        os.environ["STOP_STREAMLIT"] = "1"
+
+        del os.environ["STOP_STREAMLIT"]
+
 

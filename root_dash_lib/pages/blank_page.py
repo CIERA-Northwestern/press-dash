@@ -16,7 +16,14 @@ from root_dash_lib import user_utils, dash_utils, data_utils, time_series_utils
 for module_to_reload in [ user_utils, dash_utils, data_utils, time_series_utils ]:
     importlib.reload( module_to_reload )
 
-def main( config_fp ):
+def main( config_fp, user_utils=user_utils ):
+    '''This is the main function that runs the dashboard.
+
+    Args:
+        config_fp (str): The filepath to the configuration file.
+        user_utils (module): The module containing the user-defined functions.
+            Defaults to those in root_dash_lib.
+    '''
 
     ################################################################################
     # Script Setup
