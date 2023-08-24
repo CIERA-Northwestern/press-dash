@@ -453,7 +453,7 @@ class TestStreamlit( unittest.TestCase ):
 
     ###############################################################################
 
-    def test_blank_page( self ):
+    def test_base_page( self ):
 
         import root_dash_lib.pages.base_page as base_page
 
@@ -485,7 +485,7 @@ class TestStreamlitGrants( unittest.TestCase ):
 
     ###############################################################################
 
-    def test_blank_page( self ):
+    def test_base_page( self ):
 
         import root_dash_lib.pages.base_page as base_page
 

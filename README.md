@@ -235,8 +235,8 @@ This enables editing the streamlit script to be almost exactly like an ordinary 
 If you know how to make plots in Python, then you know how to make interactive plots with Streamlit.
 
 The basic streamlit dashboard that starts up is a general-purpose dashboard,
-for which the majority of the code exists in `<short name>_dash_lib/pages/blank_page.py`
-The file `src/dashboard.py`calls the main function in `blank_page.py` by default,
+for which the majority of the code exists in `<short name>_dash_lib/pages/base_page.py`
+The file `src/dashboard.py`calls the main function in `base_page.py` by default,
 but can be edited to call the main function of a different file by default instead.
 Much of the Streamlit functionality is also encapsulated in utility functions inside the `<short name>_dash_lib/` directory.
 
@@ -273,7 +273,7 @@ The repository is structured as follows:
 │   ├── time_series_utils.py    # Utilities for working with time series.
 │   └── pages                   # Dashboard page templates.
 │       ├── __init__.py
-│       ├── blank_page.py       # The default dashboard setup. High flexibility.
+│       ├── base_page.py       # The default dashboard setup. High flexibility.
 │       └── panels_page.py      # A multi-panel dashboard example.
 ├── setup.py                    # Script for packaging the project
 ├── requirements.txt            # List of project dependencies
