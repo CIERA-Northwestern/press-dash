@@ -18,14 +18,14 @@ class DataHandler:
         self.config = config
         self.user_utils = user_utils
 
+        # Container for dataframes
         self.dfs = {}
-        self.dfs['raw'] = self.load_data()
-        self.dfs['preprocessed'], self.config = self.preprocess_data(
-            self.dfs['raw']
-        )
 
     def load_data(self) -> pd.DataFrame:
         '''Load the data using the stored config and user_utils.
+        This is one of the only functions where we allow the config
+        to be modified. In general the on-the-fly settings are
+        kept elsewhere.
 
         Returns:
             raw_df: The data.
@@ -35,10 +35,13 @@ class DataHandler:
         '''
         raw_df, self.config = self.user_utils.load_data(self.config)
         self.dfs['raw'] = raw_df
-        return raw_df
+        return raw_df, self.config
 
     def preprocess_data(self, raw_df: pd.DataFrame) -> pd.DataFrame:
         '''Preprocess the data using the stored config and user_utils.
+        This is one of the only functions where we allow the config
+        to be modified. In general the on-the-fly settings are
+        kept elsewhere.
 
         Args:
             raw_df: The loaded data.
@@ -53,4 +56,4 @@ class DataHandler:
             raw_df, self.config
         )
         self.dfs['preprocessed'] = preprocessed_df
-        return preprocessed_df
+        return preprocessed_df, self.config

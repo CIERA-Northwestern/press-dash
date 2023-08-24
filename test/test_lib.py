@@ -56,7 +56,17 @@ class TestLoadAndPreProcess(unittest.TestCase):
         dsh = dash.Dashboard(self.config_fp)
 
         assert dsh.config['color_palette'] == 'deep'
+
+    def test_load_data(self):
+        '''Does load_data at least run?'''
+
+        dsh = dash.Dashboard(self.config_fp)
+        raw_df = dsh.data_handler.load_data()
+
         assert 'raw' in dsh.dfs
+
+    def test_preprocess_data(self):
+        '''Does preprocess data at least run?'''
         assert 'preprocessed' in dsh.dfs
 
     def test_consistent_original_and_preprocessed(self):
