@@ -85,7 +85,7 @@ class TestLoadAndPreProcess(unittest.TestCase):
         dash = Dashboard(self.config_fp)
         raw_df, config = dash.data_handler.load_data(dash.config)
 
-        assert 'raw' in dash.dfs
+        assert 'raw' in dash.data
 
     def test_preprocess_data(self):
         '''Does preprocess data at least run?'''
@@ -93,7 +93,7 @@ class TestLoadAndPreProcess(unittest.TestCase):
         dash = Dashboard(self.config_fp)
         preprocessed_df, config = dash.load_and_preprocess_data(dash.config)
 
-        assert 'preprocessed' in dash.dfs
+        assert 'preprocessed' in dash.data
 
     def test_consistent_original_and_preprocessed(self):
         '''Are the raw and preprocessed dataframes consistent?
@@ -104,7 +104,7 @@ class TestLoadAndPreProcess(unittest.TestCase):
 
         dash = Dashboard(self.config_fp)
         preprocessed_df, config = dash.load_and_preprocess_data(dash.config)
-        raw_df = dash.dfs['raw']
+        raw_df = dash.data['raw']
 
         groupby_column = 'Research Topics'
 
@@ -195,7 +195,7 @@ class TestRecategorize(unittest.TestCase):
     def test_recategorize_data_per_grouping_realistic(self):
 
         group_by = 'Research Topics'
-        original_df = self.dash.dfs['preprocessed']
+        original_df = self.dash.data['preprocessed']
         recategorized = self.dash.data_handler.recategorize_data_per_grouping(
             original_df,
             group_by,

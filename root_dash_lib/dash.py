@@ -29,13 +29,13 @@ class Dashboard:
         self.data_handler = data_handler.DataHandler(self.config, user_utils)
 
     @property
-    def dfs(self):
+    def data(self):
         '''Convenience property for accessing the dataframes.
 
         Returns:
-            dfs (dict): The dataframes.
+            data (dict): The dataframes.
         '''
-        return self.data_handler.dfs
+        return self.data_handler.data
 
     def load_config(self, config_fp: str) -> dict:
         '''Get the config. This is done once per session.
@@ -74,7 +74,7 @@ class Dashboard:
             config: The config file. This will also be stored at self.config
         
         Side Effects:
-            self.data_handler.dfs: Updates data stored.
+            self.data_handler.data: Updates data stored.
             self.config: Possible updates to the stored config file.
         '''
 
