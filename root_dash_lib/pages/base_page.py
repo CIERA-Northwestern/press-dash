@@ -240,8 +240,8 @@ def main( config_fp, user_utils=user_utils ):
         if view == 'data':
             df_tag = st.radio(
                 'What data do you want to see?',
-                [ 'preprocessed', 'filtered', 'aggregated' ],
-                index=1,
+                [ 'original', 'preprocessed', 'recategorized', 'aggregated' ],
+                index=0,
                 horizontal=True,
                 key='{}:df_tag'.format( tag ),
             )
@@ -249,6 +249,7 @@ def main( config_fp, user_utils=user_utils ):
             df_tag = 'selected'
         download_kw = st.cache_data( time_series_utils.view_time_series )(
             view,
+            df,
             preprocessed_df,
             selected_df,
             aggregated_df,
@@ -256,6 +257,7 @@ def main( config_fp, user_utils=user_utils ):
             data_kw,
             lineplot_kw,
             stackplot_kw,
+            config,
             tag=tag,
             df_tag=df_tag,
         )

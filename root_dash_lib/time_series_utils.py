@@ -144,6 +144,7 @@ def sum( selected_df, time_bin_column, weight_column, groupby_column ):
 
 def view_time_series(
         view,
+        df,
         preprocessed_df,
         selected_df,
         aggregated_df,
@@ -151,6 +152,7 @@ def view_time_series(
         data_kw,
         lineplot_kw,
         stackplot_kw,
+        config,
         filetag = None,
         tag = '',
         df_tag = 'selected',
@@ -215,13 +217,16 @@ def view_time_series(
 
     elif view == 'data':
 
-        @st.cache_data
         def view_data( df_tag ):
-            if df_tag == 'preprocessed':
-                st.markdown( 'This table contains all {} selected entries, prior to any recategorization.'.format( len( preprocessed_df ) ) )
+            if df_tag == 'original':
+                st.markdown( 'This table contains all {} selected entries, prior to pre-processing.'.format( len( df ) ) )
+                ids = getattr( df, config['primary_id_column'] )
+                show_df = df.loc[ids.isin( selected_df['id'] )]
+            elif df_tag == 'preprocessed':
+                st.markdown( 'This table contains all {} selected entries, after pre-processing and prior to any recategorization.'.format( len( preprocessed_df ) ) )
                 show_df = preprocessed_df.loc[preprocessed_df['id'].isin( selected_df['id'] )]
-            elif df_tag == 'filtered':
-                st.markdown( 'This table contains all {} selected entries.'.format( len( selected_df ) ) )
+            elif df_tag == 'recategorized':
+                st.markdown( 'This table contains all {} selected entries, after recategorization.'.format( len( selected_df ) ) )
                 show_df = selected_df
             elif df_tag == 'aggregated':
                 show_df = aggregated_df

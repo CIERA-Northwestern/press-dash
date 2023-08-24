@@ -39,6 +39,7 @@ groupings:
 
 ## Column Classifications
 # The anything that's in a given grouping can be analyzed similarly.
+primary_id_column: index
 id_columns: # Unique identifiers
   - id
   - Title
