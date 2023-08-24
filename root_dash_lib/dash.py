@@ -1,8 +1,10 @@
+'''Main dashboard class.
+'''
 import os
 import yaml
 
 from . import user_utils as default_user_utils
-from . import data_handler
+from . import dash, data_handler
 
 
 class Dashboard:
@@ -41,4 +43,3 @@ class Dashboard:
         with open(config_fn, "r", encoding='UTF-8') as file:
             config = yaml.load(file, Loader=yaml.FullLoader)
         return config
-
