@@ -45,41 +45,51 @@ class TestDashboardSetupPressData( unittest.TestCase ):
 
     ###############################################################################
 
-    def test_constructor( self ):
+    def test_load_config( self ):
 
-        dsh = dash.Dashboard( self.config_fp )
+        config = dash_utils.load_config( self.config_fp )
 
-        assert dsh.config['color_palette'] == 'deep'
+        assert config['color_palette'] == 'deep'
+
+    ###############################################################################
+
+    def test_load_original_data( self ):
+
+        config = dash_utils.load_config( self.config_fp )
+
+        original_df = press_user_utils.load_original_data( config )
+
+        assert original_df.size > 0
 
     ###############################################################################
 
     def test_load_data( self ):
 
-        dsh = dash.Dashboard( self.config_fp )
+        config = dash_utils.load_config( self.config_fp )
 
-        df = dsh.data_handler.load_data()
+        df = press_user_utils.load_data( config )
 
         assert df.size > 0 
 
     ###############################################################################
 
-    def test_consistent_original_and_preprocessed( self ):
+    def test_consistent_original_and_processed( self ):
 
-        dsh = dash.Dashboard( self.config_fp )
+        config = dash_utils.load_config( self.config_fp )
 
-        df = dsh.data_handler.load_data()
-        preprocessed_df = dsh.data_handler.preprocess_data( df )
+        original_df = press_user_utils.load_original_data( config )
+        df = press_user_utils.load_data( config )
 
-        for groupby_column in dsh.config['groupings']:
-            subset_df = preprocessed_df[['id',groupby_column]].fillna( 'N/A' )
+        for groupby_column in config['groupings']:
+            subset_df = df[['id',groupby_column]].fillna( 'N/A' )
             subset_df = subset_df.drop_duplicates()
             grouped = subset_df.groupby('id')
             actual = grouped[groupby_column].apply( '|'.join )
-            not_equal = actual != df[groupby_column]
+            not_equal = actual != original_df[groupby_column]
             assert not_equal.sum() == 0
             np.testing.assert_array_equal(
                 actual,
-                df[groupby_column]
+                original_df[groupby_column]
             )
 
 ###############################################################################
@@ -99,10 +109,9 @@ class TestDataUtils( unittest.TestCase ):
         copy_config( root_config_fp, self.config_fp )
 
         self.group_by = 'Research Topics'
-
-        self.dsh = dash.Dashboard( self.config_fp )
-        df = self.dsh.data_handler.load_data()
-        self.dsh.data_handler.preprocess_data( df )
+        self.config = dash_utils.load_config( self.config_fp )
+        self.original_df = press_user_utils.load_original_data( self.config )
+        self.df = press_user_utils.load_data( self.config )
 
     def tearDown( self ):
         if os.path.isfile( self.config_fp ):
@@ -114,6 +123,12 @@ class TestDataUtils( unittest.TestCase ):
 
         # Test Dataset
         data = {
+            'id': [1, 2, 3],
+            'Press Types': [ 'Northwestern Press|CIERA Press', 'External Press|CIERA Press', 'CIERA Press'],
+            'Year': [ 2015, 2014, 2015 ],
+        }
+        original_df = pd.DataFrame(data)
+        data = {
             'id': [1, 1, 2, 2, 3],
             'Press Types': [ 'Northwestern Press', 'CIERA Press', 'External Press', 'CIERA Press', 'CIERA Press'],
             'Year': [ 2015, 2015, 2014, 2014, 2015 ],
@@ -123,11 +138,11 @@ class TestDataUtils( unittest.TestCase ):
         new_categories = {
             'Northwestern Press (Inclusive)': "'Northwestern Press' | ( 'Northwestern Press' & 'CIERA Press')",
         }
-        self.dsh.config['new_categories'] = new_categories
 
-        df = self.dsh.data_handler.recategorize_data_per_group(
+        df = data_utils.recategorize_data_per_grouping(
             df,
             groupby_column = 'Press Types',
+            new_categories_per_grouping = new_categories,
         )
 
         # Build up expected data
@@ -147,9 +162,10 @@ class TestDataUtils( unittest.TestCase ):
     def test_recategorize_data_per_grouping_realistic( self ):
 
         group_by = 'Research Topics'
-        recategorized = self.dsh.data_handler.recategorize_data_per_group(
+        recategorized = data_utils.recategorize_data_per_grouping(
             self.df,
             group_by,
+            self.config['new_categories'][group_by],
             False,
         )
 
@@ -182,8 +198,9 @@ class TestDataUtils( unittest.TestCase ):
 
     def test_recategorize_data( self ):
 
-        recategorized = self.dsh.data_handler.recategorize_data(
+        recategorized = data_utils.recategorize_data(
             self.df,
+            self.config['new_categories'],
             True,
         )
 
@@ -273,9 +290,10 @@ class TestDataUtils( unittest.TestCase ):
             'Press Mentions': [ 0, 10 ], 
         }
 
-        selected = self.dsh.data_handler.filter_data(
+        selected = data_utils.filter_data(
             self.df,
-            { 'Title': search_str, },
+            search_str,
+            'Title',
             categorical_filters,
             range_filters
         )
@@ -288,7 +306,7 @@ class TestDataUtils( unittest.TestCase ):
 
 ###############################################################################
     
-class TestAggregate( unittest.TestCase ):
+class TestTimeSeriesUtils( unittest.TestCase ):
 
     def setUp( self ):
 
@@ -302,10 +320,9 @@ class TestAggregate( unittest.TestCase ):
         copy_config( root_config_fp, self.config_fp )
 
         self.group_by = 'Research Topics'
-
-        self.dsh = dash.Dashboard( self.config_fp )
-        df = self.dsh.data_handler.load_data()
-        self.dsh.data_handler.preprocess_data( df )
+        self.config = dash_utils.load_config( self.config_fp )
+        self.original_df = press_user_utils.load_original_data( self.config )
+        self.df = press_user_utils.load_data( self.config )
 
     def tearDown( self ):
         if os.path.isfile( self.config_fp ):
@@ -315,9 +332,9 @@ class TestAggregate( unittest.TestCase ):
 
     def test_count( self ):
 
-        selected = self.dsh.df
+        selected = self.df
 
-        counts, total = self.dsh.count(
+        counts, total = time_series_utils.count(
             selected,
             'Year',
             'id',
@@ -350,7 +367,7 @@ class TestAggregate( unittest.TestCase ):
         selected = self.df
         weighting = 'Press Mentions'
 
-        sums, total = self.dsh.sum(
+        sums, total = time_series_utils.count(
             selected,
             'Year',
             weighting,
@@ -385,7 +402,7 @@ class TestAggregate( unittest.TestCase ):
         selected = self.df
         weighting = 'Press Mentions'
 
-        sums, total = self.dsh.sum(
+        sums, total = time_series_utils.sum(
             selected,
             'Year',
             weighting,
@@ -430,8 +447,6 @@ class TestStreamlit( unittest.TestCase ):
 
         copy_config( root_config_fp, self.config_fp )
 
-        self.dsh = dash.Dashboard( self.config_fp ) 
-
     def tearDown( self ):
         if os.path.isfile( self.config_fp ):
             os.remove( self.config_fp )
@@ -440,9 +455,9 @@ class TestStreamlit( unittest.TestCase ):
 
     def test_base_page( self ):
 
-        self.dsh.add_page( 'base_page' )
+        import root_dash_lib.pages.base_page as base_page
 
-        self.dsh.run()
+        base_page.main( self.config_fp )
 
         # Set the environment variable to signal the app to stop
         os.environ["STOP_STREAMLIT"] = "1"
@@ -464,8 +479,6 @@ class TestStreamlitGrants( unittest.TestCase ):
 
         copy_config( root_config_fp, self.config_fp )
 
-        self.dsh = dash.Dashboard( self.config_fp, grants_user_utils ) 
-
     def tearDown( self ):
         if os.path.isfile( self.config_fp ):
             os.remove( self.config_fp )
@@ -474,9 +487,9 @@ class TestStreamlitGrants( unittest.TestCase ):
 
     def test_base_page( self ):
 
-        self.dsh.add_page( 'base_page' )
+        import root_dash_lib.pages.base_page as base_page
 
-        self.dsh.run()
+        base_page.main( self.config_fp, grants_user_utils )
 
         # Set the environment variable to signal the app to stop
         os.environ["STOP_STREAMLIT"] = "1"
