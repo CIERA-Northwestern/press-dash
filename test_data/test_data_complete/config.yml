@@ -1,0 +1,84 @@
+###############################################################################
+# Options
+###############################################################################
+
+
+# Location of the data relative to the config
+data_dir: .
+# Location of the figures relative to the config
+figure_dir: figures
+
+# What day of the year to start on.
+# Default is September 1st, start of the Northwestern Financial Year
+start_of_year: September 1
+
+# Aesthetic options
+page_title: 'Press Data'
+# Seaborn color palette to use. More options at https://seaborn.pydata.org/tutorial/color_palettes.html
+color_palette: deep
+
+###############################################################################
+# Advanced Options
+###############################################################################
+# The below options must be modified to adapt the dashboard to your own purposes,
+# but most users of the completed dashboard will not need to modify them.
+
+# Filetree options
+input_dirname: raw_data
+output_dirname: processed_data
+website_data_file_pattern: News_Report*.csv
+press_office_data_file_pattern: press_office*.xls*
+combined_filename: press.csv
+
+# What to group by
+# If you add additional categorical columns to the data, you can specify them here and they will be added to the dashboard.
+groupings:
+  - Research Topics
+  - Press Types
+  - Categories
+
+## Column Classifications
+# The anything that's in a given grouping can be analyzed similarly.
+primary_id_column: index
+id_columns: # Unique identifiers
+  - id
+  - Title
+weight_columns: # Numeric columns that can be summed
+  - Press Mentions
+  - People Reached
+date_columns: # Dates
+  - Date
+time_bin_columns: # The value of these columns indicates what time bin the data should be grouped into
+  - Year # For example, a value of 2019 would be grouped into the 2019-2020 financial year
+categorical_columns: # Categorical columns that can be grouped, e.g. all Press Types=="Science" articles
+  - Research Topics
+  - Press Types
+  - Categories
+text_columns: # Text columns that can be searched
+  - Title
+  - Permalink
+  - Top Outlets
+  - Notes
+
+## Custom Categories
+# Use boolean logic to define categories.
+# In addition to boolean logic, preceeding the definition with 'only' will restrict the category to only the tags that show up in the proceeding definition.
+# Any categories not defined here will be left as is if they are the sole tag, or added to an 'Other' category if they are one of multiple tags.
+new_categories:
+  # Press types are defined hierarchicaly.
+  Press Types:
+    'External Press (Inclusive)': "'External Press'" # Anything tagged as External Press will be included in this category
+    'Northwestern Press (Inclusive)': "'Northwestern Press' & ( not 'External Press' )" # Anything tagged with Northwestern Press but not External Press will be included in this category
+    # CIERA press is left undefined, so it defaults to showing up as usual, provided it is not also tagged with Northwestern Press or External Press.
+  # Research topics are defined as falling into one of three main categories: Exploding & Dead Stars, Astrophysical Populations, and Exoplanets & the Solar System.
+  Research Topics:
+    'Compact Objects': "only ('Life & Death of Stars' | 'Gravitational Waves & Multi-Messenger Astronomy' | 'Black Holes & Dead Stars' )"
+    'Cosmological Populations': "only ('Galaxies & Cosmology' | 'Stellar Dynamics & Stellar Populations' )"
+  # Article categories are grouped into research, outreach, and achievements & events, with research and outreach categorization superseeding achievements & events.
+  Categories:
+    'Research': "('Science' | 'Data Science & Computing') & ( not ( 'Education' | 'Outreach' ) )"
+    'Outreach': "('Education' | 'Outreach' ) & ( not ( 'Science' | 'Data Science & Computing' ) )"
+    'Achievements & Events': "only ('Achievement' | 'Event' | 'Interdisciplinary')"
+  # You can use the same source category for multiple new categories by placing the source column in brackets.
+  "Multi-messenger Astro vs everything else [Research Topics]":
+    'GW': "'Gravitational Waves & Multi-Messenger Astronomy'" # Anything tagged as GW will be included in this category

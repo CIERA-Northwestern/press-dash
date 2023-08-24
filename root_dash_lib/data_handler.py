@@ -1,6 +1,7 @@
 '''Module for handling data.
 '''
 
+
 class DataHandler:
     '''Class for handling data.
     The data is loaded and pre-processed at initialization.
@@ -16,7 +17,9 @@ class DataHandler:
 
         self.dfs = {}
         self.dfs['raw'] = self.load_data()
-        self.dfs['preprocessed'] = self.preprocess_data(self.dfs['raw'])
+        self.dfs['preprocessed'], self.config = self.preprocess_data(
+            self.dfs['raw']
+        )
 
     def load_data(self):
         '''Load the data using the stored config and user_utils.
