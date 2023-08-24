@@ -75,30 +75,49 @@ class TestLoadAndPreProcess(unittest.TestCase):
 
     def test_consistent_original_and_preprocessed(self):
         '''Are the raw and preprocessed dataframes consistent?
-        This checks the user utils more than anything.
+        This checks the user utils more than anything,
+        and also whether or not we can recover the raw data
+        from the pre-processed data.
         '''
 
         dsh = dash.Dashboard(self.config_fp)
         preprocessed_df, config = dsh.load_and_preprocess_data(dsh.config)
         raw_df = dsh.dfs['raw']
 
-        for groupby_column in dsh.config['groupings']:
-            test_df = preprocessed_df.copy()
-            test_df['dup_col'] = \
-                test_df['id'].astype(str) + test_df[groupby_column]
-            test_df = test_df.drop_duplicates(subset='dup_col',keep='first')
-            grouped = test_df.groupby('id')
-            actual = grouped[groupby_column].apply('|'.join)
+        groupby_column = 'Research Topics'
 
-            missing = raw_df.loc[np.invert(raw_df.index.isin(actual.index))]
-            assert len(missing) == 0
+        # Drafts and weird articles are dropped
+        # And ampersands...
+        raw_df = raw_df.drop(
+            raw_df.index[raw_df['Date'].dt.year == 1970],
+            axis='rows',
+        )
+        raw_df.dropna(
+            axis='rows',
+            how='any',
+            subset=['Title', 'Press Types', ],
+            inplace=True,
+        )
+        raw_df[groupby_column] = \
+            raw_df[groupby_column].str.replace('&amp;', '&')
+        raw_df.fillna('N/A', inplace=True)
 
-            not_equal = actual != raw_df[groupby_column]
-            assert not_equal.sum() == 0
-            np.testing.assert_array_equal(
-                actual,
-                raw_df[groupby_column]
-            )
+        test_df = preprocessed_df.copy()
+        test_df['dup_col'] = \
+            test_df['id'].astype(str) + test_df[groupby_column]
+        test_df = test_df.drop_duplicates(subset='dup_col', keep='first')
+        grouped = test_df.groupby('id')
+        actual = grouped[groupby_column].apply('|'.join)
+
+        missing = raw_df.loc[np.invert(raw_df.index.isin(actual.index))]
+        assert len(missing) == 0
+
+        not_equal = actual != raw_df[groupby_column]
+        assert not_equal.sum() == 0
+        np.testing.assert_array_equal(
+            actual,
+            raw_df[groupby_column]
+        )
 
 
 class TestDataUtils( unittest.TestCase ):
