@@ -1,6 +1,7 @@
 '''Main dashboard class.
 '''
 import os
+import types
 import yaml
 
 from . import user_utils as default_user_utils
@@ -11,25 +12,29 @@ class Dashboard:
     '''Root dashboard class.
 
     Args:
-        config_fp (str): Path to the config file.
-        user_utils (module): User-customized module for data loading
+        config_fp: Path to the config file.
+        user_utils: User-customized module for data loading
             and preprocessing.
     '''
 
-    def __init__(self, config_fp, user_utils=default_user_utils):
+    def __init__(
+        self,
+        config_fp: str,
+        user_utils: types.ModuleType = default_user_utils,
+    ):
 
         self.config = self.load_config(config_fp)
         self.data_handler = data_handler.DataHandler(self.config, user_utils)
 
-    def load_config(self, config_fp):
+    def load_config(self, config_fp: str) -> dict:
         '''Get the config. This is done once per session.
         The config directory is set as the working directory.
 
         Args:
-            config_fp (str): Filepath for the config file.
+            config_fp: Filepath for the config file.
 
         Returns:
-            config (dict): The config dictionary.
+            config: The config dictionary.
         '''
 
         config_dir, config_fn = os.path.split(config_fp)

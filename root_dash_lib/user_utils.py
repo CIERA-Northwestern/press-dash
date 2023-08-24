@@ -14,14 +14,16 @@ def load_data(config):
     '''This is the main function for loading the data, and one of the
     most-important functions the user will need to modify when adapting
     this dashboard to their own data. For compatibility with the existing
-    dashboard, this function should return a pandas DataFrame and take
-    in a config dictionary.
+    dashboard, this function should accept a config dictionary
+    and return a dataframe and the config dictionary (which may be
+    modified, but isn't necessarily).
 
     Args:
         config (dict): The configuration dictionary, loaded from a YAML file.
 
     Returns:
-        df (pandas.DataFrame): The data to be used in the dashboard.
+        raw_df (pandas.DataFrame): The data to be used in the dashboard.
+        config (dict): The configuration dictionary, loaded from a YAML file.
     '''
 
     ##########################################################################
@@ -66,7 +68,7 @@ def load_data(config):
     # Combine the data
     raw_df = website_df.join(press_df)
 
-    return raw_df
+    return raw_df, config
 
 
 def preprocess_data(raw_df, config):
@@ -77,21 +79,22 @@ def preprocess_data(raw_df, config):
     config dictionary and return the same.
 
     Args:
-        df (pandas.DataFrame): The data to be used in the dashboard.
+        raw_df (pandas.DataFrame): The raw data to be used in the dashboard.
         config (dict): The configuration dictionary, loaded from a YAML file.
 
     Returns:
-        df (pandas.DataFrame): The processed data to be used in the dashboard.
+        processed_df (pandas.DataFrame): The processed data.
         config (dict): The (possibly altered) configuration dictionary.
     '''
 
     # Drop drafts
-    raw_df.drop(
-        raw_df.index[raw_df['Date'].dt.year == 1970], axis='rows', inplace=True
+    preprocessed_df = raw_df.drop(
+        raw_df.index[raw_df['Date'].dt.year == 1970],
+        axis='rows',
     )
 
     # Drop weird articles---ancient ones w/o a title or press type
-    raw_df.dropna(
+    preprocessed_df.dropna(
         axis='rows',
         how='any',
         subset=['Title', 'Press Types', ],
@@ -100,32 +103,34 @@ def preprocess_data(raw_df, config):
 
     # Get rid of HTML ampersands
     for str_column in ['Title', 'Research Topics', 'Categories']:
-        raw_df[str_column] = raw_df[str_column].str.replace('&amp;', '&')
+        preprocessed_df[str_column] = preprocessed_df[str_column].str.replace('&amp;', '&')
 
     # Get the year, according to the config start date
-    raw_df['Year'] = time_series_utils.get_year(
-        raw_df['Date'], config['start_of_year']
+    preprocessed_df['Year'] = time_series_utils.get_year(
+        preprocessed_df['Date'], config['start_of_year']
     )
 
     # Handle NaNs and such
     columns_to_fill = ['Press Mentions', 'People Reached', ]
-    raw_df[columns_to_fill] = raw_df[columns_to_fill].fillna(value=0)
-    raw_df.fillna(value='N/A', inplace=True)
+    preprocessed_df[columns_to_fill] = preprocessed_df[columns_to_fill].fillna(
+        value=0
+    )
+    preprocessed_df.fillna(value='N/A', inplace=True)
 
     # Tweaks to the press data
-    if 'Title (optional)' in raw_df.columns:
-        raw_df.drop('Title (optional)', axis='columns', inplace=True)
+    if 'Title (optional)' in preprocessed_df.columns:
+        preprocessed_df.drop('Title (optional)', axis='columns', inplace=True)
     for column in ['Press Mentions', 'People Reached']:
-        raw_df[column] = raw_df[column].astype('Int64')
+        preprocessed_df[column] = preprocessed_df[column].astype('Int64')
 
     # Now explode the data
     for group_by_i in config['groupings']:
-        raw_df[group_by_i] = raw_df[group_by_i].str.split('|')
-        raw_df = raw_df.explode(group_by_i)
+        preprocessed_df[group_by_i] = preprocessed_df[group_by_i].str.split('|')
+        preprocessed_df = preprocessed_df.explode(group_by_i)
 
     # Exploding the data results in duplicate IDs,
     # so let's set up some new, unique IDs.
-    raw_df['id'] = raw_df.index
-    raw_df.set_index(np.arange(len(raw_df)), inplace=True)
+    preprocessed_df['id'] = preprocessed_df.index
+    preprocessed_df.set_index(np.arange(len(preprocessed_df)), inplace=True)
 
-    return raw_df, config
+    return preprocessed_df, config

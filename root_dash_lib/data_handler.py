@@ -1,5 +1,8 @@
 '''Module for handling data.
 '''
+import types
+
+import pandas as pd
 
 
 class DataHandler:
@@ -11,7 +14,7 @@ class DataHandler:
         user_utils (module): User-customized module for data loading
     '''
 
-    def __init__(self, config, user_utils):
+    def __init__(self, config: dict, user_utils: types.ModuleType):
         self.config = config
         self.user_utils = user_utils
 
@@ -21,21 +24,33 @@ class DataHandler:
             self.dfs['raw']
         )
 
-    def load_data(self):
+    def load_data(self) -> pd.DataFrame:
         '''Load the data using the stored config and user_utils.
 
         Returns:
-            df (pandas.DataFrame): The data.
-        '''
-        return self.user_utils.load_data(self.config)
+            raw_df: The data.
 
-    def preprocess_data(self, raw_df):
+        Side Effects:
+            self.config: Possible updates to the config file.
+        '''
+        raw_df, self.config = self.user_utils.load_data(self.config)
+        self.dfs['raw'] = raw_df
+        return raw_df
+
+    def preprocess_data(self, raw_df: pd.DataFrame) -> pd.DataFrame:
         '''Preprocess the data using the stored config and user_utils.
 
         Args:
-            df (pandas.DataFrame): The loaded data.
+            raw_df: The loaded data.
 
         Returns:
-            df (pandas.DataFrame): The preprocessed data.
+            preprocessed_df: The preprocessed data.
+
+        Side Effects:
+            self.config: Possible updates to the config file.
         '''
-        return self.user_utils.preprocess_data(raw_df, self.config)
+        preprocessed_df, self.config = self.user_utils.preprocess_data(
+            raw_df, self.config
+        )
+        self.dfs['preprocessed'] = preprocessed_df
+        return preprocessed_df
