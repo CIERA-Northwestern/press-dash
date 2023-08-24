@@ -4,6 +4,8 @@ import os
 import types
 import yaml
 
+import pandas as pd
+
 from . import user_utils as default_user_utils
 from . import data_handler
 
@@ -25,6 +27,15 @@ class Dashboard:
 
         self.config = self.load_config(config_fp)
         self.data_handler = data_handler.DataHandler(self.config, user_utils)
+
+    @property
+    def dfs(self):
+        '''Convenience property for accessing the dataframes.
+
+        Returns:
+            dfs (dict): The dataframes.
+        '''
+        return self.data_handler.dfs
 
     def load_config(self, config_fp: str) -> dict:
         '''Get the config. This is done once per session.
@@ -49,11 +60,27 @@ class Dashboard:
             config = yaml.load(file, Loader=yaml.FullLoader)
         return config
 
-    @property
-    def dfs(self):
-        '''Convenience property for accessing the dataframes.
+    def load_and_preprocess_data(self, config: dict) -> pd.DataFrame:
+        '''Both load and preprocess the data.
+        This is the one time that the config can be altered during execution,
+        chosen as such to allow the user to modify the config on the fly,
+        as these two functions are user defined.
+
+        Args:
+            config: The config dict.
 
         Returns:
-            dfs (dict): The dataframes.
+            preprocessed_df: The preprocessed data.
+            config: The config file. This will also be stored at self.config
+        
+        Side Effects:
+            self.data_handler.dfs: Updates data stored.
+            self.config: Possible updates to the stored config file.
         '''
-        return self.data_handler.dfs
+
+        raw_df, self.config = self.data_handler.load_data(config)
+        preprocessed_df, self.config = \
+            self.data_handler.preprocess_data(raw_df, self.config)
+
+        return preprocessed_df, config
+ 

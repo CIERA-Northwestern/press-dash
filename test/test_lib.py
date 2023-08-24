@@ -61,12 +61,16 @@ class TestLoadAndPreProcess(unittest.TestCase):
         '''Does load_data at least run?'''
 
         dsh = dash.Dashboard(self.config_fp)
-        raw_df = dsh.data_handler.load_data()
+        raw_df, config = dsh.data_handler.load_data(dsh.config)
 
         assert 'raw' in dsh.dfs
 
     def test_preprocess_data(self):
         '''Does preprocess data at least run?'''
+
+        dsh = dash.Dashboard(self.config_fp)
+        preprocessed_df, config = dsh.load_and_preprocess_data(dsh.config)
+
         assert 'preprocessed' in dsh.dfs
 
     def test_consistent_original_and_preprocessed(self):
@@ -75,14 +79,20 @@ class TestLoadAndPreProcess(unittest.TestCase):
         '''
 
         dsh = dash.Dashboard(self.config_fp)
+        preprocessed_df, config = dsh.load_and_preprocess_data(dsh.config)
         raw_df = dsh.dfs['raw']
-        preprocessed_df = dsh.dfs['preprocessed']
 
         for groupby_column in dsh.config['groupings']:
-            subset_df = preprocessed_df[['id', groupby_column]].fillna('N/A')
-            subset_df = subset_df.drop_duplicates()
-            grouped = subset_df.groupby('id')
+            test_df = preprocessed_df.copy()
+            test_df['dup_col'] = \
+                test_df['id'].astype(str) + test_df[groupby_column]
+            test_df = test_df.drop_duplicates(subset='dup_col',keep='first')
+            grouped = test_df.groupby('id')
             actual = grouped[groupby_column].apply('|'.join)
+
+            missing = raw_df.loc[np.invert(raw_df.index.isin(actual.index))]
+            assert len(missing) == 0
+
             not_equal = actual != raw_df[groupby_column]
             assert not_equal.sum() == 0
             np.testing.assert_array_equal(
@@ -90,8 +100,6 @@ class TestLoadAndPreProcess(unittest.TestCase):
                 raw_df[groupby_column]
             )
 
-###############################################################################
-###############################################################################
 
 class TestDataUtils( unittest.TestCase ):
 
