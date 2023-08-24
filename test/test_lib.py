@@ -1,85 +1,83 @@
+'''Tests for root_dash_lib
+'''
 import unittest
-
-import glob
-import fileinput
-import numpy as np
 import os
+import numpy as np
 import pandas as pd
-import shutil
-import streamlit as st
-import subprocess
-import yaml
 
 from root_dash_lib import dash
-from .lib_for_tests import press_user_utils, grants_user_utils
+from .lib_for_tests import grants_user_utils
 
-def copy_config( root_config_fp, config_fp ):
 
-        # Copy and edit config
-        with open( root_config_fp, 'r' ) as f:
-            config_text = f.read()
-        config_text = config_text.replace( '../data', '.' )
-        config_text = config_text.replace( './', '')
-        with open( config_fp, 'w' ) as f:
-            f.write( config_text )
+def copy_config(root_config_fp, config_fp):
+    '''Copy the config file from the root directory to the test data directory.
+    Commonly used in setting up tests, so defined here.
 
-###############################################################################
+    Args:
+        root_config_fp (str): Filepath for the config file
+            in the root directory.
+        config_fp (str): Filepath for the config file
+            in the test data directory.
+    '''
 
-class TestDashboardSetupPressData( unittest.TestCase ):
+    # Copy and edit config
+    with open(root_config_fp, 'r', encoding='UTF-8') as file:
+        config_text = file.read()
+    config_text = config_text.replace('../data', '.')
+    config_text = config_text.replace('./', '')
+    with open(config_fp, 'w', encoding='UTF-8') as file:
+        file.write(config_text)
+
+
+class TestLoadAndPreProcess(unittest.TestCase):
     '''This tests the setup for press data.
     '''
 
-    def setUp( self ):
+    def setUp(self):
 
         # Get filepath info
-        test_dir = os.path.abspath( os.path.dirname( __file__ ) )
-        self.root_dir = os.path.dirname( test_dir )
-        self.data_dir = os.path.join( self.root_dir, 'test_data', 'test_data_complete', )
-        root_config_fp = os.path.join( self.root_dir, 'test', 'config.yml' )
-        self.config_fp = os.path.join( self.data_dir, 'config.yml' )
-        copy_config( root_config_fp, self.config_fp )
+        test_dir = os.path.abspath(os.path.dirname(__file__))
+        self.root_dir = os.path.dirname(test_dir)
+        self.data_dir = os.path.join(
+            self.root_dir, 'test_data', 'test_data_complete'
+        )
+        root_config_fp = os.path.join(self.root_dir, 'test', 'config.yml')
+        self.config_fp = os.path.join(self.data_dir, 'config.yml')
+        copy_config(root_config_fp, self.config_fp)
 
-    def tearDown( self ):
-        if os.path.isfile( self.config_fp ):
-            os.remove( self.config_fp )
+    def tearDown(self):
+        if os.path.isfile(self.config_fp):
+            os.remove(self.config_fp)
 
-    ###############################################################################
+    def test_constructor(self):
+        '''Does the constructor work?
+        '''
 
-    def test_constructor( self ):
-
-        dsh = dash.Dashboard( self.config_fp )
+        dsh = dash.Dashboard(self.config_fp)
 
         assert dsh.config['color_palette'] == 'deep'
+        assert 'raw' in dsh.dfs
+        assert 'preprocessed' in dsh.dfs
 
-    ###############################################################################
+    def test_consistent_original_and_preprocessed(self):
+        '''Are the raw and preprocessed dataframes consistent?
+        This checks the user utils more than anything.
+        '''
 
-    def test_load_data( self ):
-
-        dsh = dash.Dashboard( self.config_fp )
-
-        df = dsh.data_handler.load_data()
-
-        assert df.size > 0 
-
-    ###############################################################################
-
-    def test_consistent_original_and_preprocessed( self ):
-
-        dsh = dash.Dashboard( self.config_fp )
-
-        df = dsh.data_handler.load_data()
-        preprocessed_df = dsh.data_handler.preprocess_data( df )
+        dsh = dash.Dashboard(self.config_fp)
+        raw_df = dsh.dfs['raw']
+        preprocessed_df = dsh.dfs['preprocessed']
 
         for groupby_column in dsh.config['groupings']:
-            subset_df = preprocessed_df[['id',groupby_column]].fillna( 'N/A' )
+            subset_df = preprocessed_df[['id', groupby_column]].fillna('N/A')
             subset_df = subset_df.drop_duplicates()
             grouped = subset_df.groupby('id')
-            actual = grouped[groupby_column].apply( '|'.join )
-            not_equal = actual != df[groupby_column]
+            actual = grouped[groupby_column].apply('|'.join)
+            not_equal = actual != raw_df[groupby_column]
             assert not_equal.sum() == 0
             np.testing.assert_array_equal(
                 actual,
-                df[groupby_column]
+                raw_df[groupby_column]
             )
 
 ###############################################################################

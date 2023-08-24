@@ -43,3 +43,12 @@ class Dashboard:
         with open(config_fn, "r", encoding='UTF-8') as file:
             config = yaml.load(file, Loader=yaml.FullLoader)
         return config
+
+    @property
+    def dfs(self):
+        '''Convenience property for accessing the dataframes.
+
+        Returns:
+            dfs (dict): The dataframes.
+        '''
+        return self.data_handler.dfs
