@@ -7,7 +7,6 @@ from typing import Tuple
 
 import numpy as np
 import pandas as pd
-import streamlit as st
 
 
 class DataHandler:
@@ -191,11 +190,10 @@ class DataHandler:
             
         return recategorized_series
 
-    @st.cache_data
     def recategorize_data(
-            _self,
+            self,
             preprocessed_df: pd.DataFrame,
-            new_categories: dict,
+            new_categories: dict = None,
             recategorize: bool = True,
             combine_single_categories: bool = False,
         ) -> pd.DataFrame:
@@ -217,11 +215,12 @@ class DataHandler:
                 One entry per article.
         '''
 
-        print( 'Recategorizing data.' )
-
         # We include the automatic return to help with data caching.
         if not recategorize:
             return preprocessed_df
+
+        if new_categories is None:
+            new_categories = self.config.get('new_categories', 0)
         
         # Get the condensed data frame
         # This is probably dropping stuff that shouldn't be dropped!!!!!!!
@@ -240,7 +239,7 @@ class DataHandler:
             else:
                 raise KeyError( 'New categories cannot have multiple sets of brackets.' )
 
-            recategorized_groupby = _self.recategorize_data_per_grouping(
+            recategorized_groupby = self.recategorize_data_per_grouping(
                 preprocessed_df,
                 groupby_column,
                 copy.deepcopy( new_categories_per_grouping ),
@@ -249,6 +248,9 @@ class DataHandler:
             recategorized[new_column] = recategorized_groupby
 
         recategorized.reset_index( inplace=True )
+
+        self.data['recategorized'] = recategorized
+
         return recategorized
 
     def filter_data(
@@ -290,4 +292,7 @@ class DataHandler:
             )
 
         selected_df = recategorized_df.loc[is_included]
+
+        self.data['selected'] = selected_df
+
         return selected_df

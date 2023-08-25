@@ -47,7 +47,7 @@ def main(config_fp: str, user_utils: types.ModuleType=None):
 
     # Recategorize data
     selected_settings = builder.settings.common['data']
-    recategorized_df = builder.data_handler.recategorize_data(
+    recategorized_df = builder.recategorize_data(
         preprocessed_df=preprocessed_df,
         new_categories=builder.config.get( 'new_categories', {} ),
         recategorize=selected_settings['recategorize'],

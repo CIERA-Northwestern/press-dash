@@ -103,3 +103,40 @@ class DashBuilder:
 
         return preprocessed_df, config
  
+    @st.cache_data
+    def recategorize_data(
+            _self,
+            preprocessed_df: pd.DataFrame,
+            new_categories: dict = None,
+            recategorize: bool = True,
+            combine_single_categories: bool = False,
+        ) -> pd.DataFrame:
+        '''Recategorize the data, i.e. combine existing categories into new ones.
+        The end result is one category per article, so no articles are double-counted.
+        However, if the new categories are ill-defined they can contradict one another
+        and lead to inconsistencies.
+
+        This is a wrapper for the same function in the data handler.
+        Part of the motivation for being a wrapper is to limit data caching to the builder.
+
+        Args:
+            preprocessed_df: The dataframe containing the original data.
+            new_categories: The new categories to use.
+            recategorize: Whether to recategorize the data. Included for caching.
+            combine_single_categories: If True, instead of leaving
+                undefined singly-tagged entries alone,
+                group them all into an "Other" category.
+
+        Returns:
+            recategorized: The dataframe containing the recategorized data.
+                One entry per article.
+        '''
+
+        print( 'Recategorizing data...' )
+
+        return _self.data_handler.recategorize_data(
+            preprocessed_df=preprocessed_df,
+            new_categories=new_categories,
+            recategorize=recategorize,
+            combine_single_categories=combine_single_categories,
+        )
