@@ -5,7 +5,7 @@ import os
 import numpy as np
 import pandas as pd
 
-from root_dash_lib.dash import Dashboard
+from root_dash_lib.dash_builder import DashBuilder
 from .lib_for_tests import grants_user_utils
 
 
@@ -46,9 +46,9 @@ def standard_setup(self):
 
     self.group_by = 'Research Topics'
 
-    self.dash = Dashboard(self.config_fp)
+    self.builder = DashBuilder(self.config_fp)
     preprocessed_df, config = \
-        self.dash.prep_data(self.dash.config)
+        self.builder.prep_data(self.builder.config)
 
 
 class TestPrepData(unittest.TestCase):
@@ -75,25 +75,25 @@ class TestPrepData(unittest.TestCase):
         '''Does the constructor work?
         '''
 
-        dash = Dashboard(self.config_fp)
+        builder = DashBuilder(self.config_fp)
 
-        assert dash.config['color_palette'] == 'deep'
+        assert builder.config['color_palette'] == 'deep'
 
     def test_load_data(self):
         '''Does load_data at least run?'''
 
-        dash = Dashboard(self.config_fp)
-        raw_df, config = dash.data_handler.load_data(dash.config)
+        builder = DashBuilder(self.config_fp)
+        raw_df, config = builder.data_handler.load_data(builder.config)
 
-        assert 'raw' in dash.data
+        assert 'raw' in builder.data
 
     def test_preprocess_data(self):
         '''Does preprocess data at least run?'''
 
-        dash = Dashboard(self.config_fp)
-        preprocessed_df, config = dash.prep_data(dash.config)
+        builder = DashBuilder(self.config_fp)
+        preprocessed_df, config = builder.prep_data(builder.config)
 
-        assert 'preprocessed' in dash.data
+        assert 'preprocessed' in builder.data
 
     def test_consistent_original_and_preprocessed(self):
         '''Are the raw and preprocessed dataframes consistent?
@@ -102,9 +102,9 @@ class TestPrepData(unittest.TestCase):
         from the pre-processed data.
         '''
 
-        dash = Dashboard(self.config_fp)
-        preprocessed_df, config = dash.prep_data(dash.config)
-        cleaned_df = dash.data['cleaned']
+        builder = DashBuilder(self.config_fp)
+        preprocessed_df, config = builder.prep_data(builder.config)
+        cleaned_df = builder.data['cleaned']
 
         groupby_column = 'Research Topics'
 
@@ -154,7 +154,7 @@ class TestRecategorize(unittest.TestCase):
             )
         }
 
-        df = self.dash.data_handler.recategorize_data_per_grouping(
+        df = self.builder.data_handler.recategorize_data_per_grouping(
             df,
             'Press Types',
             new_categories
@@ -179,11 +179,11 @@ class TestRecategorize(unittest.TestCase):
     def test_recategorize_data_per_grouping_realistic(self):
 
         group_by = 'Research Topics'
-        cleaned_df = self.dash.data['cleaned']
-        recategorized_df = self.dash.data_handler.recategorize_data_per_grouping(
-            self.dash.data['preprocessed'],
+        cleaned_df = self.builder.data['cleaned']
+        recategorized_df = self.builder.data_handler.recategorize_data_per_grouping(
+            self.builder.data['preprocessed'],
             group_by,
-            self.dash.config['new_categories'][group_by],
+            self.builder.config['new_categories'][group_by],
             False,
         )
 
@@ -200,7 +200,7 @@ class TestRecategorize(unittest.TestCase):
             assert (is_group.values & is_compact.values).sum() == 0
 
         # Check that none of the singles categories shows up in other
-        for group in pd.unique(self.dash.data['preprocessed'][group_by]):
+        for group in pd.unique(self.builder.data['preprocessed'][group_by]):
             is_group = cleaned_df[group_by] == group
             is_other = recategorized_df == 'Other'
             is_bad = (is_group.values & is_other.values)
@@ -218,12 +218,12 @@ class TestRecategorize(unittest.TestCase):
 
     def test_recategorize_data(self):
 
-        recategorized = self.dash.data_handler.recategorize_data(
-            self.dash.data['preprocessed'],
-            self.dash.config['new_categories'],
+        recategorized = self.builder.data_handler.recategorize_data(
+            self.builder.data['preprocessed'],
+            self.builder.config['new_categories'],
             True,
         )
-        cleaned_df = self.dash.data['cleaned']
+        cleaned_df = self.builder.data['cleaned']
 
         # Check that NU Press inclusive is right
         group_by = 'Press Types'
@@ -252,7 +252,7 @@ class TestRecategorize(unittest.TestCase):
             assert (is_group.values & is_compact.values).sum() == 0
 
         # Check that none of the singles categories shows up in other
-        for group in pd.unique( self.dash.data['preprocessed'][group_by] ):
+        for group in pd.unique( self.builder.data['preprocessed'][group_by] ):
             is_group = cleaned_df[group_by] == group
             is_other = recategorized[group_by] == 'Other'
             is_bad = (is_group.values & is_other.values)
@@ -270,7 +270,7 @@ class TestRecategorize(unittest.TestCase):
 
     def test_recategorize_data_rename(self):
 
-        new_categories = self.dash.config['new_categories']
+        new_categories = self.builder.config['new_categories']
         new_categories['Also Research Topics [Research Topics]'] = {
             'Compact Objects': (
                 "only ('Life & Death of Stars' | 'Gravitational Waves & Multi-Messenger Astronomy' | 'Black Holes & Dead Stars' )"
@@ -279,8 +279,8 @@ class TestRecategorize(unittest.TestCase):
                 "only ('Galaxies & Cosmology' | 'Stellar Dynamics & Stellar Populations' )"
             ),
         }
-        recategorized_df = self.dash.data_handler.recategorize_data(
-            self.dash.data['preprocessed'],
+        recategorized_df = self.builder.data_handler.recategorize_data(
+            self.builder.data['preprocessed'],
             new_categories,
             True,
         )
@@ -298,8 +298,8 @@ class TestRecategorize(unittest.TestCase):
                 "only ('Galaxies & Cosmology' | 'Stellar Dynamics & Stellar Populations' )"
             ),
         }
-        recategorized_df = self.dash.data_handler.recategorize_data(
-            self.dash.data['preprocessed'],
+        recategorized_df = self.builder.data_handler.recategorize_data(
+            self.builder.data['preprocessed'],
             new_categories,
             True,
         )
@@ -331,8 +331,8 @@ class TestFilterData(unittest.TestCase):
             'Press Mentions': [ 0, 10 ], 
         }
 
-        selected = self.dash.data_handler.filter_data(
-            self.dash.data['preprocessed'],
+        selected = self.builder.data_handler.filter_data(
+            self.builder.data['preprocessed'],
             { 'Title': search_str, },
             categorical_filters,
             range_filters
@@ -360,9 +360,9 @@ class TestAggregate( unittest.TestCase ):
 
     def test_count( self ):
 
-        selected_df = self.dash.data['preprocessed']
+        selected_df = self.builder.data['preprocessed']
 
-        counts, total = self.dash.agg.count(
+        counts, total = self.builder.agg.count(
             selected_df,
             'Year',
             'id',
@@ -392,10 +392,10 @@ class TestAggregate( unittest.TestCase ):
 
     def test_sum_press_mentions( self ):
 
-        selected_df = self.dash.data['preprocessed']
+        selected_df = self.builder.data['preprocessed']
         weighting = 'Press Mentions'
 
-        sums, total = self.dash.sum(
+        sums, total = self.builder.sum(
             selected_df,
             'Year',
             weighting,
@@ -427,10 +427,10 @@ class TestAggregate( unittest.TestCase ):
 
     def test_count_press_mentions_nonzero( self ):
 
-        selected_df = self.dash.data['preprocessed']
+        selected_df = self.builder.data['preprocessed']
         weighting = 'Press Mentions'
 
-        sums, total = self.dash.sum(
+        sums, total = self.builder.sum(
             selected_df,
             'Year',
             weighting,
@@ -475,7 +475,7 @@ class TestStreamlit( unittest.TestCase ):
 
         copy_config( root_config_fp, self.config_fp )
 
-        self.dash = Dashboard( self.config_fp ) 
+        self.builder = DashBuilder( self.config_fp ) 
 
     def tearDown( self ):
         if os.path.isfile( self.config_fp ):
@@ -485,9 +485,9 @@ class TestStreamlit( unittest.TestCase ):
 
     def test_base_page( self ):
 
-        self.dash.add_page( 'base_page' )
+        self.builder.add_page( 'base_page' )
 
-        self.dash.run()
+        self.builder.run()
 
         # Set the environment variable to signal the app to stop
         os.environ["STOP_STREAMLIT"] = "1"
@@ -509,7 +509,7 @@ class TestStreamlitGrants( unittest.TestCase ):
 
         copy_config( root_config_fp, self.config_fp )
 
-        self.dash = Dashboard( self.config_fp, grants_user_utils ) 
+        self.builder = DashBuilder( self.config_fp, grants_user_utils ) 
 
     def tearDown( self ):
         if os.path.isfile( self.config_fp ):
@@ -519,9 +519,9 @@ class TestStreamlitGrants( unittest.TestCase ):
 
     def test_base_page( self ):
 
-        self.dash.add_page( 'base_page' )
+        self.builder.add_page( 'base_page' )
 
-        self.dash.run()
+        self.builder.run()
 
         # Set the environment variable to signal the app to stop
         os.environ["STOP_STREAMLIT"] = "1"

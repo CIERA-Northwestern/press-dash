@@ -10,7 +10,7 @@ from . import user_utils as default_user_utils
 from . import data_handler, aggregator
 
 
-class Dashboard:
+class DashBuilder:
     '''Root dashboard class.
 
     Args:
@@ -27,7 +27,7 @@ class Dashboard:
 
         self.config = self.load_config(config_fp)
         self.data_handler = data_handler.DataHandler(self.config, user_utils)
-        self.agg = aggregator.Aggregator()
+        self.agg = aggregator.Aggregator(self.config)
 
     @property
     def data(self):
