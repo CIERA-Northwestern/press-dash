@@ -5,6 +5,7 @@ import types
 import yaml
 
 import pandas as pd
+import streamlit as st
 
 from . import user_utils as default_user_utils
 from . import data_handler, aggregator
@@ -22,8 +23,11 @@ class DashBuilder:
     def __init__(
         self,
         config_fp: str,
-        user_utils: types.ModuleType = default_user_utils,
+        user_utils: types.ModuleType = None,
     ):
+
+        if user_utils is None:
+            user_utils = default_user_utils
 
         self.config = self.load_config(config_fp)
         self.data_handler = data_handler.DataHandler(self.config, user_utils)
@@ -61,7 +65,8 @@ class DashBuilder:
             config = yaml.load(file, Loader=yaml.FullLoader)
         return config
 
-    def prep_data(self, config: dict) -> pd.DataFrame:
+    @st.cache_data
+    def prep_data(_self, config: dict) -> pd.DataFrame:
         '''Load, clean, and preprocess the data.
 
         This is the one time that the config can be altered during execution,
@@ -80,9 +85,11 @@ class DashBuilder:
             self.config: Possible updates to the stored config file.
         '''
 
-        raw_df, self.config = self.data_handler.load_data(config)
-        cleaned_df, self.config = self.data_handler.clean_data(raw_df, self.config)
-        preprocessed_df, self.config = self.data_handler.preprocess_data(cleaned_df, self.config)
+        print('Doing data prep...')
+
+        raw_df, _self.config = _self.data_handler.load_data(config)
+        cleaned_df, _self.config = _self.data_handler.clean_data(raw_df, _self.config)
+        preprocessed_df, _self.config = _self.data_handler.preprocess_data(cleaned_df, _self.config)
 
         return preprocessed_df, config
  

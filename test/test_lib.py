@@ -31,7 +31,7 @@ def copy_config(root_config_fp, config_fp):
         file.write(config_text)
 
 
-def standard_setup(self):
+def standard_setup(self, user_utils=None):
     '''Common function for setting up the data
     '''
 
@@ -48,7 +48,7 @@ def standard_setup(self):
 
     self.group_by = 'Research Topics'
 
-    self.builder = DashBuilder(self.config_fp)
+    self.builder = DashBuilder(self.config_fp, user_utils)
     preprocessed_df, config = \
         self.builder.prep_data(self.builder.config)
 
@@ -192,8 +192,6 @@ class TestRecategorize(unittest.TestCase):
 
         pd.testing.assert_series_equal(expected['Press Types'], df)
 
-    ###############################################################################
-
     def test_recategorize_data_per_grouping_realistic(self):
 
         group_by = 'Research Topics'
@@ -231,8 +229,6 @@ class TestRecategorize(unittest.TestCase):
                     bad_ids_original, bad_ids_recategorized
                 )
             assert n_matched == 0
-
-    ###############################################################################
 
     def test_recategorize_data(self):
 
@@ -283,8 +279,6 @@ class TestRecategorize(unittest.TestCase):
                     bad_ids_original, bad_ids_recategorized
                 )
             assert n_matched == 0
-
-    ###############################################################################
 
     def test_recategorize_data_rename(self):
 
@@ -362,19 +356,15 @@ class TestFilterData(unittest.TestCase):
         assert np.invert( ( 2016 <= selected['Year'] ) & ( selected['Year'] <= 2023 ) ).sum() == 0
         assert np.invert( ( 0 <= selected['Press Mentions'] ) & ( selected['Press Mentions'] <= 10 ) ).sum() == 0
 
-###############################################################################
     
 class TestAggregate( unittest.TestCase ):
 
     def setUp( self ):
-
         standard_setup( self )
 
     def tearDown( self ):
         if os.path.isfile( self.config_fp ):
             os.remove( self.config_fp )
-
-    ###############################################################################
 
     def test_count( self ):
 
@@ -483,17 +473,7 @@ class TestAggregate( unittest.TestCase ):
 class TestStreamlit( unittest.TestCase ):
 
     def setUp( self ):
-
-        # Get filepath info
-        test_dir = os.path.abspath( os.path.dirname( __file__ ) )
-        self.root_dir = os.path.dirname( test_dir )
-        self.data_dir = os.path.join( self.root_dir, 'test_data', 'test_data_complete', )
-        root_config_fp = os.path.join( self.root_dir, 'test', 'config.yml' )
-        self.config_fp = os.path.join( self.data_dir, 'config.yml' )
-
-        copy_config( root_config_fp, self.config_fp )
-
-        self.builder = DashBuilder( self.config_fp ) 
+        standard_setup(self, press_user_utils)
 
     def tearDown( self ):
         if os.path.isfile( self.config_fp ):
@@ -503,9 +483,9 @@ class TestStreamlit( unittest.TestCase ):
 
     def test_base_page( self ):
 
-        self.builder.add_page( 'base_page' )
+        import root_dash_lib.pages.base_page as base_page
 
-        self.builder.run()
+        base_page.main( self.config_fp )
 
         # Set the environment variable to signal the app to stop
         os.environ["STOP_STREAMLIT"] = "1"
