@@ -332,7 +332,7 @@ class TestFilterData(unittest.TestCase):
         }
 
         selected = self.dash.data_handler.filter_data(
-            self.df,
+            self.dash.data['preprocessed'],
             { 'Title': search_str, },
             categorical_filters,
             range_filters

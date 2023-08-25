@@ -246,3 +246,44 @@ class DataHandler:
 
         recategorized.reset_index( inplace=True )
         return recategorized
+
+    def filter_data(
+        self,
+        recategorized_df: pd.DataFrame,
+        text_filters: dict[str, str] = {},
+        categorical_filters: dict[str, list] = {},
+        numerical_filters: dict[str, tuple] = {},
+    ) -> pd.DataFrame:
+        '''Filter what data shows up in the dashboard.
+
+        Args:
+            recategorized_df: The dataframe containing the data.
+            text_filters (dict): Search fields for text.
+            categorical_filters (dict): How categories are filtered.
+            numerical_filters (dict): Ranges for numerical data filters
+
+        Returns:
+            selected_df: The dataframe containing the selected data.
+        '''
+
+        # Initialized
+        is_included = np.ones( len( recategorized_df ), dtype=bool )
+
+        # Text filter
+        for text_filter_col, search_str in text_filters.items():
+            is_matching = recategorized_df[text_filter_col].str.extract( '(' + search_str + ')', flags=re.IGNORECASE ).notna().values[:,0]
+            is_included = is_included & is_matching
+
+        # Categories filter
+        for cat_filter_col, selected_cats in categorical_filters.items():
+            is_included = is_included & recategorized_df[cat_filter_col].isin( selected_cats )
+
+        # Range filters
+        for num_filter_col, column_range in numerical_filters.items():
+            is_included = is_included & (
+                ( column_range[0] <= recategorized_df[num_filter_col] ) &
+                ( recategorized_df[num_filter_col] <= column_range[1] )
+            )
+
+        selected_df = recategorized_df.loc[is_included]
+        return selected_df
