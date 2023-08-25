@@ -1,8 +1,9 @@
-'''Module for handling data.
+'''Module for handling data: Loading, transforming, extracting, etc.
 '''
 import copy
 import re
 import types
+from typing import Tuple
 
 import numpy as np
 import pandas as pd
@@ -10,11 +11,10 @@ import pandas as pd
 
 class DataHandler:
     '''Class for handling data.
-    The data is loaded and pre-processed at initialization.
 
     Args:
-        config (dict): The config dictionary.
-        user_utils (module): User-customized module for data loading
+        config: The config dictionary.
+        user_utils: User-customized module for data loading
     '''
 
     def __init__(self, config: dict, user_utils: types.ModuleType):
@@ -24,7 +24,7 @@ class DataHandler:
         # Container for dataframes
         self.data = {}
 
-    def load_data(self, config: dict) -> (pd.DataFrame, dict):
+    def load_data(self, config: dict) -> Tuple[pd.DataFrame, dict]:
         '''Load the data using the stored config and user_utils.
 
         This is one of the only functions where we allow the config
@@ -50,7 +50,7 @@ class DataHandler:
             self,
             raw_df: pd.DataFrame,
             config: dict,
-    ) -> (pd.DataFrame, dict):
+    ) -> Tuple[pd.DataFrame, dict]:
         '''Clean the data using the stored config and user_utils.
 
         This is one of the only functions where we allow the config
@@ -81,7 +81,7 @@ class DataHandler:
             self,
             cleaned_df: pd.DataFrame,
             config: dict,
-    ) -> (pd.DataFrame, dict):
+    ) -> Tuple[pd.DataFrame, dict]:
         '''Preprocess the data using the stored config and user_utils.
         This is one of the only functions where we allow the config
         to be modified. In general the on-the-fly settings are

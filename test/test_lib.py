@@ -362,7 +362,7 @@ class TestAggregate( unittest.TestCase ):
 
         selected_df = self.dash.data['preprocessed']
 
-        counts, total = self.dash.count(
+        counts, total = self.dash.agg.count(
             selected_df,
             'Year',
             'id',
