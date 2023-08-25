@@ -40,15 +40,6 @@ class DashBuilder:
         self.agg = aggregator.Aggregator(self.config)
         self.data_viewer = data_viewer.DataViewer(self.config, self.settings)
 
-    @property
-    def data(self):
-        '''Convenience property for accessing the dataframes.
-
-        Returns:
-            data (dict): The dataframes.
-        '''
-        return self.data_handler.data
-
     def load_config(self, config_fp: str) -> dict:
         '''Get the config. This is done once per session.
         The config directory is set as the working directory.

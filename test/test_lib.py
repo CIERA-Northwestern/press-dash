@@ -49,7 +49,7 @@ def standard_setup(self, user_utils=None):
     self.group_by = 'Research Topics'
 
     self.builder = DashBuilder(self.config_fp, user_utils)
-    preprocessed_df, config = \
+    self.data, self.config = \
         self.builder.prep_data(self.builder.config)
 
 
@@ -190,9 +190,9 @@ class TestRecategorize(unittest.TestCase):
     def test_recategorize_data_per_grouping_realistic(self):
 
         group_by = 'Research Topics'
-        cleaned_df = self.builder.data['cleaned']
+        cleaned_df = self.data['cleaned']
         recategorized_df = self.builder.data_handler.recategorize_data_per_grouping(
-            self.builder.data['preprocessed'],
+            self.data['preprocessed'],
             group_by,
             self.builder.config['new_categories'][group_by],
             False,
@@ -211,7 +211,7 @@ class TestRecategorize(unittest.TestCase):
             assert (is_group.values & is_compact.values).sum() == 0
 
         # Check that none of the singles categories shows up in other
-        for group in pd.unique(self.builder.data['preprocessed'][group_by]):
+        for group in pd.unique(self.data['preprocessed'][group_by]):
             is_group = cleaned_df[group_by] == group
             is_other = recategorized_df == 'Other'
             is_bad = (is_group.values & is_other.values)
@@ -228,11 +228,11 @@ class TestRecategorize(unittest.TestCase):
     def test_recategorize_data(self):
 
         recategorized = self.builder.data_handler.recategorize_data(
-            self.builder.data['preprocessed'],
+            self.data['preprocessed'],
             self.builder.config['new_categories'],
             True,
         )
-        cleaned_df = self.builder.data['cleaned']
+        cleaned_df = self.data['cleaned']
 
         # Check that NU Press inclusive is right
         group_by = 'Press Types'
@@ -261,7 +261,7 @@ class TestRecategorize(unittest.TestCase):
             assert (is_group.values & is_compact.values).sum() == 0
 
         # Check that none of the singles categories shows up in other
-        for group in pd.unique( self.builder.data['preprocessed'][group_by] ):
+        for group in pd.unique( self.data['preprocessed'][group_by] ):
             is_group = cleaned_df[group_by] == group
             is_other = recategorized[group_by] == 'Other'
             is_bad = (is_group.values & is_other.values)
@@ -287,7 +287,7 @@ class TestRecategorize(unittest.TestCase):
             ),
         }
         recategorized_df = self.builder.data_handler.recategorize_data(
-            self.builder.data['preprocessed'],
+            self.data['preprocessed'],
             new_categories,
             True,
         )
@@ -306,7 +306,7 @@ class TestRecategorize(unittest.TestCase):
             ),
         }
         recategorized_df = self.builder.data_handler.recategorize_data(
-            self.builder.data['preprocessed'],
+            self.data['preprocessed'],
             new_categories,
             True,
         )
@@ -339,7 +339,7 @@ class TestFilterData(unittest.TestCase):
         }
 
         selected = self.builder.data_handler.filter_data(
-            self.builder.data['preprocessed'],
+            self.data['preprocessed'],
             { 'Title': search_str, },
             categorical_filters,
             range_filters
@@ -363,7 +363,7 @@ class TestAggregate( unittest.TestCase ):
 
     def test_count( self ):
 
-        selected_df = self.builder.data['preprocessed']
+        selected_df = self.data['preprocessed']
 
         counts, total = self.builder.agg.count(
             selected_df,
@@ -395,7 +395,7 @@ class TestAggregate( unittest.TestCase ):
 
     def test_sum_press_mentions( self ):
 
-        selected_df = self.builder.data['preprocessed']
+        selected_df = self.data['preprocessed']
         weighting = 'Press Mentions'
 
         sums, total = self.builder.sum(
@@ -430,7 +430,7 @@ class TestAggregate( unittest.TestCase ):
 
     def test_count_press_mentions_nonzero( self ):
 
-        selected_df = self.builder.data['preprocessed']
+        selected_df = self.data['preprocessed']
         weighting = 'Press Mentions'
 
         sums, total = self.builder.sum(
