@@ -79,7 +79,7 @@ class TestPrepData(unittest.TestCase):
 
         builder = DashBuilder(self.config_fp)
 
-        assert builder.config['color_palette'] == 'deep'
+        assert builder.config['primary_id_column'] == 'index'
 
     def test_load_data(self):
         '''Does load_data at least run?'''
@@ -87,15 +87,11 @@ class TestPrepData(unittest.TestCase):
         builder = DashBuilder(self.config_fp)
         raw_df, config = builder.data_handler.load_data(builder.config)
 
-        assert 'raw' in builder.data
-
     def test_preprocess_data(self):
         '''Does preprocess data at least run?'''
 
         builder = DashBuilder(self.config_fp)
         preprocessed_df, config = builder.prep_data(builder.config)
-
-        assert 'preprocessed' in builder.data
 
     def test_changes_propagate(self):
         '''We have a config object that's passed around.
@@ -121,26 +117,25 @@ class TestPrepData(unittest.TestCase):
         '''
 
         builder = DashBuilder(self.config_fp)
-        preprocessed_df, config = builder.prep_data(builder.config)
-        cleaned_df = builder.data['cleaned']
+        data, config = builder.prep_data(builder.config)
 
         groupby_column = 'Research Topics'
 
-        test_df = preprocessed_df.copy()
+        test_df = data['preprocessed'].copy()
         test_df['dup_col'] = \
             test_df['id'].astype(str) + test_df[groupby_column]
         test_df = test_df.drop_duplicates(subset='dup_col', keep='first')
         grouped = test_df.groupby('id')
         actual = grouped[groupby_column].apply('|'.join)
 
-        missing = cleaned_df.loc[np.invert(cleaned_df.index.isin(actual.index))]
+        missing = data['cleaned'].loc[np.invert(data['cleaned'].index.isin(actual.index))]
         assert len(missing) == 0
 
-        not_equal = actual != cleaned_df[groupby_column]
+        not_equal = actual != data['cleaned'][groupby_column]
         assert not_equal.sum() == 0
         np.testing.assert_array_equal(
             actual,
-            cleaned_df[groupby_column]
+            data['cleaned'][groupby_column]
         )
 
 
