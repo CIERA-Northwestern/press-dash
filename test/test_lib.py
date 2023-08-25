@@ -1,12 +1,14 @@
 '''Tests for root_dash_lib
 '''
-import unittest
+import copy
 import os
+import unittest
+
 import numpy as np
 import pandas as pd
 
 from root_dash_lib.dash_builder import DashBuilder
-from .lib_for_tests import grants_user_utils
+from .lib_for_tests import press_user_utils, grants_user_utils
 
 
 def copy_config(root_config_fp, config_fp):
@@ -94,6 +96,22 @@ class TestPrepData(unittest.TestCase):
         preprocessed_df, config = builder.prep_data(builder.config)
 
         assert 'preprocessed' in builder.data
+
+    def test_changes_propagate(self):
+        '''We have a config object that's passed around.
+        Let's double check that if it's edited in DataHandler
+        that Aggregator's version is also changed.
+        '''
+        builder = DashBuilder(self.config_fp, press_user_utils)
+        builder_val_before = copy.copy(builder.config['page_title'])
+        agg_val_before = copy.copy(builder.agg.config['page_title'])
+        builder.prep_data(builder.config)
+        builder_val_after = copy.copy(builder.config['page_title'])
+        agg_val_after = copy.copy(builder.agg.config['page_title'])
+
+        assert builder_val_before == agg_val_before
+        assert builder_val_before != builder_val_after
+        assert builder_val_after == agg_val_after
 
     def test_consistent_original_and_preprocessed(self):
         '''Are the raw and preprocessed dataframes consistent?
