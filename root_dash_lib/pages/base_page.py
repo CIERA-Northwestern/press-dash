@@ -45,7 +45,24 @@ def main(config_fp: str, user_utils: types.ModuleType=None):
     st.sidebar.markdown('# View Settings')
     builder.interface.request_view_settings(st.sidebar)
 
-    st.markdown('#### Data Axes')
+    # Recategorize data
+    selected_settings = builder.settings.common['data']
+    recategorized_df = builder.data_handler.recategorize_data(
+        preprocessed_df=preprocessed_df,
+        new_categories=builder.config.get( 'new_categories', {} ),
+        recategorize=selected_settings['recategorize'],
+        combine_single_categories=selected_settings.get( 'combine_single_categories', False),
+    )
+
+    # Data filters
+    st.subheader('Data Filters')
+    builder.interface.request_filter_settings(
+        st,
+        recategorized_df,
+    )
+
+    # Data axes
+    st.subheader('Data Axes')
     builder.interface.request_data_axes(st)
 
     # ################################################################################

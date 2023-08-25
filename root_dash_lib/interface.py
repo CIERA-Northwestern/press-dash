@@ -5,6 +5,7 @@ import os
 from typing import Union
 
 import numpy as np
+import pandas as pd
 import streamlit as st
 
 import matplotlib
@@ -151,6 +152,66 @@ class Interface:
                         value=display_defaults.get( key, False ),
                         key=tag + key
                     )
+
+        return selected_settings
+
+    def request_filter_settings(
+            self,
+            st_loc,
+            df: pd.DataFrame,
+            ask_for: list[str] = [ 'text_filters', 'categorical_filters', 'numerical_filters' ],
+            display_defaults: dict = {},
+            display_options: dict = {},
+            selected_settings: dict = None,
+            tag: str = None,
+    ) -> dict:
+        '''Request common data settings from the user.
+
+        Args:
+            st_loc: Streamlit object (st or st.sidebar) indicating where to place.
+            df: The dataframe that will be filtered. Required because good defaults require it.
+            ask_for: Keys for widgets to include.
+            display_defaults: Default values the user sees in the widgets.
+            display_options: Options the user sees in the widgets.
+            selected_settings: Where the settings should be stored. Defaults to common filter settings.
+            tag: Unique tag that allows duplication of widgets.
+
+        Returns:
+            selected_settings: Current values in the dictionary the settings are stored in.
+        '''
+
+        if selected_settings is None:
+            selected_settings = self.settings.common['filter']
+
+        # Setup the tag
+        if tag is None:
+            tag = ''
+        else:
+            tag += ':'
+
+        key = 'text_filters'
+        if key in ask_for:
+            current = selected_settings.setdefault(key, {})
+            # Select which columns to filter on
+            if len(current) == 0:
+                multiselect_default = []
+            else:
+                multiselect_default = list(current)
+            filter_columns = st_loc.multiselect(
+                'What columns do you want to search? (case insensitive; not a smart search)',
+                options=display_options.get(key, self.config['text_columns']),
+                default=multiselect_default,
+                key=tag + key
+            )
+            for col in filter_columns:
+                # Check the current values then the passed-in defaults
+                # for a default
+                default = current.get(col,'')
+                default = display_defaults.get(key, {}).get(col, default)
+                selected_settings[key][col] = st_loc.text_input(
+                    'Search {} for what?'.format(col),
+                    value=default,
+                )
 
         return selected_settings
 
