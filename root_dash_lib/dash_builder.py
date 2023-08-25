@@ -11,7 +11,7 @@ from . import data_handler, aggregator
 
 
 class DashBuilder:
-    '''Root dashboard class.
+    '''Main class for constructing dashboards.
 
     Args:
         config_fp: Path to the config file.
