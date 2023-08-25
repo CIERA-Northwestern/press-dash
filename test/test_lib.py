@@ -179,7 +179,7 @@ class TestRecategorize(unittest.TestCase):
     def test_recategorize_data_per_grouping_realistic(self):
 
         group_by = 'Research Topics'
-        raw_df = self.dash.data['raw']
+        cleaned_df = self.dash.data['cleaned']
         recategorized_df = self.dash.data_handler.recategorize_data_per_grouping(
             self.dash.data['preprocessed'],
             group_by,
@@ -195,19 +195,19 @@ class TestRecategorize(unittest.TestCase):
             'N/A',
         ]
         for group in not_included_groups:
-            is_group = raw_df[group_by].str.contains(group)
+            is_group = cleaned_df[group_by].str.contains(group)
             is_compact = recategorized_df == 'Compact Objects'
             assert (is_group.values & is_compact.values).sum() == 0
 
         # Check that none of the singles categories shows up in other
-        for group in pd.unique(self.df[group_by]):
-            is_group = raw_df[group_by] == group
+        for group in pd.unique(self.dash.data['preprocessed'][group_by]):
+            is_group = cleaned_df[group_by] == group
             is_other = recategorized_df == 'Other'
             is_bad = (is_group.values & is_other.values)
             n_matched = is_bad.sum()
             # compare bad ids, good for debugging
             if n_matched > 0:
-                bad_ids_original = raw_df.index[is_bad]
+                bad_ids_original = cleaned_df.index[is_bad]
                 bad_ids_recategorized = recategorized_df.index[is_bad]
                 np.testing.assert_allclose(
                     bad_ids_original, bad_ids_recategorized
