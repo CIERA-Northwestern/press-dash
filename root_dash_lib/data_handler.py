@@ -1,5 +1,7 @@
 '''Module for handling data.
 '''
+import copy
+import re
 import types
 
 import numpy as np
@@ -107,16 +109,15 @@ class DataHandler:
 
     def recategorize_data_per_grouping(
         self,
-        df: pd.DataFrame,
+        preprocessed_df: pd.DataFrame,
         groupby_column: dict,
         new_cat_per_g: dict,
         combine_single_categories: bool = False,
-    ) -> pd.DataFrame:
+    ) -> pd.Series:
         '''The actual function doing most of the recategorizing.
 
         Args:
-            df: The dataframe containing the data to recategorize.
-                Typically preprocessed.
+            preprocessed_df: The dataframe containing the data to recategorize.
             groupby_column: The category to group the data by,
                 e.g. 'Research Topics'.
             new_categories_per_grouping: The new categories to use
@@ -126,12 +127,12 @@ class DataHandler:
                 group them all into an "Other" category.
 
         Returns:
-            recategorized_df (pd.Series): The new categories.
+            recategorized_series: The new categories.
         '''
 
         # Get the formatted data used for the categories
-        dummies = pd.get_dummies(df[groupby_column])
-        dummies['id'] = df['id']
+        dummies = pd.get_dummies(preprocessed_df[groupby_column])
+        dummies['id'] = preprocessed_df['id']
         dummies_grouped = dummies.groupby('id')
         bools = dummies_grouped.sum() >= 1
         n_cats = bools.sum(axis='columns')
@@ -145,11 +146,11 @@ class DataHandler:
         # Setup return arr
         base_categories = bools.columns
         recat_dtype = np.array(new_cat_per_g.keys()).dtype
-        recategorized_df = np.full(
+        recategorized_series = np.full(
             len(bools), fill_value='Other', dtype=recat_dtype,
         )
-        recategorized_df = pd.Series(
-            recategorized_df, index=bools.index, name=groupby_column
+        recategorized_series = pd.Series(
+            recategorized_series, index=bools.index, name=groupby_column
         )
 
         # Do all the single-category entries
@@ -159,7 +160,7 @@ class DataHandler:
             for base_category in base_categories:
                 is_base_cat = bools_singles[base_category].values
                 base_cat_inds = bools_singles.index[is_base_cat]
-                recategorized_df.loc[base_cat_inds] = base_category
+                recategorized_series.loc[base_cat_inds] = base_category
 
         # Loop through and do the recategorization
         for category_key, category_definition in new_cat_per_g.items():
@@ -185,6 +186,63 @@ class DataHandler:
             is_new_cat = bools.apply(
                 lambda row: eval(category_definition), axis='columns'
             )
-            recategorized_df[is_new_cat] = category_key
+            recategorized_series[is_new_cat] = category_key
             
-        return recategorized_df
+        return recategorized_series
+
+    def recategorize_data(
+            self,
+            preprocessed_df: pd.DataFrame,
+            new_categories: dict,
+            recategorize: bool = True,
+            combine_single_categories: bool = False,
+        ) -> pd.DataFrame:
+        '''Recategorize the data, i.e. combine existing categories into new ones.
+        The end result is one category per article, so no articles are double-counted.
+        However, if the new categories are ill-defined they can contradict one another
+        and lead to inconsistencies.
+
+        Args:
+            preprocessed_df: The dataframe containing the original data.
+            new_categories: The new categories to use.
+            recategorize: Whether to recategorize the data. Included for caching.
+            combine_single_categories: If True, instead of leaving
+                undefined singly-tagged entries alone,
+                group them all into an "Other" category.
+
+        Returns:
+            recategorized: The dataframe containing the recategorized data.
+                One entry per article.
+        '''
+
+        # We include the automatic return to help with data caching.
+        if not recategorize:
+            return preprocessed_df
+        
+        # Get the condensed data frame
+        # This is probably dropping stuff that shouldn't be dropped!!!!!!!
+        recategorized = preprocessed_df.drop_duplicates( subset='id', keep='first' )
+        recategorized.set_index( 'id', inplace=True )
+
+        for groupby_column, new_categories_per_grouping in new_categories.items():
+
+            # Look for columns that are re-definitions of existing columns
+            # This regex looks for anything in front of anything else in brackets
+            search = re.findall( r'(.*?)\s\[(.+)\]', groupby_column )
+            if len( search ) == 0:
+                new_column = groupby_column
+            elif len( search ) == 1:
+                new_column, groupby_column = search[0]
+            else:
+                raise KeyError( 'New categories cannot have multiple sets of brackets.' )
+
+            recategorized_groupby = self.recategorize_data_per_grouping(
+                preprocessed_df,
+                groupby_column,
+                copy.deepcopy( new_categories_per_grouping ),
+                combine_single_categories
+            )
+            recategorized[new_column] = recategorized_groupby
+
+        recategorized.reset_index( inplace=True )
+        return recategorized

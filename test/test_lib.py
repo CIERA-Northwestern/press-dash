@@ -219,16 +219,18 @@ class TestRecategorize(unittest.TestCase):
     def test_recategorize_data(self):
 
         recategorized = self.dash.data_handler.recategorize_data(
-            self.df,
+            self.dash.data['preprocessed'],
+            self.dash.config['new_categories'],
             True,
         )
+        cleaned_df = self.dash.data['cleaned']
 
         # Check that NU Press inclusive is right
         group_by = 'Press Types'
         expected = (
-            (self.original_df[group_by] == 'CIERA Stories|Northwestern Press') |
-            (self.original_df[group_by] == 'Northwestern Press|CIERA Stories') |
-            (self.original_df[group_by] == 'Northwestern Press')
+            (cleaned_df[group_by] == 'CIERA Stories|Northwestern Press') |
+            (cleaned_df[group_by] == 'Northwestern Press|CIERA Stories') |
+            (cleaned_df[group_by] == 'Northwestern Press')
         )
         actual = recategorized[group_by] == 'Northwestern Press (Inclusive)'
         np.testing.assert_allclose(
@@ -245,19 +247,19 @@ class TestRecategorize(unittest.TestCase):
             'N/A',
         ]
         for group in not_included_groups:
-            is_group = self.original_df[group_by].str.contains(group)
+            is_group = cleaned_df[group_by].str.contains(group)
             is_compact = recategorized[group_by] == 'Compact Objects'
             assert (is_group.values & is_compact.values).sum() == 0
 
         # Check that none of the singles categories shows up in other
-        for group in pd.unique( self.df[group_by] ):
-            is_group = self.original_df[group_by] == group
+        for group in pd.unique( self.dash.data['preprocessed'][group_by] ):
+            is_group = cleaned_df[group_by] == group
             is_other = recategorized[group_by] == 'Other'
             is_bad = (is_group.values & is_other.values)
             n_matched = is_bad.sum()
             # compare bad ids, good for debugging
             if n_matched > 0:
-                bad_ids_original = self.original_df.index[is_bad]
+                bad_ids_original = cleaned_df.index[is_bad]
                 bad_ids_recategorized = recategorized.loc[is_bad, 'id']
                 np.testing.assert_allclose(
                     bad_ids_original, bad_ids_recategorized
@@ -268,40 +270,40 @@ class TestRecategorize(unittest.TestCase):
 
     def test_recategorize_data_rename(self):
 
-        new_categories = self.config['new_categories']
+        new_categories = self.dash.config['new_categories']
         new_categories['Also Research Topics [Research Topics]'] = {
             'Compact Objects': (
-                "only ('Life & Death of Stars' | 'Gravitational Waves & Multi-Messenger Astronomy' | 'Black Holes & Dead Stars' )",
+                "only ('Life & Death of Stars' | 'Gravitational Waves & Multi-Messenger Astronomy' | 'Black Holes & Dead Stars' )"
             ),
             'Cosmological Populations': (
                 "only ('Galaxies & Cosmology' | 'Stellar Dynamics & Stellar Populations' )"
             ),
         }
-        recategorized = data_utils.recategorize_data(
-            self.df,
+        recategorized_df = self.dash.data_handler.recategorize_data(
+            self.dash.data['preprocessed'],
             new_categories,
             True,
         )
-        is_bad = recategorized['Also Research Topics'] != \
-            recategorized['Research Topics']
+        is_bad = recategorized_df['Also Research Topics'] != \
+            recategorized_df['Research Topics']
         n_bad = is_bad.sum()
         assert n_bad == 0
 
         # Check that this still works for columns with similar names 
         new_categories['Also Research Topics (with parenthesis) [Research Topics]'] = {
             'Compact Objects': (
-                "only ('Life & Death of Stars' | 'Gravitational Waves & Multi-Messenger Astronomy' | 'Black Holes & Dead Stars' )",
+                "only ('Life & Death of Stars' | 'Gravitational Waves & Multi-Messenger Astronomy' | 'Black Holes & Dead Stars' )"
             ),
             'Cosmological Populations': (
-                "only ('Galaxies & Cosmology' | 'Stellar Dynamics & Stellar Populations' )",
+                "only ('Galaxies & Cosmology' | 'Stellar Dynamics & Stellar Populations' )"
             ),
         }
-        recategorized_df = data_utils.recategorize_data(
-            self.df,
+        recategorized_df = self.dash.data_handler.recategorize_data(
+            self.dash.data['preprocessed'],
             new_categories,
             True,
         )
-        is_bad = recategorized['Also Research Topics (with parenthesis)'] != \
+        is_bad = recategorized_df['Also Research Topics (with parenthesis)'] != \
             recategorized_df['Research Topics']
         n_bad = is_bad.sum()
         assert n_bad == 0
