@@ -51,3 +51,28 @@ class DataViewer:
             shown_df = shown_df[columns]
 
         st.write(data[data_key])
+
+def get_tick_range_and_spacing( total, cumulative, ax_frac=0.1 ):
+    '''Solid defaults for ymax and the tick_spacing.
+
+    Args:
+        total (pd.Series): The total counts or sums.
+        cumulative (bool): Whether the data is cumulative.
+        ax_frac (float): Fraction of axis between ticks.
+
+    Returns:
+        ymax (float): The maximum y value.
+        tick_spacing (float): The spacing between ticks.
+    '''
+
+    # Settings for the lineplot
+    if cumulative:
+        ymax = total.sum().max() * 1.05
+    else:
+        ymax = total.values.max() * 1.05
+
+    # Round the tick spacing to a nice number
+    unrounded_tick_spacing = ax_frac * ymax
+    tick_spacing = np.round( unrounded_tick_spacing, -np.floor(np.log10(unrounded_tick_spacing)).astype(int) )
+
+    return ymax, tick_spacing
