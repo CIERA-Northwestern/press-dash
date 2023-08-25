@@ -54,7 +54,7 @@ def main(config_fp: str, user_utils: types.ModuleType=None):
         combine_single_categories=selected_settings.get( 'combine_single_categories', False),
     )
 
-    # Data filters
+    # Data filter settings
     st.subheader('Data Filters')
     builder.interface.request_filter_settings(
         st,

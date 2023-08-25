@@ -181,7 +181,7 @@ class Interface:
         '''
 
         if selected_settings is None:
-            selected_settings = self.settings.common['filter']
+            selected_settings = self.settings.common['filters']
 
         # Setup the tag
         if tag is None:
