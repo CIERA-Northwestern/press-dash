@@ -13,6 +13,7 @@ class Settings:
         self.config = config
         self.common = {
             'data': {},
+            'filter': {},
             'view': {},
         }
         self.local = {}

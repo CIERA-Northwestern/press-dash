@@ -33,7 +33,7 @@ class Interface:
             display_defaults: dict = {},
             display_options: dict = {},
             aggregation_method: str = 'count',
-            store_in: dict = None,
+            selected_settings: dict = None,
         ) -> dict:
         '''Add to st_loc widgets commonly used to set up the axes of a plot.
 
@@ -45,62 +45,60 @@ class Interface:
             aggregation_method: Different aggregation methods have different
                 aggregation methods. If the aggregation method isn't provided by
                 a widget then it defaults to this value.
-            store_in: Where the settings should be stored. Defaults to common data settings.
+            selected_settings: Where the settings should be stored. Defaults to common data settings.
 
         Returns:
-            storage_dict: Current values in the dictionary the settings are stored in.
+            selected_settings: Current values in the dictionary the settings are stored in.
         '''
+
+        if selected_settings is None:
+            selected_settings = self.settings.common['data']
 
         # We have to add the data settings to a dictionary piece-by-piece
         # because as soon as they're called the user input exists.
-        data_axes_kw = {}
         if 'aggregation' in ask_for:
-            data_axes_kw['aggregation'] = st_loc.selectbox(
+            selected_settings['aggregation'] = st_loc.selectbox(
                 'How do you want to aggregate the data?',
                 [ 'count', 'sum' ],
                 index=display_defaults.get( 'aggregation', 0 ),
             )
         else:
-            data_axes_kw['aggregation'] = aggregation_method
+            selected_settings['aggregation'] = aggregation_method
         if 'x_column' in ask_for:
-            data_axes_kw['x_column'] = st_loc.selectbox(
+            selected_settings['x_column'] = st_loc.selectbox(
                 'How do you want to bin the data in time?',
                 display_options.get( 'x_column', self.config['x_columns'] ),
                 index=display_defaults.get( 'x_column', 0 ),
             )
         if 'y_column' in ask_for:
-            if data_axes_kw['aggregation'] == 'count':
-                data_axes_kw['y_column'] = st_loc.selectbox(
+            if selected_settings['aggregation'] == 'count':
+                selected_settings['y_column'] = st_loc.selectbox(
                     'What do you want to count unique entries of?',
                     display_options.get( 'y_column', self.config['id_columns'] ),
                     index=display_defaults.get( 'y_column', 0 ),
                 )
-            elif data_axes_kw['aggregation'] == 'sum':
-                data_axes_kw['y_column'] = st_loc.selectbox(
+            elif selected_settings['aggregation'] == 'sum':
+                selected_settings['y_column'] = st_loc.selectbox(
                     'What do you want to sum?',
                     display_options.get( 'y_column', self.config['weight_columns'] ),
                     index=display_defaults.get( 'y_column', 0 ),
                 )
         if 'groupby_column' in ask_for:
-            data_axes_kw['groupby_column'] = st_loc.selectbox(
+            selected_settings['groupby_column'] = st_loc.selectbox(
                 'What do you want to group the data by?',
                 display_options.get( 'groupby_column', self.config['categorical_columns'] ),
                 index=display_defaults.get( 'groupby_column', 0 ),
             )
 
-        # Update stored objects
-        if store_in is None:
-            storage_dict = self.settings.common['data']
-        storage_dict.update( data_axes_kw )
-
-        return storage_dict
+        return selected_settings
 
     def request_data_settings(
             self,
             st_loc,
             ask_for: list[str] = [ 'show_total', 'cumulative', 'recategorize', 'combine_single_categories' ],
             display_defaults: dict = {},
-            store_in: dict = None,
+            selected_settings: dict = None,
+            tag: str = None,
     ) -> dict:
         '''Request common data settings from the user.
 
@@ -108,40 +106,52 @@ class Interface:
             st_loc: Streamlit object (st or st.sidebar) indicating where to place.
             ask_for: Keys for widgets to include.
             display_defaults: Default values the user sees in the widgets.
-            store_in: Where the settings should be stored. Defaults to common data settings.
+            selected_settings: Where the settings should be stored. Defaults to common data settings.
+            tag: Unique tag that allows duplication of widgets.
 
         Returns:
-            storage_dict: Current values in the dictionary the settings are stored in.
+            selected_settings: Current values in the dictionary the settings are stored in.
         '''
 
-        data_kw = {}
-        if 'show_total' in ask_for:
-            data_kw['show_total'] = st_loc.checkbox(    
+        if selected_settings is None:
+            selected_settings = self.settings.common['data']
+
+        # Setup the tag
+        if tag is None:
+            tag = ''
+        else:
+            tag += ':'
+
+        key = 'show_total'
+        if key in ask_for:
+            selected_settings[key] = st_loc.checkbox(    
                 'show total',
-                value=display_defaults.get( 'show_total', True ),
+                value=display_defaults.get( key, True ),
+                key=tag + key
             )
-        if 'cumulative' in ask_for:
-            data_kw['cumulative'] = st_loc.checkbox(
+        key = 'cumulative'
+        if key in ask_for:
+            selected_settings[key] = st_loc.checkbox(
                 'use cumulative values',
-                value=display_defaults.get( 'cumulative', False ),
+                value=display_defaults.get( key, False ),
+                key=tag + key
             )
-        if 'recategorize' in ask_for:
-            data_kw['recategorize'] = st_loc.checkbox(
+        key = 'recategorize'
+        if key in ask_for:
+            selected_settings[key] = st_loc.checkbox(
                 'use combined categories (avoids double counting; definitions can be edited in the config)',
-                value=display_defaults.get( 'recategorize', False ),
+                value=display_defaults.get( key, False ),
+                key=tag + key
             )
-            if 'combine_single_categories' in ask_for:
-                data_kw['combine_single_categories'] = st_loc.checkbox(
+            key = 'combine_single_categories'
+            if key in ask_for:
+                selected_settings[key] = st_loc.checkbox(
                     'group all undefined categories as "Other"',
-                    value=display_defaults.get( 'combine_single_categories', False ),
+                    value=display_defaults.get( key, False ),
+                    key=tag + key
                 )
 
-        # Update stored objects
-        if store_in is None:
-            storage_dict = self.settings.common['data']
-        storage_dict.update( data_kw )
-
-        return storage_dict
+        return selected_settings
 
     def request_view_settings(
             self,
@@ -164,7 +174,8 @@ class Interface:
             ],
             display_defaults: dict = {},
             display_options: dict = {},
-            store_in: dict = None,
+            selected_settings: dict = None,
+            tag: str = None,
         ):
         '''Generic and common figure settings.
 
@@ -176,103 +187,139 @@ class Interface:
             aggregation_method: Different aggregation methods have different
                 aggregation methods. If the aggregation method isn't provided by
                 a widget then it defaults to this value.
-            store_in: Where the settings should be stored. Defaults to common view settings.
+            selected_settings: Where the settings should be stored. Defaults to common view settings.
+            tag: Unique tag that allows duplication of widgets.
 
         Returns:
-            storage_dict: Current values in the dictionary the settings are stored in.
+            selected_settings: Current values in the dictionary the settings are stored in.
         '''
+
+        if selected_settings is None:
+            selected_settings = self.settings.common['data']
+
+        # Setup the tag
+        if tag is None:
+            tag = ''
+        else:
+            tag += ':'
 
         # Set up generic figure settings
         fig_width, fig_height = matplotlib.rcParams['figure.figsize']
         # The figure size is doubled because this is a primarily horizontal plot
         fig_width *= 2.
-        view_kw = {}
-        if 'seaborn_style' in ask_for:
-            view_kw['seaborn_style'] = st_loc.selectbox(
+        key = 'seaborn_style'
+        if key in ask_for:
+            selected_settings[key] = st_loc.selectbox(
                 'choose seaborn plot style',
-                [ 'whitegrid', 'white', 'darkgrid', 'dark', 'ticks', ],
-                index=display_defaults.get( 'seaborn_style', 0 ),
+                display_options.get(key, [ 'whitegrid', 'white', 'darkgrid', 'dark', 'ticks', ]),
+                index=display_defaults.get(key, 0),
+                key=tag + key,
             )
-        if 'fig_width' in ask_for:
-            view_kw['fig_width'] = st_loc.slider(
+        key = 'fig_width'
+        if key in ask_for:
+            selected_settings[key] = st_loc.slider(
                 'figure width',
                 0.1*fig_width,
                 2.*fig_width,
-                value=display_defaults.get( 'fig_width', fig_width ),
+                value=display_defaults.get( key, fig_width ),
+                key=tag + key,
             )
-        if 'fig_height' in ask_for:
-            view_kw['fig_height'] = st_loc.slider(
+        key = 'fig_height'
+        if key in ask_for:
+            selected_settings[key] = st_loc.slider(
                 'figure height',
                 0.1*fig_height,
                 2.*fig_height,
-                value=display_defaults.get( 'fig_height', fig_height ),
+                value=display_defaults.get( key, fig_height ),
+                key=tag + key,
             )
-        if 'font_scale' in ask_for:
-            view_kw['font_scale'] = st_loc.slider(
+        key = 'font_scale'
+        if key in ask_for:
+            selected_settings[key] = st_loc.slider(
                 'font scale',
                 0.1,
                 2.,
-                value=display_defaults.get( 'font_scale', 1. ),
+                value=display_defaults.get( key, 1. ),
+                key=tag + key,
             )
-        if 'include_legend' in ask_for:
-            view_kw['include_legend'] = st_loc.checkbox(
+        key = 'include_legend'
+        if key in ask_for:
+            selected_settings[key] = st_loc.checkbox(
                 'include legend',
-                value=display_defaults.get( 'include_legend', True ),
+                value=display_defaults.get( key, True ),
+                key=tag + key,
             )
-        if view_kw.get( 'include_legend', False ):
-            if 'legend_scale' in ask_for:
-                view_kw['legend_scale'] = st_loc.slider(
+        if selected_settings.get( 'include_legend', False ):
+            key = 'legend_scale'
+            if key in ask_for:
+                selected_settings[key] = st_loc.slider(
                     'legend scale',
                     0.1,
                     2.,
-                    value=display_defaults.get( 'legend_scale', 1. ),
+                    value=display_defaults.get( key, 1. ),
+                    key=tag + key,
                 )
-            if 'legend_x' in ask_for:
-                view_kw['legend_x'] = st_loc.slider(
+            key = 'legend_x'
+            if key in ask_for:
+                selected_settings[key] = st_loc.slider(
                     'legend x',
                     0.,
                     1.5,
-                    value=display_defaults.get( 'legend_x', 1. ),
+                    value=display_defaults.get( key, 1. ),
+                    key=tag + key,
                 )
-            if 'legend_y' in ask_for:
-                view_kw['legend_y'] = st_loc.slider(
+            key = 'legend_y'
+            if key in ask_for:
+                selected_settings[key] = st_loc.slider(
                     'legend y',
                     0.,
                     1.5,
-                    value=display_defaults.get( 'legend_y', 1. ),
+                    value=display_defaults.get( key, 1. ),
+                    key=tag + key,
                 )
-            if 'legend_horizontal_alignment' in ask_for:
-                view_kw['legend_horizontal_alignment'] = st_loc.selectbox(
+            key = 'legend_ha'
+            if key in ask_for:
+                selected_settings[key] = st_loc.selectbox(
                     'legend horizontal alignment',
                     [ 'left', 'center', 'right' ],
-                    index=display_defaults.get( 'legend_horizontal_alignment', 2 ),
+                    index=display_defaults.get( key, 2 ),
+                    key=tag + key,
                 )
-            if 'legend_vertical_alignment' in ask_for:
-                view_kw['legend_vertical_alignment'] = st_loc.selectbox(
+            key = 'legend_va'
+            if key in ask_for:
+                selected_settings[key] = st_loc.selectbox(
                     'legend vertical alignment',
                     [ 'upper', 'center', 'lower' ],
-                    index=display_defaults.get( 'legend_vertical_alignment', 2 ),
+                    index=display_defaults.get( key, 2 ),
+                    key=tag + key,
                 )
-        if 'include_annotations' in ask_for:
-            view_kw['include_annotations'] = st_loc.checkbox(
+        key = 'include_annotations'
+        if key in ask_for:
+            selected_settings[key] = st_loc.checkbox(
                 'include annotations',
-                value=display_defaults.get( 'include_annotations', False ),
+                value=display_defaults.get( key, False ),
+                key=tag + key,
             )
-        if view_kw.get( 'include_annotations', False ):
-            if 'annotations_horizontal_alignment' in ask_for:
-                view_kw['annotations_horizontal_alignment'] = st_loc.selectbox(
+        if selected_settings.get( 'include_annotations', False ):
+            key = 'annotations_ha'
+            if key in ask_for:
+                selected_settings[key] = st_loc.selectbox(
                     'annotations horizontal alignment',
                     [ 'left', 'center', 'right' ],
-                    index=display_defaults.get( 'annotations_horizontal_alignment', 0 ),
+                    index=display_defaults.get( key, 0 ),
+                    key=tag + key,
                 )
-        if 'color_palette' in ask_for:
-            view_kw['color_palette'] = st_loc.selectbox(
+        key = 'color_palette'
+        if key in ask_for:
+            selected_settings[key] = st_loc.selectbox(
                 'color palette',
-                display_options.get('color_palette', [ 'deep', 'colorblind', 'dark', 'bright', 'pastel', 'muted', ]),
-                index=display_defaults.get( 'color_palette', 0 ),
+                display_options.get(key, [ 'deep', 'colorblind', 'dark', 'bright', 'pastel', 'muted', ]),
+                index=display_defaults.get( key, 0 ),
+                key=tag + key,
             )
 
-        if 'font' in ask_for:
+        key = 'font'
+        if key in ask_for:
             original_font = copy.copy( plt.rcParams['font.family'] )[0]
             # This can be finicky, so we'll wrap it in a try/except
             try:
@@ -288,17 +335,13 @@ class Interface:
                     'Select font',
                     np.arange( len( fonts ) ),
                     index=default_index,
-                    format_func=lambda x: fonts[x]
+                    format_func=lambda x: fonts[x],
+                    key=tag + key,
                 )
                 font = font_manager.FontProperties( fname=font_fps[font_ind] )
-                view_kw['font'] = font.get_name()
+                selected_settings[key] = font.get_name()
             except:
-                view_kw['font'] = original_font
+                selected_settings[key] = original_font
 
-        # Update stored objects
-        if store_in is None:
-            storage_dict = self.settings.common['view']
-        storage_dict.update(view_kw)
-
-        return storage_dict
+        return selected_settings
 
