@@ -209,8 +209,36 @@ class Interface:
                 default = current.get(col,'')
                 default = display_defaults.get(key, {}).get(col, default)
                 selected_settings[key][col] = st_loc.text_input(
-                    'Search {} for what?'.format(col),
+                    '"{}" column: What do you want to search for?'.format(col),
                     value=default,
+                    key=tag + key + ':' + col
+                )
+
+        key = 'categorical_filters'
+        if key in ask_for:
+            current = selected_settings.setdefault(key, {})
+            # Select which columns to filter on
+            if len(current) == 0:
+                multiselect_default = []
+            else:
+                multiselect_default = list(current)
+            filter_columns = st_loc.multiselect(
+                'What categorical columns do you want to filter on?',
+                options=display_options.get(key, self.config['categorical_columns']),
+                default=multiselect_default,
+                key=tag + key
+            )
+            for col in filter_columns:
+                possible_columns = pd.unique(df[col])
+                # Check the current values then the passed-in defaults
+                # for a default
+                default = current.get(col, possible_columns)
+                default = display_defaults.get(key, {}).get(col, default)
+                selected_settings[key][col] = st_loc.multiselect(
+                    '"{}" column: What groups to include?'.format(col),
+                    possible_columns,
+                    default=default,
+                    key=tag + key + ':' + col
                 )
 
         return selected_settings

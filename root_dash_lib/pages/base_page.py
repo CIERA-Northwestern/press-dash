@@ -23,18 +23,14 @@ def main(config_fp: str, user_utils: types.ModuleType=None):
             Defaults to those in root_dash_lib.
     '''
 
-    ################################################################################
-    # Script Setup
-    ################################################################################
-
     # This must be the first streamlit command
     st.set_page_config(layout='wide')
 
+    # Get the builder used to construct the dashboard
     builder = dash_builder.DashBuilder(config_fp, user_utils=user_utils)
 
     # Set the title that shows up at the top of the dashboard
-    if 'page_title' in builder.config:
-        st.title(builder.config['page_title'])
+    st.title(builder.config.get('page_title','Dashboard'))
 
     # Prep data
     preprocessed_df, config = builder.prep_data(builder.config)
