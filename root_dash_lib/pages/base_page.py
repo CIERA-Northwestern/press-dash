@@ -33,11 +33,8 @@ def main(config_fp: str, user_utils: types.ModuleType=None):
     st.title(builder.config.get('page_title','Dashboard'))
 
     # Prep data
-    data_handler = builder.prep_data(builder.config)
-    preprocessed_df = data_handler.data['preprocessed']
-
-    # DEBUG
-    st.write(data_handler.data)
+    data, config = builder.prep_data(builder.config)
+    builder.config.update(config)
 
     # Global settings
     st.sidebar.markdown('# Data Settings')
@@ -47,8 +44,8 @@ def main(config_fp: str, user_utils: types.ModuleType=None):
 
     # Recategorize data
     selected_settings = builder.settings.common['data']
-    recategorized_df = builder.recategorize_data(
-        preprocessed_df=preprocessed_df,
+    data['recategorized'] = builder.recategorize_data(
+        preprocessed_df=data['preprocessed'],
         new_categories=builder.config.get( 'new_categories', {} ),
         recategorize=selected_settings['recategorize'],
         combine_single_categories=selected_settings.get( 'combine_single_categories', False),
@@ -58,21 +55,23 @@ def main(config_fp: str, user_utils: types.ModuleType=None):
     st.subheader('Data Filters')
     builder.interface.request_filter_settings(
         st,
-        recategorized_df,
+        data['recategorized'],
     )
 
-    # DEBUG
-    st.write(builder.data_handler.data)
+    # Apply data filters
+    data['selected'] = builder.data_handler.filter_data(
+        data['recategorized'],
+        builder.settings.common['filters']['text'],
+        builder.settings.common['filters']['categorical'],
+        builder.settings.common['filters']['numerical'],
+    )
 
     # Data axes
     st.subheader('Data Axes')
     builder.interface.request_data_axes(st)
 
-    # DEBUG
-    st.write(builder.data_handler.data)
-
-    # View the data
-    builder.data_viewer.write()
+    # View the data directly
+    builder.data_viewer.write(data)
 
     # ################################################################################
     # # Set up global settings

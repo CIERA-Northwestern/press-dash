@@ -162,4 +162,8 @@ def preprocess_data(cleaned_df, config):
     preprocessed_df['id'] = preprocessed_df.index
     preprocessed_df.set_index(np.arange(len(preprocessed_df)), inplace=True)
 
+    # This flag exists just to demonstrate you can modify the config
+    # during the user functions
+    config['data_preprocessed'] = True
+
     return preprocessed_df, config

@@ -21,9 +21,6 @@ class DataHandler:
         self.config = config
         self.user_utils = user_utils
 
-        # Container for dataframes
-        self.data = {}
-
     def load_data(self, config: dict) -> Tuple[pd.DataFrame, dict]:
         '''Load the data using the stored config and user_utils.
 
@@ -34,15 +31,8 @@ class DataHandler:
         Returns:
             raw_df: The data.
             config: The config file. This will also be stored at self.config
-        
-        Side Effects:
-            self.data['raw']: Data stored.
-            self.config: Possible updates to the stored config file.
         '''
         raw_df, config = self.user_utils.load_data(config)
-
-        self.data['raw'] = raw_df
-        self.config = config
 
         return raw_df, config
 
@@ -63,19 +53,10 @@ class DataHandler:
         Returns:
             cleaned_df: The preprocessed data.
             config: The config file. This will also be stored at self.config
-        
-        Side Effects:
-            self.data['cleaned']: Data stored.
-            self.config: Possible updates to the stored config file.
         '''
-        cleaned_df, config = self.user_utils.clean_data(
+        return self.user_utils.clean_data(
             raw_df, config
         )
-
-        self.data['cleaned'] = cleaned_df
-        self.config = config
-
-        return cleaned_df, config
 
     def preprocess_data(
             self,
@@ -93,19 +74,10 @@ class DataHandler:
         Returns:
             preprocessed_df: The preprocessed data.
             config: The config file. This will also be stored at self.config
-        
-        Side Effects:
-            self.data['preprocessed']: Data stored.
-            self.config: Possible updates to the stored config file.
         '''
-        preprocessed_df, config = self.user_utils.preprocess_data(
+        return self.user_utils.preprocess_data(
             cleaned_df, config
         )
-
-        self.data['preprocessed'] = preprocessed_df
-        self.config = config
-
-        return preprocessed_df, config
 
     def recategorize_data_per_grouping(
         self,
@@ -249,8 +221,6 @@ class DataHandler:
 
         recategorized.reset_index( inplace=True )
 
-        self.data['recategorized'] = recategorized
-
         return recategorized
 
     def filter_data(
@@ -292,7 +262,5 @@ class DataHandler:
             )
 
         selected_df = recategorized_df.loc[is_included]
-
-        self.data['selected'] = selected_df
 
         return selected_df

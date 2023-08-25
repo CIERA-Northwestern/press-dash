@@ -38,7 +38,7 @@ class DashBuilder:
         self.interface = interface.Interface(self.config, self.settings)
         self.data_handler = data_handler.DataHandler(self.config, user_utils)
         self.agg = aggregator.Aggregator(self.config)
-        self.data_viewer = data_viewer.DataViewer(self.config, self.settings, self.data_handler)
+        self.data_viewer = data_viewer.DataViewer(self.config, self.settings)
 
     @property
     def data(self):
@@ -72,9 +72,13 @@ class DashBuilder:
             config = yaml.load(file, Loader=yaml.FullLoader)
         return config
 
-    @st.cache_resource
+    @st.cache_data
     def prep_data(_self, config: dict) -> pd.DataFrame:
         '''Load, clean, and preprocess the data.
+
+        *Note*: calculations cannot depend on any values updated during
+        any cached functions (a.k.a. calculations cannot rely on any side effects)
+        because streamlit caches outputs only.
 
         This is the one time that the config can be altered during execution,
         chosen as such to allow the user to modify the config on the fly,
@@ -95,14 +99,15 @@ class DashBuilder:
             self.data_handler.data: Updates data stored.
             self.config: Possible updates to the stored config file.
         '''
+        msg = 'Prepping data...'
+        print(msg)
+        with st.spinner(msg):
+            data = {}
+            data['raw'], config = _self.data_handler.load_data(config)
+            data['cleaned'], config = _self.data_handler.clean_data(data['raw'], config)
+            data['preprocessed'], config = _self.data_handler.preprocess_data(data['cleaned'], config)
 
-        print('Doing data prep...')
-
-        raw_df, _self.config = _self.data_handler.load_data(config)
-        cleaned_df, _self.config = _self.data_handler.clean_data(raw_df, _self.config)
-        preprocessed_df, _self.config = _self.data_handler.preprocess_data(cleaned_df, _self.config)
-
-        return _self.data_handler
+            return data, config
  
     @st.cache_data
     def recategorize_data(
@@ -132,12 +137,41 @@ class DashBuilder:
             recategorized: The dataframe containing the recategorized data.
                 One entry per article.
         '''
+        msg = 'Recategorizing data...'
+        print(msg)
+        with st.spinner(msg):
+            return _self.data_handler.recategorize_data(
+                preprocessed_df=preprocessed_df,
+                new_categories=new_categories,
+                recategorize=recategorize,
+                combine_single_categories=combine_single_categories,
+            )
 
-        print( 'Recategorizing data...' )
+    @st.cache_data
+    def filter_data(
+        self,
+        recategorized_df: pd.DataFrame,
+        text_filters: dict[str, str] = {},
+        categorical_filters: dict[str, list] = {},
+        numerical_filters: dict[str, tuple] = {},
+    ) -> pd.DataFrame:
+        '''Filter what data shows up in the dashboard.
 
-        return _self.data_handler.recategorize_data(
-            preprocessed_df=preprocessed_df,
-            new_categories=new_categories,
-            recategorize=recategorize,
-            combine_single_categories=combine_single_categories,
-        )
+        Args:
+            recategorized_df: The dataframe containing the data.
+            text_filters (dict): Search fields for text.
+            categorical_filters (dict): How categories are filtered.
+            numerical_filters (dict): Ranges for numerical data filters
+
+        Returns:
+            selected_df: The dataframe containing the selected data.
+        '''
+        msg = 'Filtering data...'
+        print(msg)
+        with st.spinner(msg):
+            return self.data_handler.filter_data(
+                recategorized_df=recategorized_df,
+                text_filters=text_filters,
+                categorical_filters=categorical_filters,
+                numerical_filters=numerical_filters
+            )

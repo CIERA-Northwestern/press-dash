@@ -159,7 +159,7 @@ class Interface:
             self,
             st_loc,
             df: pd.DataFrame,
-            ask_for: list[str] = [ 'text_filters', 'categorical_filters', 'numerical_filters' ],
+            ask_for: list[str] = [ 'text', 'categorical', 'numerical' ],
             display_defaults: dict = {},
             display_options: dict = {},
             selected_settings: dict = None,
@@ -189,7 +189,7 @@ class Interface:
         else:
             tag += ':'
 
-        key = 'text_filters'
+        key = 'text'
         if key in ask_for:
             current = selected_settings.setdefault(key, {})
             # Select which columns to filter on
@@ -214,7 +214,7 @@ class Interface:
                     key=tag + key + ':' + col
                 )
 
-        key = 'categorical_filters'
+        key = 'categorical'
         if key in ask_for:
             current = selected_settings.setdefault(key, {})
             # Select which columns to filter on
@@ -241,7 +241,7 @@ class Interface:
                     key=tag + key + ':' + col
                 )
 
-        key = 'numerical_filters'
+        key = 'numerical'
         if key in ask_for:
             current = selected_settings.setdefault(key, {})
             # Select which columns to filter on

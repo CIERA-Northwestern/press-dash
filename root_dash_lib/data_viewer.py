@@ -20,15 +20,15 @@ class DataViewer:
         data_handler: The data handler containing the relevant data.
     '''
 
-    def __init__(self, config: dict, settings: Settings, data_handler: DataHandler):
+    def __init__(self, config: dict, settings: Settings):
         self.config = config
         self.settings = settings
-        self.data_handler = data_handler
 
-    def write(self, data_key: str=None, st_loc=st, columns: list[str]=None):
+    def write(self, data, data_key: str=None, st_loc=st, columns: list[str]=None):
         '''Show a specified dataframe.
 
         Args:
+            data: Data dict containing the data frames.
             data_key: key to search the data handler for.
                 Defaults to providing a widget.
             st_loc: Where to show the data.
@@ -38,16 +38,16 @@ class DataViewer:
         if data_key is None:
             data_key = st_loc.radio(
                 'View what data?',
-                options=self.data_handler.data.keys(),
+                options=data.keys(),
                 horizontal=True,
             )
 
-        if data_key not in self.data_handler.data:
+        if data_key not in data:
             st.write('{} not found in data'.format( data_key ))
             return
 
-        shown_df = self.data_handler.data[data_key]
+        shown_df = data[data_key]
         if columns is not None:
             shown_df = shown_df[columns]
 
-        st.write(self.data_handler.data[data_key])
+        st.write(data[data_key])
