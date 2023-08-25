@@ -24,6 +24,7 @@ class DataHandler:
 
     def load_data(self, config: dict) -> (pd.DataFrame, dict):
         '''Load the data using the stored config and user_utils.
+
         This is one of the only functions where we allow the config
         to be modified. In general the on-the-fly settings are
         kept elsewhere.
@@ -43,9 +44,40 @@ class DataHandler:
 
         return raw_df, config
 
-    def preprocess_data(
+    def clean_data(
             self,
             raw_df: pd.DataFrame,
+            config: dict,
+    ) -> (pd.DataFrame, dict):
+        '''Clean the data using the stored config and user_utils.
+
+        This is one of the only functions where we allow the config
+        to be modified. In general the on-the-fly settings are
+        kept elsewhere.
+
+        Args:
+            raw_df: The loaded data.
+
+        Returns:
+            cleaned_df: The preprocessed data.
+            config: The config file. This will also be stored at self.config
+        
+        Side Effects:
+            self.data['cleaned']: Data stored.
+            self.config: Possible updates to the stored config file.
+        '''
+        cleaned_df, config = self.user_utils.clean_data(
+            raw_df, config
+        )
+
+        self.data['cleaned'] = cleaned_df
+        self.config = config
+
+        return cleaned_df, config
+
+    def preprocess_data(
+            self,
+            cleaned_df: pd.DataFrame,
             config: dict,
     ) -> (pd.DataFrame, dict):
         '''Preprocess the data using the stored config and user_utils.
@@ -54,7 +86,7 @@ class DataHandler:
         kept elsewhere.
 
         Args:
-            raw_df: The loaded data.
+            cleaned_df: The loaded data.
 
         Returns:
             preprocessed_df: The preprocessed data.
@@ -65,7 +97,7 @@ class DataHandler:
             self.config: Possible updates to the stored config file.
         '''
         preprocessed_df, config = self.user_utils.preprocess_data(
-            raw_df, config
+            cleaned_df, config
         )
 
         self.data['preprocessed'] = preprocessed_df

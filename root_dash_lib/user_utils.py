@@ -11,12 +11,14 @@ from root_dash_lib import time_series_utils
 
 
 def load_data(config):
-    '''This is the main function for loading the data, and one of the
-    most-important functions the user will need to modify when adapting
-    this dashboard to their own data. For compatibility with the existing
-    dashboard, this function should accept a config dictionary
-    and return a dataframe and the config dictionary (which may be
-    modified, but isn't necessarily).
+    '''Modify this!
+    
+    This is the main function for loading the data
+    (but save cleaning and preprocessing for later).
+    
+    For compatibility with the existing
+    dashboard, this function should accept a pandas DataFrame and a
+    config dictionary and return the same.
 
     Args:
         config (dict): The configuration dictionary, loaded from a YAML file.
@@ -71,10 +73,13 @@ def load_data(config):
     return raw_df, config
 
 
-def preprocess_data(raw_df, config):
-    '''This is the main function for loading the data, and one of the
-    most-important functions the user will need to modify when adapting
-    this dashboard to their own data. For compatibility with the existing
+def clean_data(raw_df, config):
+    '''Modify this!
+    
+    This is the main function for cleaning the data,
+    i.e. getting rid of NaNs, dropping glitches, etc.
+    
+    For compatibility with the existing
     dashboard, this function should accept a pandas DataFrame and a
     config dictionary and return the same.
 
@@ -83,18 +88,18 @@ def preprocess_data(raw_df, config):
         config (dict): The configuration dictionary, loaded from a YAML file.
 
     Returns:
-        processed_df (pandas.DataFrame): The processed data.
+        cleaned_df (pandas.DataFrame): The cleaned data.
         config (dict): The (possibly altered) configuration dictionary.
     '''
 
     # Drop drafts
-    preprocessed_df = raw_df.drop(
+    cleaned_df = raw_df.drop(
         raw_df.index[raw_df['Date'].dt.year == 1970],
         axis='rows',
     )
 
     # Drop weird articles---ancient ones w/o a title or press type
-    preprocessed_df.dropna(
+    cleaned_df.dropna(
         axis='rows',
         how='any',
         subset=['Title', 'Press Types', ],
@@ -103,19 +108,43 @@ def preprocess_data(raw_df, config):
 
     # Get rid of HTML ampersands
     for str_column in ['Title', 'Research Topics', 'Categories']:
-        preprocessed_df[str_column] = preprocessed_df[str_column].str.replace('&amp;', '&')
+        cleaned_df[str_column] = cleaned_df[str_column].str.replace('&amp;', '&')
+
+    # Handle NaNs and such
+    columns_to_fill = ['Press Mentions', 'People Reached', ]
+    cleaned_df[columns_to_fill] = cleaned_df[columns_to_fill].fillna(
+        value=0
+    )
+    cleaned_df.fillna(value='N/A', inplace=True)
+
+    return cleaned_df, config
+
+
+def preprocess_data(cleaned_df, config):
+    '''Modify this!
+    
+    This is the main function for doing preprocessing, e.g. 
+    adding new columns, renaming them, etc.
+    
+    For compatibility with the existing
+    dashboard, this function should accept a pandas DataFrame and a
+    config dictionary and return the same.
+
+    Args:
+        cleaned_df (pandas.DataFrame): The raw data to be used in the dashboard.
+        config (dict): The configuration dictionary, loaded from a YAML file.
+
+    Returns:
+        processed_df (pandas.DataFrame): The processed data.
+        config (dict): The (possibly altered) configuration dictionary.
+    '''
+
+    preprocessed_df = cleaned_df.copy()
 
     # Get the year, according to the config start date
     preprocessed_df['Year'] = time_series_utils.get_year(
         preprocessed_df['Date'], config['start_of_year']
     )
-
-    # Handle NaNs and such
-    columns_to_fill = ['Press Mentions', 'People Reached', ]
-    preprocessed_df[columns_to_fill] = preprocessed_df[columns_to_fill].fillna(
-        value=0
-    )
-    preprocessed_df.fillna(value='N/A', inplace=True)
 
     # Tweaks to the press data
     if 'Title (optional)' in preprocessed_df.columns:

@@ -48,10 +48,10 @@ def standard_setup(self):
 
     self.dash = Dashboard(self.config_fp)
     preprocessed_df, config = \
-        self.dash.load_and_preprocess_data(self.dash.config)
+        self.dash.prep_data(self.dash.config)
 
 
-class TestLoadAndPreProcess(unittest.TestCase):
+class TestPrepData(unittest.TestCase):
     '''This tests the setup for press data.
     '''
 
@@ -91,7 +91,7 @@ class TestLoadAndPreProcess(unittest.TestCase):
         '''Does preprocess data at least run?'''
 
         dash = Dashboard(self.config_fp)
-        preprocessed_df, config = dash.load_and_preprocess_data(dash.config)
+        preprocessed_df, config = dash.prep_data(dash.config)
 
         assert 'preprocessed' in dash.data
 
@@ -103,26 +103,10 @@ class TestLoadAndPreProcess(unittest.TestCase):
         '''
 
         dash = Dashboard(self.config_fp)
-        preprocessed_df, config = dash.load_and_preprocess_data(dash.config)
-        raw_df = dash.data['raw']
+        preprocessed_df, config = dash.prep_data(dash.config)
+        cleaned_df = dash.data['cleaned']
 
         groupby_column = 'Research Topics'
-
-        # Drafts and weird articles are dropped
-        # And ampersands...
-        raw_df = raw_df.drop(
-            raw_df.index[raw_df['Date'].dt.year == 1970],
-            axis='rows',
-        )
-        raw_df.dropna(
-            axis='rows',
-            how='any',
-            subset=['Title', 'Press Types', ],
-            inplace=True,
-        )
-        raw_df[groupby_column] = \
-            raw_df[groupby_column].str.replace('&amp;', '&')
-        raw_df.fillna('N/A', inplace=True)
 
         test_df = preprocessed_df.copy()
         test_df['dup_col'] = \
@@ -131,14 +115,14 @@ class TestLoadAndPreProcess(unittest.TestCase):
         grouped = test_df.groupby('id')
         actual = grouped[groupby_column].apply('|'.join)
 
-        missing = raw_df.loc[np.invert(raw_df.index.isin(actual.index))]
+        missing = cleaned_df.loc[np.invert(cleaned_df.index.isin(actual.index))]
         assert len(missing) == 0
 
-        not_equal = actual != raw_df[groupby_column]
+        not_equal = actual != cleaned_df[groupby_column]
         assert not_equal.sum() == 0
         np.testing.assert_array_equal(
             actual,
-            raw_df[groupby_column]
+            cleaned_df[groupby_column]
         )
 
 
@@ -195,9 +179,9 @@ class TestRecategorize(unittest.TestCase):
     def test_recategorize_data_per_grouping_realistic(self):
 
         group_by = 'Research Topics'
-        original_df = self.dash.data['preprocessed']
-        recategorized = self.dash.data_handler.recategorize_data_per_grouping(
-            original_df,
+        raw_df = self.dash.data['raw']
+        recategorized_df = self.dash.data_handler.recategorize_data_per_grouping(
+            self.dash.data['preprocessed'],
             group_by,
             self.dash.config['new_categories'][group_by],
             False,
@@ -211,20 +195,20 @@ class TestRecategorize(unittest.TestCase):
             'N/A',
         ]
         for group in not_included_groups:
-            is_group = original_df[group_by].str.contains(group)
-            is_compact = recategorized == 'Compact Objects'
+            is_group = raw_df[group_by].str.contains(group)
+            is_compact = recategorized_df == 'Compact Objects'
             assert (is_group.values & is_compact.values).sum() == 0
 
         # Check that none of the singles categories shows up in other
         for group in pd.unique(self.df[group_by]):
-            is_group = original_df[group_by] == group
-            is_other = recategorized == 'Other'
+            is_group = raw_df[group_by] == group
+            is_other = recategorized_df == 'Other'
             is_bad = (is_group.values & is_other.values)
             n_matched = is_bad.sum()
             # compare bad ids, good for debugging
             if n_matched > 0:
-                bad_ids_original = original_df.index[is_bad]
-                bad_ids_recategorized = recategorized.index[is_bad]
+                bad_ids_original = raw_df.index[is_bad]
+                bad_ids_recategorized = recategorized_df.index[is_bad]
                 np.testing.assert_allclose(
                     bad_ids_original, bad_ids_recategorized
                 )

@@ -60,8 +60,9 @@ class Dashboard:
             config = yaml.load(file, Loader=yaml.FullLoader)
         return config
 
-    def load_and_preprocess_data(self, config: dict) -> pd.DataFrame:
-        '''Both load and preprocess the data.
+    def prep_data(self, config: dict) -> pd.DataFrame:
+        '''Load, clean, and preprocess the data.
+
         This is the one time that the config can be altered during execution,
         chosen as such to allow the user to modify the config on the fly,
         as these two functions are user defined.
@@ -79,8 +80,8 @@ class Dashboard:
         '''
 
         raw_df, self.config = self.data_handler.load_data(config)
-        preprocessed_df, self.config = \
-            self.data_handler.preprocess_data(raw_df, self.config)
+        cleaned_df, self.config = self.data_handler.clean_data(raw_df, self.config)
+        preprocessed_df, self.config = self.data_handler.preprocess_data(cleaned_df, self.config)
 
         return preprocessed_df, config
  
