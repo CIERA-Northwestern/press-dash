@@ -43,7 +43,7 @@ primary_id_column: index
 id_columns: # Unique identifiers
   - id
   - Title
-weight_columns: # Numeric columns that can be summed
+numerical_columns: # Numeric columns that can be summed
   - Press Mentions
   - People Reached
 date_columns: # Dates

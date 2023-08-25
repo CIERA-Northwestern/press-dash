@@ -241,6 +241,35 @@ class Interface:
                     key=tag + key + ':' + col
                 )
 
+        key = 'numerical_filters'
+        if key in ask_for:
+            current = selected_settings.setdefault(key, {})
+            # Select which columns to filter on
+            if len(current) == 0:
+                multiselect_default = []
+            else:
+                multiselect_default = list(current)
+            filter_columns = st_loc.multiselect(
+                'What numerical columns do you want to filter on?',
+                options=display_options.get(key, self.config['numerical_columns']),
+                default=multiselect_default,
+                key=tag + key
+            )
+            for col in filter_columns:
+                value_min = df[col].min()
+                value_max = df[col].max()
+                # Check the current values then the passed-in defaults
+                # for a default
+                default = current.get(col, (value_min, value_max))
+                default = display_defaults.get(key, {}).get(col, default)
+                selected_settings[key][col] = st_loc.slider(
+                    '"{}" column: What range to include?'.format(col),
+                    min_value=default[0],
+                    max_value=default[1],
+                    value=default,
+                    key=tag + key + ':' + col
+                )
+
         return selected_settings
 
     def request_view_settings(
