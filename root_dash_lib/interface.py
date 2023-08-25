@@ -143,13 +143,14 @@ class Interface:
                 value=display_defaults.get( key, False ),
                 key=tag + key
             )
-            key = 'combine_single_categories'
-            if key in ask_for:
-                selected_settings[key] = st_loc.checkbox(
-                    'group all undefined categories as "Other"',
-                    value=display_defaults.get( key, False ),
-                    key=tag + key
-                )
+            if selected_settings.get('recategorize', False):
+                key = 'combine_single_categories'
+                if key in ask_for:
+                    selected_settings[key] = st_loc.checkbox(
+                        'group all undefined categories as "Other"',
+                        value=display_defaults.get( key, False ),
+                        key=tag + key
+                    )
 
         return selected_settings
 
