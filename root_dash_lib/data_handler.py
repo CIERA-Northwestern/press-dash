@@ -7,6 +7,7 @@ from typing import Tuple
 
 import numpy as np
 import pandas as pd
+import streamlit as st
 
 
 class DataHandler:
@@ -190,8 +191,9 @@ class DataHandler:
             
         return recategorized_series
 
+    @st.cache_data
     def recategorize_data(
-            self,
+            _self,
             preprocessed_df: pd.DataFrame,
             new_categories: dict,
             recategorize: bool = True,
@@ -215,6 +217,8 @@ class DataHandler:
                 One entry per article.
         '''
 
+        print( 'Recategorizing data.' )
+
         # We include the automatic return to help with data caching.
         if not recategorize:
             return preprocessed_df
@@ -222,7 +226,7 @@ class DataHandler:
         # Get the condensed data frame
         # This is probably dropping stuff that shouldn't be dropped!!!!!!!
         recategorized = preprocessed_df.drop_duplicates( subset='id', keep='first' )
-        recategorized.set_index( 'id', inplace=True )
+        recategorized = recategorized.set_index('id')
 
         for groupby_column, new_categories_per_grouping in new_categories.items():
 
@@ -236,7 +240,7 @@ class DataHandler:
             else:
                 raise KeyError( 'New categories cannot have multiple sets of brackets.' )
 
-            recategorized_groupby = self.recategorize_data_per_grouping(
+            recategorized_groupby = _self.recategorize_data_per_grouping(
                 preprocessed_df,
                 groupby_column,
                 copy.deepcopy( new_categories_per_grouping ),
