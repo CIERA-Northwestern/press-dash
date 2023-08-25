@@ -350,20 +350,7 @@ class TestAggregate( unittest.TestCase ):
 
     def setUp( self ):
 
-        # Get filepath info
-        test_dir = os.path.abspath( os.path.dirname( __file__ ) )
-        self.root_dir = os.path.dirname( test_dir )
-        self.data_dir = os.path.join( self.root_dir, 'test_data', 'test_data_complete', )
-        root_config_fp = os.path.join( self.root_dir, 'test', 'config.yml' )
-        self.config_fp = os.path.join( self.data_dir, 'config.yml' )
-
-        copy_config( root_config_fp, self.config_fp )
-
-        self.group_by = 'Research Topics'
-
-        self.dash = Dashboard( self.config_fp )
-        df = self.dash.data_handler.load_data()
-        self.dash.data_handler.preprocess_data( df )
+        standard_setup( self )
 
     def tearDown( self ):
         if os.path.isfile( self.config_fp ):
@@ -373,10 +360,10 @@ class TestAggregate( unittest.TestCase ):
 
     def test_count( self ):
 
-        selected = self.dash.df
+        selected_df = self.dash.data['preprocessed']
 
         counts, total = self.dash.count(
-            selected,
+            selected_df,
             'Year',
             'id',
             self.group_by
@@ -385,9 +372,9 @@ class TestAggregate( unittest.TestCase ):
         test_year = 2015
         test_group = 'Galaxies & Cosmology'
         expected = len( pd.unique(
-            selected.loc[(
-                ( selected['Year'] == test_year ) &
-                ( selected[self.group_by] == test_group )
+            selected_df.loc[(
+                ( selected_df['Year'] == test_year ) &
+                ( selected_df[self.group_by] == test_group )
             ),'id']
         ) )
         assert counts.loc[test_year,test_group] == expected
@@ -395,8 +382,8 @@ class TestAggregate( unittest.TestCase ):
         # Total count
         test_year = 2015
         expected = len( pd.unique(
-            selected.loc[(
-                ( selected['Year'] == test_year )
+            selected_df.loc[(
+                ( selected_df['Year'] == test_year )
             ),'id']
         ) )
         assert total.loc[test_year][0] == expected
@@ -405,11 +392,11 @@ class TestAggregate( unittest.TestCase ):
 
     def test_sum_press_mentions( self ):
 
-        selected = self.df
+        selected_df = self.dash.data['preprocessed']
         weighting = 'Press Mentions'
 
         sums, total = self.dash.sum(
-            selected,
+            selected_df,
             'Year',
             weighting,
             self.group_by,
@@ -417,9 +404,9 @@ class TestAggregate( unittest.TestCase ):
 
         test_year = 2015
         test_group = 'Galaxies & Cosmology'
-        subselected = selected.loc[(
-            ( selected['Year'] == test_year ) &
-            ( selected[self.group_by] == test_group )
+        subselected = selected_df.loc[(
+            ( selected_df['Year'] == test_year ) &
+            ( selected_df[self.group_by] == test_group )
         )]
         subselected = subselected.drop_duplicates( subset='id' )
         subselected = subselected.replace( 'N/A', 0, )
@@ -428,8 +415,8 @@ class TestAggregate( unittest.TestCase ):
 
         # Total count
         test_year = 2015
-        subselected = selected.loc[(
-            ( selected['Year'] == test_year )
+        subselected = selected_df.loc[(
+            ( selected_df['Year'] == test_year )
         )]
         subselected = subselected.drop_duplicates( subset='id' )
         subselected = subselected.replace( 'N/A', 0, )
@@ -440,11 +427,11 @@ class TestAggregate( unittest.TestCase ):
 
     def test_count_press_mentions_nonzero( self ):
 
-        selected = self.df
+        selected_df = self.dash.data['preprocessed']
         weighting = 'Press Mentions'
 
         sums, total = self.dash.sum(
-            selected,
+            selected_df,
             'Year',
             weighting,
             self.group_by,
@@ -453,9 +440,9 @@ class TestAggregate( unittest.TestCase ):
         # Non-zero test
         test_year = 2021
         test_group = 'Gravitational Waves & Multi-Messenger Astronomy'
-        subselected = selected.loc[(
-            ( selected['Year'] == test_year ) &
-            ( selected[self.group_by] == test_group )
+        subselected = selected_df.loc[(
+            ( selected_df['Year'] == test_year ) &
+            ( selected_df[self.group_by] == test_group )
         )]
         subselected = subselected.drop_duplicates( subset='id' )
         subselected = subselected.replace( 'N/A', 0 )
@@ -465,8 +452,8 @@ class TestAggregate( unittest.TestCase ):
 
         # Total count
         test_year = 2021
-        subselected = selected.loc[(
-            ( selected['Year'] == test_year )
+        subselected = selected_df.loc[(
+            ( selected_df['Year'] == test_year )
         )]
         subselected = subselected.drop_duplicates( subset='id' )
         subselected = subselected.replace( 'N/A', 0 )
