@@ -16,31 +16,6 @@ import seaborn as sns
 
 ################################################################################
 
-def load_config( config_fp ):
-    '''Get the config. This is done once per session.
-    The config directory is set as the working directory.
-
-    Args:
-        config_fp (str): Filepath for the config file.
-
-    Returns:
-        config (dict): The config dictionary.
-    '''
-
-    config_dir, config_fn = os.path.split( config_fp )
-
-    # Check if we're in the directory the script is in,
-    # which should also be the directory the config is in.
-    # If not, move into that directory
-    if os.getcwd() != config_dir:
-        os.chdir( config_dir )
-
-    with open( config_fn, "r") as f:
-        config = yaml.load(f, Loader=yaml.FullLoader)
-    return config
-
-################################################################################
-
 def generate_widgets( st_loc, instructions, defaults={}, options={}, include=None ):
     '''Wrapper for generating widgets, which are the user input objects.
     This function should *not* be used for one-off creation of widgets.
