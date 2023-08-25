@@ -1,5 +1,6 @@
 '''Main dashboard class.
 '''
+import importlib
 import os
 import types
 import yaml
@@ -8,8 +9,11 @@ import pandas as pd
 import streamlit as st
 
 from . import user_utils as default_user_utils
-from . import data_handler, aggregator
+from . import settings, interface, data_handler, aggregator
 
+# We need to reload all the individual pieces if we want changes in them to propagate
+for module in [ settings, interface, data_handler, aggregator ]:
+    importlib.reload(module)
 
 class DashBuilder:
     '''Main class for constructing dashboards.
@@ -30,6 +34,8 @@ class DashBuilder:
             user_utils = default_user_utils
 
         self.config = self.load_config(config_fp)
+        self.settings = settings.Settings(self.config)
+        self.interface = interface.Interface(self.config, self.settings)
         self.data_handler = data_handler.DataHandler(self.config, user_utils)
         self.agg = aggregator.Aggregator(self.config)
 
@@ -72,6 +78,10 @@ class DashBuilder:
         This is the one time that the config can be altered during execution,
         chosen as such to allow the user to modify the config on the fly,
         as these two functions are user defined.
+
+        For this and other functions wrapped by a streamlit caching function,
+        "self" must be replaced be preceeded by "_" to avoid streamlit
+        trying to cache self.
 
         Args:
             config: The config dict.

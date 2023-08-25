@@ -39,6 +39,14 @@ def main(config_fp: str, user_utils: types.ModuleType=None):
     # Prep data
     preprocessed_df, config = builder.prep_data(builder.config)
 
+
+    # Global settings
+    st.sidebar.markdown('# Data Settings')
+    builder.interface.request_data_settings(st.sidebar)
+
+    st.markdown('#### Data Axes')
+    builder.interface.request_data_axes(st)
+
     # ################################################################################
     # # Set up global settings
     # ################################################################################

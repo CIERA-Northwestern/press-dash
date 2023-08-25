@@ -134,7 +134,6 @@ def setup_data_axes(
     Args:
         count_or_sum (str): If we're not prompting the user for a count or sum
             (i.e. it's not in include), then we need to know what to do for the y_column.
-    
     '''
 
     # We have to add the data settings to a dictionary piece-by-piece
