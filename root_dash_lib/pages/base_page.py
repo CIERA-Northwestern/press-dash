@@ -33,7 +33,11 @@ def main(config_fp: str, user_utils: types.ModuleType=None):
     st.title(builder.config.get('page_title','Dashboard'))
 
     # Prep data
-    preprocessed_df, config = builder.prep_data(builder.config)
+    data_handler = builder.prep_data(builder.config)
+    preprocessed_df = data_handler.data['preprocessed']
+
+    # DEBUG
+    st.write(data_handler.data)
 
     # Global settings
     st.sidebar.markdown('# Data Settings')
@@ -57,9 +61,18 @@ def main(config_fp: str, user_utils: types.ModuleType=None):
         recategorized_df,
     )
 
+    # DEBUG
+    st.write(builder.data_handler.data)
+
     # Data axes
     st.subheader('Data Axes')
     builder.interface.request_data_axes(st)
+
+    # DEBUG
+    st.write(builder.data_handler.data)
+
+    # View the data
+    builder.data_viewer.write()
 
     # ################################################################################
     # # Set up global settings

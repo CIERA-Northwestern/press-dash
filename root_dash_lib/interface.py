@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 import matplotlib.font_manager as font_manager
 import seaborn as sns
 
-from . import settings
+from .settings import Settings
 
 class Interface:
     '''Main interaction object.
@@ -22,7 +22,7 @@ class Interface:
         config: The config dictionary.
     '''
 
-    def __init__(self, config: dict, settings: settings.Settings):
+    def __init__(self, config: dict, settings: Settings):
 
         self.config = config
         self.settings = settings

@@ -9,10 +9,10 @@ import pandas as pd
 import streamlit as st
 
 from . import user_utils as default_user_utils
-from . import settings, interface, data_handler, aggregator
+from . import settings, interface, data_handler, aggregator, data_viewer
 
 # We need to reload all the individual pieces if we want changes in them to propagate
-for module in [ settings, interface, data_handler, aggregator ]:
+for module in [ settings, interface, data_handler, aggregator, data_viewer ]:
     importlib.reload(module)
 
 class DashBuilder:
@@ -38,6 +38,7 @@ class DashBuilder:
         self.interface = interface.Interface(self.config, self.settings)
         self.data_handler = data_handler.DataHandler(self.config, user_utils)
         self.agg = aggregator.Aggregator(self.config)
+        self.data_viewer = data_viewer.DataViewer(self.config, self.settings, self.data_handler)
 
     @property
     def data(self):
@@ -71,7 +72,7 @@ class DashBuilder:
             config = yaml.load(file, Loader=yaml.FullLoader)
         return config
 
-    @st.cache_data
+    @st.cache_resource
     def prep_data(_self, config: dict) -> pd.DataFrame:
         '''Load, clean, and preprocess the data.
 
@@ -101,7 +102,7 @@ class DashBuilder:
         cleaned_df, _self.config = _self.data_handler.clean_data(raw_df, _self.config)
         preprocessed_df, _self.config = _self.data_handler.preprocess_data(cleaned_df, _self.config)
 
-        return preprocessed_df, config
+        return _self.data_handler
  
     @st.cache_data
     def recategorize_data(
