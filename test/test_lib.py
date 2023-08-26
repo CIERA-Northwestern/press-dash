@@ -438,16 +438,21 @@ class TestAggregate( unittest.TestCase ):
 
     ###############################################################################
 
-    def test_count_press_mentions_nonzero( self ):
+    def test_sum_press_mentions_nonzero( self ):
 
         selected_df = self.data['preprocessed']
         weighting = 'Press Mentions'
 
-        sums, total = self.builder.sum(
+        sums = self.builder.agg.sum(
             selected_df,
             'Year',
             weighting,
             self.group_by,
+        )
+        totals = self.builder.agg.sum(
+            selected_df,
+            'Year',
+            weighting,
         )
 
         # Non-zero test
@@ -471,7 +476,7 @@ class TestAggregate( unittest.TestCase ):
         subselected = subselected.drop_duplicates( subset='id' )
         subselected = subselected.replace( 'N/A', 0 )
         expected = subselected['Press Mentions'].sum()
-        assert total.loc[test_year][0] == expected
+        assert totals.loc[test_year][0] == expected
 
 ###############################################################################
 
