@@ -365,11 +365,16 @@ class TestAggregate( unittest.TestCase ):
 
         selected_df = self.data['preprocessed']
 
-        counts, total = self.builder.agg.count(
+        counts = self.builder.agg.count(
             selected_df,
             'Year',
             'id',
             self.group_by
+        )
+        total = self.builder.agg.count(
+            selected_df,
+            'Year',
+            'id',
         )
 
         test_year = 2015
@@ -398,11 +403,16 @@ class TestAggregate( unittest.TestCase ):
         selected_df = self.data['preprocessed']
         weighting = 'Press Mentions'
 
-        sums, total = self.builder.sum(
+        sums = self.builder.agg.sum(
             selected_df,
             'Year',
             weighting,
             self.group_by,
+        )
+        total = self.builder.agg.sum(
+            selected_df,
+            'Year',
+            weighting,
         )
 
         test_year = 2015
