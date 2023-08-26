@@ -42,7 +42,7 @@ id_columns:
   - Investigator HR Dept Name
   - Award Current PI HR Dept Name
   - Award Current PI Employee ID
-weight_columns:
+numerical_columns:
   - Allocation Total Sum Amount
   - Allocation Authorized Total Amount
   - Allocation Anticipated Total Amount
@@ -51,7 +51,7 @@ weight_columns:
   - Allocation Authorized F&A Amount
   - Allocation Anticipated F&A Amount
   - Cost Share Amount
-time_bin_columns:
+x_columns:
   - Overall Award Reporting Fiscal Year (yyyy)
   - Award Start Fiscal Year (yyyy)
   - Award End Fiscal Year (yyyy)

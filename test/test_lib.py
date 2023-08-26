@@ -31,7 +31,12 @@ def copy_config(root_config_fp, config_fp):
         file.write(config_text)
 
 
-def standard_setup(self, user_utils=None):
+def standard_setup(
+        self,
+        user_utils=None,
+        test_data_subdir='test_data_complete',
+        config_fn='config.yml'
+    ):
     '''Common function for setting up the data
     '''
 
@@ -39,9 +44,9 @@ def standard_setup(self, user_utils=None):
     test_dir = os.path.abspath(os.path.dirname(__file__))
     self.root_dir = os.path.dirname(test_dir)
     self.data_dir = os.path.join(
-        self.root_dir, 'test_data', 'test_data_complete',
+        self.root_dir, 'test_data', test_data_subdir,
     )
-    root_config_fp = os.path.join(self.root_dir, 'test', 'config.yml')
+    root_config_fp = os.path.join(self.root_dir, 'test', config_fn)
     self.config_fp = os.path.join(self.data_dir, 'config.yml')
 
     copy_config(root_config_fp, self.config_fp)
@@ -507,17 +512,12 @@ class TestStreamlit( unittest.TestCase ):
 class TestStreamlitGrants( unittest.TestCase ):
 
     def setUp( self ):
-
-        # Get filepath info
-        test_dir = os.path.abspath( os.path.dirname( __file__ ) )
-        self.root_dir = os.path.dirname( test_dir )
-        self.data_dir = os.path.join( self.root_dir, 'test_data', 'test_data_mock_grants_and_proposals', )
-        root_config_fp = os.path.join( self.root_dir, 'test', 'config_grants.yml' )
-        self.config_fp = os.path.join( self.data_dir, 'config.yml' )
-
-        copy_config( root_config_fp, self.config_fp )
-
-        self.builder = DashBuilder( self.config_fp, grants_user_utils ) 
+        standard_setup(
+            self,
+            grants_user_utils,
+            'test_data_mock_grants_and_proposals',
+            'config_grants.yml',
+        )
 
     def tearDown( self ):
         if os.path.isfile( self.config_fp ):
@@ -527,9 +527,9 @@ class TestStreamlitGrants( unittest.TestCase ):
 
     def test_base_page( self ):
 
-        self.builder.add_page( 'base_page' )
+        import root_dash_lib.pages.base_page as base_page
 
-        self.builder.run()
+        base_page.main(self.config_fp, grants_user_utils)
 
         # Set the environment variable to signal the app to stop
         os.environ["STOP_STREAMLIT"] = "1"
