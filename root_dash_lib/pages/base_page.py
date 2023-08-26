@@ -59,7 +59,7 @@ def main(config_fp: str, user_utils: types.ModuleType=None):
     )
 
     # Apply data filters
-    data['selected'] = builder.data_handler.filter_data(
+    data['selected'] = builder.filter_data(
         data['recategorized'],
         builder.settings.common['filters']['text'],
         builder.settings.common['filters']['categorical'],
@@ -69,6 +69,15 @@ def main(config_fp: str, user_utils: types.ModuleType=None):
     # Data axes
     st.subheader('Data Axes')
     builder.interface.request_data_axes(st)
+
+    # Aggregate data
+    data['aggregated'] = builder.aggregate(
+        data['recategorized'],
+        builder.settings.common['data']['x_column'],
+        builder.settings.common['data']['y_column'],
+        builder.settings.common['data']['groupby_column'],
+        builder.settings.common['data']['aggregation_method'],
+    )
 
     # View the data directly
     builder.data_viewer.write(data)

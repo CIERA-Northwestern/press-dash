@@ -30,7 +30,7 @@ class Interface:
     def request_data_axes(
             self,
             st_loc,
-            ask_for: list[str] = [ 'aggregation', 'x_column', 'y_column', 'groupby_column'],
+            ask_for: list[str] = [ 'aggregation_method', 'x_column', 'y_column', 'groupby_column'],
             display_defaults: dict = {},
             display_options: dict = {},
             aggregation_method: str = 'count',
@@ -57,14 +57,14 @@ class Interface:
 
         # We have to add the data settings to a dictionary piece-by-piece
         # because as soon as they're called the user input exists.
-        if 'aggregation' in ask_for:
-            selected_settings['aggregation'] = st_loc.selectbox(
+        if 'aggregation_method' in ask_for:
+            selected_settings['aggregation_method'] = st_loc.selectbox(
                 'How do you want to aggregate the data?',
                 [ 'count', 'sum' ],
-                index=display_defaults.get( 'aggregation', 0 ),
+                index=display_defaults.get( 'aggregation_method', 0 ),
             )
         else:
-            selected_settings['aggregation'] = aggregation_method
+            selected_settings['aggregation_method'] = aggregation_method
         if 'x_column' in ask_for:
             selected_settings['x_column'] = st_loc.selectbox(
                 'How do you want to bin the data in time?',
@@ -72,16 +72,16 @@ class Interface:
                 index=display_defaults.get( 'x_column', 0 ),
             )
         if 'y_column' in ask_for:
-            if selected_settings['aggregation'] == 'count':
+            if selected_settings['aggregation_method'] == 'count':
                 selected_settings['y_column'] = st_loc.selectbox(
                     'What do you want to count unique entries of?',
                     display_options.get( 'y_column', self.config['id_columns'] ),
                     index=display_defaults.get( 'y_column', 0 ),
                 )
-            elif selected_settings['aggregation'] == 'sum':
+            elif selected_settings['aggregation_method'] == 'sum':
                 selected_settings['y_column'] = st_loc.selectbox(
                     'What do you want to sum?',
-                    display_options.get( 'y_column', self.config['weight_columns'] ),
+                    display_options.get( 'y_column', self.config['numerical_columns'] ),
                     index=display_defaults.get( 'y_column', 0 ),
                 )
         if 'groupby_column' in ask_for:

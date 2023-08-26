@@ -3,6 +3,7 @@
 import importlib
 import os
 import types
+from typing import Union
 import yaml
 
 import pandas as pd
@@ -140,7 +141,7 @@ class DashBuilder:
 
     @st.cache_data
     def filter_data(
-        self,
+        _self,
         recategorized_df: pd.DataFrame,
         text_filters: dict[str, str] = {},
         categorical_filters: dict[str, list] = {},
@@ -160,9 +161,53 @@ class DashBuilder:
         msg = 'Filtering data...'
         print(msg)
         with st.spinner(msg):
-            return self.data_handler.filter_data(
+            return _self.data_handler.filter_data(
                 recategorized_df=recategorized_df,
                 text_filters=text_filters,
                 categorical_filters=categorical_filters,
                 numerical_filters=numerical_filters
             )
+
+    @st.cache_data
+    def aggregate(
+        _self,
+        df: pd.DataFrame,
+        x_column: str,
+        y_column: str,
+        groupby_column: str = None,
+        aggregation_method: str = 'count',
+    ) -> Union[pd.Series, pd.DataFrame]:
+        '''Aggregate stats.
+
+        Args:
+            df: The dataframe containing the selected data.
+            x_column: The column containing the year or other time bin value.
+            weight_column: What to count up.
+            groupby_column: The category to group the data by, e.g. 'Research Topics'.
+                If not passed, then returns just the totals.
+            aggregation_method: How to aggregate.
+
+        Returns:
+            sums: The dataframe containing the counts per year per category
+                or
+            totals: The series containing the counts per year
+        '''
+        msg = 'Aggregating...'
+        print(msg)
+        with st.spinner(msg):
+            if aggregation_method == 'count':
+                return _self.agg.count(
+                    df=df,
+                    x_column=x_column,
+                    count_column=y_column,
+                    groupby_column=groupby_column,
+                )
+            elif aggregation_method == 'sum':
+                return _self.agg.sum(
+                    df=df,
+                    x_column=x_column,
+                    weight_column=y_column,
+                    groupby_column=groupby_column,
+                )
+            else:
+                raise KeyError('Requested aggregation method "{}" is not available.'.format(aggregation_method))
