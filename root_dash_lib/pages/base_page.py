@@ -79,6 +79,8 @@ def main(config_fp: str, user_utils: types.ModuleType=None):
         builder.settings.common['data']['aggregation_method'],
     )
 
+    # Lineplot
+
     # View the data directly
     builder.data_viewer.write(data)
 
