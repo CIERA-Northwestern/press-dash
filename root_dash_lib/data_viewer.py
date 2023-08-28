@@ -12,6 +12,8 @@ import streamlit as st
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.figure
+
+import matplotlib.patheffects as patheffects
 import seaborn as sns
 
 from .data_handler import DataHandler
@@ -58,29 +60,96 @@ class DataViewer:
         st.write(data[data_key])
 
     def lineplot(
-            df: pd.DataFrame,
-            x_key: str = None,
+            df: pd.DataFrame = None,
             total: pd.Series = None,
+            categories: list[str] = None,
             cumulative: bool = False,
+            x_label: str = None,
+            y_label: str = None,
+            fig_width: float = plt.rcParams['figure.figsize'][0],
+            fig_height: float = plt.rcParams['figure.figsize'][1],
+            yscale: str = 'linear',
+            y_lim: Tuple[float, float] = None,
+            font_scale: float = 1.,
+            linewidth: float = 2.,
+            marker_size: float = 30.,
+            tick_spacing: float = None,
+            category_colors: dict[str,str] = None,
+            seaborn_style: str = 'whitegrid',
+            include_legend: bool = True,
+            legend_x: float = 0.,
+            legend_y: float = 1.,
+            legend_loc: str = 'upper left',
+            legend_scale: float = 1.,
+            include_annotations: bool = False,
+            annotations_ha: str = 'left',
         ) -> matplotlib.figure.Figure:
-        '''General-purpose lineplot.
+        '''General-purpose matplotlib lineplot.
+        This function provides solid defaults with a lot of customization.
+        If you want more customization you should probably create your own
+        situation-dependent function.
+
+        Args:
+            df: Dataframe to plot, formatted s.t. the x-values are the index,
+                the y-values are the values in the dataframe,
+                and each column is a different category to compare.
+            total: Total values (across all categories) to plot, if given.
+            categories: Categories to show. Defaults to all columns.
+            cumulative: If True, show cumulative quantities, not instantaneous.
+            x_label: Label for x axis. If not provided, not shown.
+            y_label: Label for y axis. If not provided, not shown.
+            fig_width: Figure width.
+            fig_height: Figure height.
+            yscale: Scale for axis, i.e. 'linear', 'log'.
+            y_lim: y-axis limits.
+            font_scale: Fonts are multiplied by this number (keeping relative size).
+            linewidth: Line thickness.
+            marker_size: Marker size.
+            tick_spacing: Distance (in data units) between y ticks.
+            category_colors: Colors to use for the different categories.
+                Defaults to using the seaborn color palette.
+            seaborn_style: Seaborn style to use.
+            include_legend: Whether to add a legend or not.
+            legend_x: Legend x location (axis units).
+            legend_y: Legend y location (axis units).
+            legend_loc: Legend alignment.
+            legend_scale: The legend size is multiplied by this number.
+            include_annotations: Whether to annotate the individual lines
+                with the category names.
+            annotation_ha: Horizontal alignment for the annotations.
 
         Returns:
             fig: The figure containing the plot.
         '''
 
+        # Modify data if cumulative
         if cumulative:
             df = df.cumsum( axis='rows' )
             if total is not None:
                 total = total.cumsum()
 
+        # Set defaults
         xs = df.index
-        categories = df.columns
+        if categories is None:
+            categories = df.columns
+        if category_colors is None:
+            color_palette = sns.color_palette()
+            category_colors = { key: color_palette[i] for i, key in enumerate( categories ) }
+        if y_lim is None:
+            # DEBUG
+            assert False, 'I should replace this with matplotlibs method for setting default ylim'
+            if total is not None:
+                y_lim = (0, total.max()*1.05 )
+            else:
+                y_lim = (0, df[categories].max()*1.05)
+        if tick_spacing is None:
+            # DEBUG
+            assert False, 'I should replace this with matplotlibs method for setting default tick spacing'
 
-        sns.set( font=lineplot_kw['font'], style=lineplot_kw['seaborn_style'] )
+        sns.set(style=seaborn_style)
         plot_context = sns.plotting_context("notebook")
 
-        fig = plt.figure( figsize=( lineplot_kw['fig_width'], lineplot_kw['fig_height'] ) )
+        fig = plt.figure(figsize=(fig_width, fig_height))
         ax = plt.gca()
         for j, category_j in enumerate( categories ):
 
@@ -89,43 +158,43 @@ class DataViewer:
             ax.plot(
                 xs,
                 ys,
-                linewidth = lineplot_kw['linewidth'],
+                linewidth = linewidth,
                 alpha = 0.5,
                 zorder = 2,
-                color = lineplot_kw['category_colors'][category_j],
+                color = category_colors[category_j],
             )
             ax.scatter(
                 xs,
                 ys,
                 label = category_j,
                 zorder = 2,
-                color = lineplot_kw['category_colors'][category_j],
-                s = lineplot_kw['marker_size'],
+                color = category_colors[category_j],
+                s = marker_size,
                 )
 
             # Add labels
-            if lineplot_kw.get( 'include_annotations', False ):
+            if include_annotations:
                 label_y = ys.iloc[-1]
 
                 text = ax.annotate(
                     text = category_j,
-                    xy = ( 1, label_y ),
+                    xy = (1, label_y),
                     xycoords = matplotlib.transforms.blended_transform_factory( ax.transAxes, ax.transData ),
-                    xytext = ( -5 + 10 * ( lineplot_kw['annotations_horizontal_alignment'] == 'left' ), 0 ),
+                    xytext = (-5 + 10 * ( annotations_ha == 'left'), 0),
                     va = 'center',
-                    ha = lineplot_kw['annotations_horizontal_alignment'],
+                    ha = annotations_ha,
                     textcoords = 'offset points',
                 )
                 text.set_path_effects([
-                    path_effects.Stroke(linewidth=2.5, foreground='w'),
-                    path_effects.Normal(),
+                    patheffects.Stroke(linewidth=2.5, foreground='w'),
+                    patheffects.Normal(),
                 ])
 
-        if lineplot_kw['show_total']:
+        if total is not None:
             ax.plot(
                 xs,
                 total,
-                linewidth = lineplot_kw['linewidth'],
+                linewidth = linewidth,
                 alpha = 0.5,
                 color = 'k',
                 zorder = 1,
@@ -136,38 +205,36 @@ class DataViewer:
                 label = 'Total',
                 color = 'k',
                 zorder = 1,
-                s = lineplot_kw['marker_size'],
+                s = marker_size,
             )
 
-        ymax = lineplot_kw['y_lim'][1]
+        ax.set_yscale(yscale)
 
-        ax.set_xticks( xs.astype( int ) )
-        count_ticks = np.arange( 0, ymax, lineplot_kw['tick_spacing'] )
-        ax.set_yticks( count_ticks )
+        ymax = y_lim[1]
 
-        if lineplot_kw['log_yscale']:
-            ax.set_yscale( 'log' )
+        ax.set_xticks(xs.astype(int))
+        count_ticks = np.arange(0, ymax, tick_spacing)
+        ax.set_yticks(count_ticks)
 
-        ax.set_xlim( xs[0], xs[-1] )
-        ax.set_ylim( lineplot_kw['y_lim'] )
+        ax.set_xlim(xs[0], xs[-1])
+        ax.set_ylim(y_lim)
 
 
-        if lineplot_kw.get( 'include_legend', False ):
+        if include_legend:
             l = ax.legend(
-                bbox_to_anchor = ( lineplot_kw['legend_x'], lineplot_kw['legend_y'] ),
-                loc = '{} {}'.format(
-                    lineplot_kw['legend_vertical_alignment'],
-                    lineplot_kw['legend_horizontal_alignment']
-                ), 
+                bbox_to_anchor = (legend_x, legend_y),
+                loc = legend_loc,
                 framealpha = 1.,
-                fontsize = plot_context['legend.fontsize'] * lineplot_kw['legend_scale'],
+                fontsize = plot_context['legend.fontsize'] * legend_scale,
                 ncol = len( categories ) // 4 + 1
             )
 
         # Labels, inc. size
-        ax.set_xlabel( lineplot_kw['x_label'], fontsize=plot_context['axes.labelsize'] * lineplot_kw['font_scale'] )
-        ax.set_ylabel( lineplot_kw['y_label'], fontsize=plot_context['axes.labelsize'] * lineplot_kw['font_scale'] )
-        ax.tick_params( labelsize=plot_context['xtick.labelsize']*lineplot_kw['font_scale'] )
+        if x_label is not None:
+            ax.set_xlabel(x_label, fontsize=plot_context['axes.labelsize'] * font_scale)
+        if y_label is not None:
+            ax.set_ylabel(y_label, fontsize=plot_context['axes.labelsize'] * font_scale)
+        ax.tick_params(labelsize=plot_context['xtick.labelsize'] * font_scale)
 
         # return facet_grid
         return fig
