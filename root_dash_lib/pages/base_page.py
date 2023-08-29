@@ -78,8 +78,23 @@ def main(config_fp: str, user_utils: types.ModuleType=None):
         builder.settings.common['data']['groupby_column'],
         builder.settings.common['data']['aggregation_method'],
     )
+    # Aggregate data
+    data['totals'] = builder.aggregate(
+        data['recategorized'],
+        builder.settings.common['data']['x_column'],
+        builder.settings.common['data']['y_column'],
+        aggregation_method=builder.settings.common['data']['aggregation_method'],
+    )
+
+    # DEBUG
+    builder.settings.common['view']
 
     # Lineplot
+    builder.data_viewer.lineplot(
+        df = data['aggregated'],
+        totals = data['totals'],
+        **builder.settings.common['view']
+    )
 
     # View the data directly
     builder.data_viewer.write(data)

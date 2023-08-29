@@ -60,26 +60,29 @@ class DataViewer:
         st.write(data[data_key])
 
     def lineplot(
-            df: pd.DataFrame = None,
-            total: pd.Series = None,
+            self,
+            df: pd.DataFrame,
+            totals: pd.Series = None,
             categories: list[str] = None,
             cumulative: bool = False,
             x_label: str = None,
             y_label: str = None,
-            fig_width: float = plt.rcParams['figure.figsize'][0],
+            fig_width: float = plt.rcParams['figure.figsize'][0] * 2,
             fig_height: float = plt.rcParams['figure.figsize'][1],
             yscale: str = 'linear',
+            x_lim: Tuple[float, float] = None,
             y_lim: Tuple[float, float] = None,
+            xtick_spacing: float = None,
+            ytick_spacing: float = None,
             font_scale: float = 1.,
             linewidth: float = 2.,
             marker_size: float = 30.,
-            tick_spacing: float = None,
             category_colors: dict[str,str] = None,
             seaborn_style: str = 'whitegrid',
             include_legend: bool = True,
-            legend_x: float = 0.,
+            legend_x: float = 1.,
             legend_y: float = 1.,
-            legend_loc: str = 'upper left',
+            legend_loc: str = 'lower right',
             legend_scale: float = 1.,
             include_annotations: bool = False,
             annotations_ha: str = 'left',
@@ -101,11 +104,13 @@ class DataViewer:
             fig_width: Figure width.
             fig_height: Figure height.
             yscale: Scale for axis, i.e. 'linear', 'log'.
+            x_lim: x-axis limits.
             y_lim: y-axis limits.
+            xtick_spacing: Distance (in data units) between x ticks.
+            ytick_spacing: Distance (in data units) between y ticks.
             font_scale: Fonts are multiplied by this number (keeping relative size).
             linewidth: Line thickness.
             marker_size: Marker size.
-            tick_spacing: Distance (in data units) between y ticks.
             category_colors: Colors to use for the different categories.
                 Defaults to using the seaborn color palette.
             seaborn_style: Seaborn style to use.
@@ -125,8 +130,8 @@ class DataViewer:
         # Modify data if cumulative
         if cumulative:
             df = df.cumsum( axis='rows' )
-            if total is not None:
-                total = total.cumsum()
+            if totals is not None:
+                totals = totals.cumsum()
 
         # Set defaults
         xs = df.index
@@ -135,16 +140,6 @@ class DataViewer:
         if category_colors is None:
             color_palette = sns.color_palette()
             category_colors = { key: color_palette[i] for i, key in enumerate( categories ) }
-        if y_lim is None:
-            # DEBUG
-            assert False, 'I should replace this with matplotlibs method for setting default ylim'
-            if total is not None:
-                y_lim = (0, total.max()*1.05 )
-            else:
-                y_lim = (0, df[categories].max()*1.05)
-        if tick_spacing is None:
-            # DEBUG
-            assert False, 'I should replace this with matplotlibs method for setting default tick spacing'
 
         sns.set(style=seaborn_style)
         plot_context = sns.plotting_context("notebook")
@@ -190,10 +185,10 @@ class DataViewer:
                     patheffects.Normal(),
                 ])
 
-        if total is not None:
+        if totals is not None:
             ax.plot(
                 xs,
-                total,
+                totals,
                 linewidth = linewidth,
                 alpha = 0.5,
                 color = 'k',
@@ -201,7 +196,7 @@ class DataViewer:
             )
             ax.scatter(
                 xs,
-                total,
+                totals,
                 label = 'Total',
                 color = 'k',
                 zorder = 1,
@@ -210,15 +205,25 @@ class DataViewer:
 
         ax.set_yscale(yscale)
 
-        ymax = y_lim[1]
+        # Limits
+        if x_lim is None:
+            x_lim = ax.get_xlim()
+        else:
+            ax.set_xlim(x_lim)
+        if y_lim is None:
+            y_lim = ax.get_ylim()
+        else:
+            ax.set_ylim(y_lim)
 
-        ax.set_xticks(xs.astype(int))
-        count_ticks = np.arange(0, ymax, tick_spacing)
-        ax.set_yticks(count_ticks)
-
-        ax.set_xlim(xs[0], xs[-1])
-        ax.set_ylim(y_lim)
-
+        # Ticks
+        if xtick_spacing is None:
+            ax.set_xticks(xs.astype(int))
+        else:
+            count_ticks = np.arange(x_lim[0], x_lim[1], xtick_spacing)
+            ax.set_xticks(count_ticks)
+        if ytick_spacing is not None:
+            count_ticks = np.arange(y_lim[0], y_lim[1], ytick_spacing)
+            ax.set_yticks(count_ticks)
 
         if include_legend:
             l = ax.legend(
@@ -235,6 +240,9 @@ class DataViewer:
         if y_label is not None:
             ax.set_ylabel(y_label, fontsize=plot_context['axes.labelsize'] * font_scale)
         ax.tick_params(labelsize=plot_context['xtick.labelsize'] * font_scale)
+
+        # Show
+        st.write(fig)
 
         # return facet_grid
         return fig
