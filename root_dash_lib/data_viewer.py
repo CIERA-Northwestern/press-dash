@@ -86,6 +86,7 @@ class DataViewer:
             legend_scale: float = 1.,
             include_annotations: bool = False,
             annotations_ha: str = 'left',
+            **kwargs
         ) -> matplotlib.figure.Figure:
         '''General-purpose matplotlib lineplot.
         This function provides solid defaults with a lot of customization.
