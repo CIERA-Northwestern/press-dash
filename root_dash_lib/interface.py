@@ -3,6 +3,7 @@
 import copy
 import os
 from typing import Union
+import warnings
 
 import numpy as np
 import pandas as pd
@@ -275,22 +276,7 @@ class Interface:
     def request_view_settings(
             self,
             st_loc,
-            ask_for: list[str] = [
-                'seaborn_style',
-                'fig_width',
-                'fig_height',
-                'font_scale',
-                'include_legend',
-                'legend_scale',
-                'legend_x',
-                'legend_y',
-                'legend_horizontal_alignment',
-                'legend_vertical_alignment',
-                'include_annotations',
-                'annotations_horizontal_alignment',
-                'font',
-                'color_palette'
-            ],
+            ask_for: list[str] = None,
             display_defaults: dict = {},
             display_options: dict = {},
             selected_settings: dict = None,
@@ -300,7 +286,7 @@ class Interface:
 
         Args:
             st_loc: Streamlit object (st or st.sidebar) indicating where to place.
-            ask_for: Keys for widgets to include.
+            ask_for: Keys for widgets to include. Defaults to all available settings.
             display_defaults: Default values the user sees in the widgets.
             display_options: Options the user sees in the widgets.
             aggregation_method: Different aggregation methods have different
@@ -313,6 +299,31 @@ class Interface:
             selected_settings: Current values in the dictionary the settings are stored in.
         '''
 
+        available_settings = [
+            'font_scale',
+            'seaborn_style',
+            'fig_width',
+            'fig_height',
+            'include_legend',
+            'legend_scale',
+            'legend_x',
+            'legend_y',
+            'legend_horizontal_alignment',
+            'legend_vertical_alignment',
+            'include_annotations',
+            'annotations_horizontal_alignment',
+            'font',
+            'color_palette'
+        ]
+        if ask_for is None:
+            ask_for = available_settings
+        unavailable_settings = [ _ for _ in ask_for if _ not in available_settings ]
+        if len(unavailable_settings) > 0:
+            warnings.warn(
+                'The following settings were requested, but this function does'
+                ' not have widgets available for them:{}'.format(unavailable_settings)
+            )
+
         if selected_settings is None:
             selected_settings = self.settings.common['data']
 
@@ -322,7 +333,77 @@ class Interface:
         else:
             tag += ':'
 
-        # Set up generic figure settings
+        key = 'x_label'
+        if key in ask_for:
+            selected_settings[key] = st_loc.text_input(
+                'x label',
+                value=display_defaults.get( key, '' ),
+                key=tag + key,
+            )
+        key = 'y_label'
+        if key in ask_for:
+            selected_settings[key] = st_loc.text_input(
+                'y label',
+                value=display_defaults.get( key, '' ),
+                key=tag + key,
+            )
+        key = 'yscale'
+        if key in ask_for:
+            selected_settings[key] = st_loc.radio(
+                'y scale',
+                options=display_options.get(key, ['linear', 'log']),
+                index=display_defaults.get(key, 0),
+                key=tag + key,
+                horizontal=True,
+            )
+        key = 'x_lim'
+        if key in ask_for:
+            lower_lim = st_loc.text_input(
+                'x lower limit',
+                value=display_defaults.get( key, '' ),
+                key=tag + key + 'lower',
+            )
+            upper_lim = st_loc.text_input(
+                'x upper limit',
+                value=display_defaults.get( key, '' ),
+                key=tag + key + 'upper',
+            )
+            if (lower_lim == '') | (upper_lim == ''):
+                selected_settings[key] = None
+            else:
+                selected_settings[key] = (float(lower_lim), float(upper_lim))
+        key = 'y_lim'
+        if key in ask_for:
+            lower_lim = st_loc.text_input(
+                'y lower limit',
+                value=display_defaults.get( key, '' ),
+                key=tag + key + 'lower',
+            )
+            upper_lim = st_loc.text_input(
+                'y upper limit',
+                value=display_defaults.get( key, '' ),
+                key=tag + key + 'upper',
+            )
+            if (lower_lim == '') | (upper_lim == ''):
+                selected_settings[key] = None
+            else:
+                selected_settings[key] = (float(lower_lim), float(upper_lim))
+        if key in ask_for:
+            selected_settings[key] = st_loc.radio(
+                'y scale',
+                options=display_options.get(key, ['linear', 'log']),
+                index=display_defaults.get(key, 0),
+                key=tag + key,
+            )
+        key = 'font_scale'
+        if key in ask_for:
+            selected_settings[key] = st_loc.slider(
+                'font scale',
+                0.1,
+                2.,
+                value=display_defaults.get( key, 1. ),
+                key=tag + key,
+            )
         fig_width, fig_height = matplotlib.rcParams['figure.figsize']
         # The figure size is doubled because this is a primarily horizontal plot
         fig_width *= 2.
@@ -350,15 +431,6 @@ class Interface:
                 0.1*fig_height,
                 2.*fig_height,
                 value=display_defaults.get( key, fig_height ),
-                key=tag + key,
-            )
-        key = 'font_scale'
-        if key in ask_for:
-            selected_settings[key] = st_loc.slider(
-                'font scale',
-                0.1,
-                2.,
-                value=display_defaults.get( key, 1. ),
                 key=tag + key,
             )
         key = 'include_legend'

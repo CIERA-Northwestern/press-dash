@@ -3,6 +3,7 @@
 import copy
 import inspect
 import types
+from typing import Tuple
 
 class Settings:
     '''Main settings object.
@@ -43,20 +44,23 @@ class Settings:
         self,
         function: types.FunctionType,
         local_key: str = None,
-        common_to_include: list[str] = ['data', 'filters', 'view']
-        accounted_for: list[str] = [ 'self', 'kwarg' ]
-    ):
+        common_to_include: list[str] = ['data', 'filters', 'view'],
+        accounted_for: list[str] = ['self', 'kwarg', 'df', 'total', 'categories'],
+    ) -> Tuple[list[str], list[str], list[str]]:
 
-        local_keys = set(self.local.get(local_key, {}).keys())
+        local_opt_keys = list(self.local.get(local_key, {}).keys())
 
-        common_keys = set()
+        common_opt_keys = set()
         for common_key in common_to_include:
-            common_keys = common_keys.union(set(self.common[common_key].keys()))
-        common_keys -= local_keys
+            common_opt_keys = common_opt_keys.union(set(self.common[common_key].keys()))
+        common_opt_keys -= set(local_opt_keys)
+        common_opt_keys = list(common_opt_keys)
 
-        function_args = set(inspect.signature(function).parameters)
-        unset_keys = function_args - local_keys.union(common_keys)
+        unset_opt_keys = [
+            arg for arg in inspect.signature(function).parameters
+            if not ((arg in local_opt_keys) | (arg in common_opt_keys) | (arg in accounted_for))
+        ]
 
-        return local_keys, common_keys, unset_keys
+        return local_opt_keys, common_opt_keys, unset_opt_keys
 
         

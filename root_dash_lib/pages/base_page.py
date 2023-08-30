@@ -88,47 +88,31 @@ def main(config_fp: str, user_utils: types.ModuleType=None):
 
     # Lineplot
     local_key = 'lineplot'
-    local_keys, common_keys, unset_keys = builder.settings.get_local_global_and_unset(
-        local_key='lineplot',
-        function = builder.data_viewer.lineplot,
-    )
-    st.write(local_keys)
-    st.write(common_keys)
-    st.write(unset_keys)
-    # builder.interface.request_view_settings(
-    #         st,
-    #         ask_for = [
-    #             cumulative: bool = False,
-    #             x_label: str = None,
-    #             y_label: str = None,
-    #             fig_width: float = plt.rcParams['figure.figsize'][0] * 2,
-    #             fig_height: float = plt.rcParams['figure.figsize'][1],
-    #             yscale: str = 'linear',
-    #             x_lim: Tuple[float, float] = None,
-    #             y_lim: Tuple[float, float] = None,
-    #             xtick_spacing: float = None,
-    #             ytick_spacing: float = None,
-    #             font_scale: float = 1.,
-    #             linewidth: float = 2.,
-    #             marker_size: float = 30.,
-    #             category_colors: dict[str,str] = None,
-    #             seaborn_style: str = 'whitegrid',
-    #             include_legend: bool = True,
-    #             legend_x: float = 1.,
-    #             legend_y: float = 1.,
-    #             legend_loc: str = 'lower right',
-    #             legend_scale: float = 1.,
-    #             include_annotations: bool = False,
-    #             annotations_ha: str = 'left',
-    #         ],
-    #         selected_settings=builder.settings.setdefault('lineplot', {}),
-    #         tag='lineplot',
-    # )
-    builder.data_viewer.lineplot(
-        df = data['aggregated'],
-        totals = data['totals'],
-        **builder.settings.get_local_settings('lineplot')
-    )
+    view_tab, settings_tab = st.tabs(['Data View', 'Local Settings'])
+    with settings_tab:
+        local_opt_keys, common_opt_keys, unset_opt_keys = builder.settings.get_local_global_and_unset(
+            function = builder.data_viewer.lineplot,
+        )
+        # DEBUG
+        st.write(unset_opt_keys)
+        builder.interface.request_view_settings(
+                st,
+                ask_for=unset_opt_keys,
+                selected_settings=builder.settings.local.setdefault('lineplot', {}),
+                tag=local_key,
+        )
+        local_opt_keys, common_opt_keys, unset_opt_keys = builder.settings.get_local_global_and_unset(
+            function = builder.data_viewer.lineplot,
+            local_key=local_key,
+        )
+        # DEBUG
+        st.write(unset_opt_keys)
+    with view_tab:
+        builder.data_viewer.lineplot(
+            df = data['aggregated'],
+            totals = data['totals'],
+            **builder.settings.get_local_settings(local_key)
+        )
 
     # View the data directly
     builder.data_viewer.write(data)
