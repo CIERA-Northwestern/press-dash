@@ -82,7 +82,8 @@ class DataViewer:
             include_legend: bool = True,
             legend_x: float = 1.,
             legend_y: float = 1.,
-            legend_loc: str = 'lower right',
+            legend_ha: str = 'right',
+            legend_va: str = 'lower',
             legend_scale: float = 1.,
             include_annotations: bool = False,
             annotations_ha: str = 'left',
@@ -229,7 +230,7 @@ class DataViewer:
         if include_legend:
             l = ax.legend(
                 bbox_to_anchor = (legend_x, legend_y),
-                loc = legend_loc,
+                loc = '{} {}'.format(legend_va, legend_ha),
                 framealpha = 1.,
                 fontsize = plot_context['legend.fontsize'] * legend_scale,
                 ncol = len( categories ) // 4 + 1

@@ -276,7 +276,14 @@ class Interface:
     def request_view_settings(
             self,
             st_loc,
-            ask_for: list[str] = None,
+            ask_for: Union[list[str], str] = [
+                'font_scale',
+                'seaborn_style',
+                'fig_width',
+                'fig_height',
+                'font',
+                'color_palette',
+            ],
             display_defaults: dict = {},
             display_options: dict = {},
             selected_settings: dict = None,
@@ -286,7 +293,7 @@ class Interface:
 
         Args:
             st_loc: Streamlit object (st or st.sidebar) indicating where to place.
-            ask_for: Keys for widgets to include. Defaults to all available settings.
+            ask_for: Keys for widgets to include. If 'all' then all settings are used.
             display_defaults: Default values the user sees in the widgets.
             display_options: Options the user sees in the widgets.
             aggregation_method: Different aggregation methods have different
@@ -302,20 +309,29 @@ class Interface:
         available_settings = [
             'font_scale',
             'seaborn_style',
+            'x_label',
+            'y_label',
+            'yscale',
+            'x_lim',
+            'y_lim',
+            'xtick_spacing',
+            'ytick_spacing',
+            'linewidth',
+            'marker_size',
             'fig_width',
             'fig_height',
             'include_legend',
             'legend_scale',
             'legend_x',
             'legend_y',
-            'legend_horizontal_alignment',
-            'legend_vertical_alignment',
+            'legend_ha',
+            'legend_va',
             'include_annotations',
-            'annotations_horizontal_alignment',
+            'annotations_ha',
             'font',
             'color_palette'
         ]
-        if ask_for is None:
+        if ask_for == 'all':
             ask_for = available_settings
         unavailable_settings = [ _ for _ in ask_for if _ not in available_settings ]
         if len(unavailable_settings) > 0:
@@ -358,42 +374,79 @@ class Interface:
             )
         key = 'x_lim'
         if key in ask_for:
-            lower_lim = st_loc.text_input(
-                'x lower limit',
-                value=display_defaults.get( key, '' ),
-                key=tag + key + 'lower',
-            )
-            upper_lim = st_loc.text_input(
-                'x upper limit',
-                value=display_defaults.get( key, '' ),
-                key=tag + key + 'upper',
-            )
+            lower_col, upper_col = st_loc.columns(2)
+            with lower_col:
+                lower_lim = st_loc.text_input(
+                    'x lower limit',
+                    value=display_defaults.get( key, '' ),
+                    key=tag + key + 'lower',
+                )
+            with upper_col:
+                upper_lim = st_loc.text_input(
+                    'x upper limit',
+                    value=display_defaults.get( key, '' ),
+                    key=tag + key + 'upper',
+                )
             if (lower_lim == '') | (upper_lim == ''):
                 selected_settings[key] = None
             else:
                 selected_settings[key] = (float(lower_lim), float(upper_lim))
         key = 'y_lim'
         if key in ask_for:
-            lower_lim = st_loc.text_input(
-                'y lower limit',
-                value=display_defaults.get( key, '' ),
-                key=tag + key + 'lower',
-            )
-            upper_lim = st_loc.text_input(
-                'y upper limit',
-                value=display_defaults.get( key, '' ),
-                key=tag + key + 'upper',
-            )
+            lower_col, upper_col = st_loc.columns(2)
+            with lower_col:
+                lower_lim = st_loc.text_input(
+                    'y lower limit',
+                    value=display_defaults.get( key, '' ),
+                    key=tag + key + 'lower',
+                )
+            with upper_col:
+                upper_lim = st_loc.text_input(
+                    'y upper limit',
+                    value=display_defaults.get( key, '' ),
+                    key=tag + key + 'upper',
+                )
             if (lower_lim == '') | (upper_lim == ''):
                 selected_settings[key] = None
             else:
                 selected_settings[key] = (float(lower_lim), float(upper_lim))
+        key = 'xtick_spacing'
         if key in ask_for:
-            selected_settings[key] = st_loc.radio(
-                'y scale',
-                options=display_options.get(key, ['linear', 'log']),
-                index=display_defaults.get(key, 0),
+            value = st_loc.text_input(
+                'x tick spacing',
+                value=display_defaults.get( key, '' ),
                 key=tag + key,
+            )
+            if value == '':
+                selected_settings[key] = None
+            else:
+                selected_settings[key] = float(value)
+        key = 'ytick_spacing'
+        if key in ask_for:
+            value = st_loc.text_input(
+                'y tick spacing',
+                value=display_defaults.get( key, '' ),
+                key=tag + key,
+            )
+            if value == '':
+                selected_settings[key] = None
+            else:
+                selected_settings[key] = float(value)
+        key = 'linewidth'
+        if key in ask_for:
+            selected_settings[key] = st_loc.slider(
+                'linewidth',
+                0.,
+                10.,
+                value=display_defaults.get(key, 2.)
+            )
+        key = 'marker_size'
+        if key in ask_for:
+            selected_settings[key] = st_loc.slider(
+                'marker size',
+                0.,
+                100.,
+                value=display_defaults.get(key, 50.)
             )
         key = 'font_scale'
         if key in ask_for:

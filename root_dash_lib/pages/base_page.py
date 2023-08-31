@@ -93,8 +93,6 @@ def main(config_fp: str, user_utils: types.ModuleType=None):
         local_opt_keys, common_opt_keys, unset_opt_keys = builder.settings.get_local_global_and_unset(
             function = builder.data_viewer.lineplot,
         )
-        # DEBUG
-        st.write(unset_opt_keys)
         builder.interface.request_view_settings(
                 st,
                 ask_for=unset_opt_keys,
@@ -105,8 +103,6 @@ def main(config_fp: str, user_utils: types.ModuleType=None):
             function = builder.data_viewer.lineplot,
             local_key=local_key,
         )
-        # DEBUG
-        st.write(unset_opt_keys)
     with view_tab:
         builder.data_viewer.lineplot(
             df = data['aggregated'],
