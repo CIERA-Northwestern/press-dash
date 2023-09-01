@@ -279,8 +279,30 @@ class DataViewer:
         '''Function to plot the relative contribution of the categories.
 
         Args:
-            counts (pd.DataFrame): The dataframe containing the counts per year per category.
-            stackplot_kw (dict): The plotting keywords. Typically set things like font size, figure dimensions, etc.
+            df: Dataframe to plot.
+            totals: Total values to plot. Currently unused.
+            categories: Categories to compare.
+            cumulative: Plot the cumulative values?
+            x_label: X-axis label.
+            y_label: Y-axis label.
+            fig_width: Figure width.
+            fig_height: Figure height.
+            x_lim: X-axis limits.
+            y_lim: Y-axis limits.
+            xtick_spacing: Spacing between x ticks in data units.
+            ytick_spacing: Spacing between y ticks in data units.
+            font_scale: Scale the font size by this value.
+            category_colors: What colors to use for different categories?
+            font: What font to use?
+            seaborn_style: What seaborn style to use?
+            include_legend: Include a legend?
+            legend_x: Legend x location.
+            legend_y: Legend y location.
+            legend_ha: Legend horizontal alignment.
+            legend_va: Legend vertical alignment.
+            legend_scale: Scale the size of the legend by this value.
+            include_annotations: Include per-category annotations?
+            annotations_ha: Horizontal alignment of the annotations.
 
         Returns:
             fig (matplotlib.figure.Figure): The figure containing the plot.
