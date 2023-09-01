@@ -88,27 +88,28 @@ def main(config_fp: str, user_utils: types.ModuleType=None):
 
     # Lineplot
     local_key = 'lineplot'
-    view_tab, settings_tab = st.tabs(['Data View', 'Local Settings'])
-    with settings_tab:
-        local_opt_keys, common_opt_keys, unset_opt_keys = builder.settings.get_local_global_and_unset(
-            function = builder.data_viewer.lineplot,
-        )
-        builder.interface.request_view_settings(
-                st,
-                ask_for=unset_opt_keys,
-                selected_settings=builder.settings.local.setdefault('lineplot', {}),
-                tag=local_key,
-        )
-        local_opt_keys, common_opt_keys, unset_opt_keys = builder.settings.get_local_global_and_unset(
-            function = builder.data_viewer.lineplot,
-            local_key=local_key,
-        )
-    with view_tab:
-        builder.data_viewer.lineplot(
-            df = data['aggregated'],
-            totals = data['totals'],
-            **builder.settings.get_local_settings(local_key)
-        )
+    st.header(config.get('lineplot_header','Lineplot'))
+    local_opt_keys, common_opt_keys, unset_opt_keys = builder.settings.get_local_global_and_unset(
+        function = builder.data_viewer.lineplot,
+    )
+    builder.interface.request_view_settings(
+            st,
+            ask_for=unset_opt_keys,
+            selected_settings=builder.settings.local.setdefault('lineplot', {}),
+            tag=local_key,
+    )
+    local_opt_keys, common_opt_keys, unset_opt_keys = builder.settings.get_local_global_and_unset(
+        function = builder.data_viewer.lineplot,
+        local_key=local_key,
+    )
+    builder.data_viewer.lineplot(
+        df = data['aggregated'],
+        totals = data['totals'],
+        **builder.settings.get_local_settings(local_key)
+    )
+
+    # DEBUG
+    st.write(builder.settings)
 
     # View the data directly
     builder.data_viewer.write(data)
