@@ -110,11 +110,11 @@ def main(config_fp: str, user_utils: types.ModuleType=None):
         **builder.settings.get_local_settings(local_key)
     )
 
-    # DEBUG
-    st.write(builder.settings)
-
     # View the data directly
     builder.data_viewer.write(data)
+
+    # Settings download button
+    builder.settings.download_button()
 
     # for view in [ 'lineplot', 'stackplot', 'data' ]:
 

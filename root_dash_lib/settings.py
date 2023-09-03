@@ -2,8 +2,11 @@
 '''
 import copy
 import inspect
+import json
 import types
 from typing import Tuple
+
+import streamlit as st
 
 class Settings:
     '''Main settings object.
@@ -21,6 +24,33 @@ class Settings:
             'view': {},
         }
         self.local = {}
+
+    def download_button(
+        self,
+        label: str = 'Download Dash Settings',
+        file_name: str = 'dash_settings.json',
+    ):
+        '''Download the settings as a json.
+
+        Args:
+            label: Label seen by the user for the button.
+            file_name: What to save the downloaded file as.
+        '''
+
+        # Get dict to save
+        combined_settings = {
+            'common': self.common,
+            'local': self.local,
+            'config': self.config,
+        }
+        json_string = json.dumps(combined_settings)
+
+        st.download_button(
+            label=label,
+            file_name=file_name,
+            mime="application/json",
+            data=json_string,
+        )
 
     def get_local_settings(
         self, 
