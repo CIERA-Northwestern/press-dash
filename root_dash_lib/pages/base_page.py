@@ -36,6 +36,9 @@ def main(config_fp: str, user_utils: types.ModuleType=None):
     data, config = builder.prep_data(builder.config)
     builder.config.update(config)
 
+    st.sidebar.markdown('# Settings Upload')
+    common_settings = builder.settings.upload_button(st.sidebar)
+
     # Global settings
     st.sidebar.markdown('# Data Settings')
     builder.interface.request_data_settings(st.sidebar)
@@ -114,55 +117,5 @@ def main(config_fp: str, user_utils: types.ModuleType=None):
     builder.data_viewer.write(data)
 
     # Settings download button
-    builder.settings.download_button()
-    builder.settings.upload_button()
-
-    # for view in [ 'lineplot', 'stackplot', 'data' ]:
-
-    #     # For datawe include additional options.
-    #     if view == 'data':
-    #         df_tag = st.radio(
-    #             'What data do you want to see?',
-    #             [ 'original', 'preprocessed', 'recategorized', 'aggregated' ],
-    #             index=0,
-    #             horizontal=True,
-    #             key='{}:df_tag'.format( tag ),
-    #         )
-    #     else:
-    #         df_tag = 'selected'
-    #     download_kw = st.cache_data( time_series_utils.view_time_series )(
-    #         view,
-    #         df,
-    #         preprocessed_df,
-    #         selected_df,
-    #         aggregated_df,
-    #         total,
-    #         data_kw,
-    #         lineplot_kw,
-    #         stackplot_kw,
-    #         config,
-    #         tag=tag,
-    #         df_tag=df_tag,
-    #     )
-    #     if view == 'data':
-    #         download_kw, show_df = download_kw
-    #         if st.checkbox( 'View a subset?', value=False, key='{}:view_subset'.format( tag ) ):
-    #             try:
-    #                 columns_to_show = st.multiselect(
-    #                     'Which columns do you want to show?',
-    #                     show_df.columns,
-    #                     default=[ data_kw['time_bin_column'], data_kw['y_column'], data_kw['groupby_column'] ],
-    #                 )
-    #             except:
-    #                 columns_to_show = st.multiselect(
-    #                     'Which columns do you want to show?',
-    #                     show_df.columns,
-    #                 )
-
-    #             st.write( show_df[ columns_to_show ] )
-    #     st.download_button( **download_kw )
-
-    # # Check for the "STOP" environment variable
-    # # This is a hack to stop the streamlit app from running
-    # if os.environ.get("STOP_STREAMLIT"):
-    #     st.stop()
+    st.sidebar.markdown('# Settings Download')
+    builder.settings.download_button(st.sidebar)

@@ -247,7 +247,6 @@ class DataViewer:
         # Show
         st.write(fig)
 
-        # return facet_grid
         return fig
 
     def stackplot(
@@ -403,5 +402,4 @@ class DataViewer:
         # Show
         st.write(fig)
 
-        # return facet_grid
         return fig

@@ -27,12 +27,14 @@ class Settings:
 
     def download_button(
         self,
-        label: str = 'Download Dash Settings',
+        st_loc = st,
+        label: str = 'Download settings in JSON format.',
         file_name: str = 'dash_settings.json',
     ):
         '''Download the settings as a json.
 
         Args:
+            st_loc: Where to place. Defaults to st, as opposed to st.sidebar.
             label: Label seen by the user for the button.
             file_name: What to save the downloaded file as.
         '''
@@ -46,17 +48,25 @@ class Settings:
         json_string = json.dumps(combined_settings)
 
         # Download
-        st.download_button(
+        st_loc.download_button(
             label=label,
             file_name=file_name,
             mime="application/json",
             data=json_string,
         )
 
-    def upload_button(self, label: str = 'Upload Dash Settings') -> dict:
+    def upload_button(
+        self,
+        st_loc = st,
+        label: str = (
+            'Upload settings in JSON format.\n'
+            'A settings download button is at the bottom.'
+        ),
+    ) -> dict:
         '''Upload the settings and overwrite the class's values.
 
         Args:
+            st_loc: Where to place. Defaults to st, as opposed to st.sidebar.
             label: Label seen by the user for the button.
 
         Returns
@@ -64,7 +74,9 @@ class Settings:
         '''
 
         # Upload
-        file_content = st.file_uploader(label=label, type='json')
+        file_content = st_loc.file_uploader(label=label, type='json')
+        if file_content is None:
+            return None
         combined_settings = json.load(file_content)
         
         # Store appropriately
