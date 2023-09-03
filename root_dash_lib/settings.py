@@ -45,12 +45,35 @@ class Settings:
         }
         json_string = json.dumps(combined_settings)
 
+        # Download
         st.download_button(
             label=label,
             file_name=file_name,
             mime="application/json",
             data=json_string,
         )
+
+    def upload_button(self, label: str = 'Upload Dash Settings') -> dict:
+        '''Upload the settings and overwrite the class's values.
+
+        Args:
+            label: Label seen by the user for the button.
+
+        Returns
+            combined_settings: All settings combined into a dict.
+        '''
+
+        # Upload
+        file_content = st.file_uploader(label=label, type='json')
+        combined_settings = json.load(file_content)
+        
+        # Store appropriately
+        self.common = combined_settings['common']
+        self.local = combined_settings['local']
+        self.config = combined_settings['config']
+
+        # Return
+        return combined_settings
 
     def get_local_settings(
         self, 

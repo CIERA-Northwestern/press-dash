@@ -115,6 +115,7 @@ def main(config_fp: str, user_utils: types.ModuleType=None):
 
     # Settings download button
     builder.settings.download_button()
+    builder.settings.upload_button()
 
     # for view in [ 'lineplot', 'stackplot', 'data' ]:
 
