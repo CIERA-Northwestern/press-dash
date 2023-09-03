@@ -32,6 +32,7 @@ class Interface:
             self,
             st_loc,
             ask_for: list[str] = [ 'aggregation_method', 'x_column', 'y_column', 'groupby_column'],
+            local_key: str = None,
             display_defaults: dict = {},
             display_options: dict = {},
             aggregation_method: str = 'count',
@@ -53,17 +54,31 @@ class Interface:
             selected_settings: Current values in the dictionary the settings are stored in.
         '''
 
+        # Update the display defaults with any values that exist in the settings
+        settings_dict = self.settings.get_settings(
+            local_key=local_key,
+            common_to_include=['data',]
+        )
+        display_defaults.update(settings_dict)
+
         if selected_settings is None:
             selected_settings = self.settings.common['data']
+
+        # DEBUG
+        # st.write(st_loc)
 
         # We have to add the data settings to a dictionary piece-by-piece
         # because as soon as they're called the user input exists.
         if 'aggregation_method' in ask_for:
-            selected_settings['aggregation_method'] = st_loc.selectbox(
+            options = display_options.get('aggregation_method', ['count', 'sum'])
+            ind = st_loc.selectbox(
                 'How do you want to aggregate the data?',
-                [ 'count', 'sum' ],
+                range(len(options)),
                 index=display_defaults.get( 'aggregation_method', 0 ),
+                format_func=lambda index: options[index],
             )
+            selected_settings['aggregation_method_ind'] = ind
+            selected_settings['aggregation_method'] = options[ind]
         else:
             selected_settings['aggregation_method'] = aggregation_method
         if 'x_column' in ask_for:
@@ -73,6 +88,7 @@ class Interface:
                 index=display_defaults.get( 'x_column', 0 ),
             )
         if 'y_column' in ask_for:
+
             if selected_settings['aggregation_method'] == 'count':
                 selected_settings['y_column'] = st_loc.selectbox(
                     'What do you want to count unique entries of?',

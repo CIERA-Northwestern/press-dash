@@ -87,23 +87,28 @@ class Settings:
         # Return
         return combined_settings
 
-    def get_local_settings(
+    def get_settings(
         self, 
-        local_key: str, 
+        local_key: str = None, 
         common_to_include: list[str] = ['data', 'filters', 'view']
     ) -> dict:
         '''Get the full local settings, including global defaults.
 
         Args:
-            local_key: Local key to use.
+            local_key: Local key to use, if given.
             common_to_include: What global settings to incorporate.
+
+        Returns:
+            settings_dict: The combination of settings used.
         '''
 
-        local_dict = copy.deepcopy(self.local.get(local_key, {}))
+        settings_dict = {}
         for common_key in common_to_include:
-            local_dict.update(self.common[common_key])
+            settings_dict.update(self.common[common_key])
+        if local_key is not None:
+            settings_dict.update(self.local[local_key])
 
-        return local_dict
+        return settings_dict
 
     def get_local_global_and_unset(
         self,

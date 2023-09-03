@@ -37,11 +37,16 @@ def main(config_fp: str, user_utils: types.ModuleType=None):
     builder.config.update(config)
 
     st.sidebar.markdown('# Settings Upload')
-    common_settings = builder.settings.upload_button(st.sidebar)
+    combined_settings = builder.settings.upload_button(st.sidebar)
+
+    # DEBUG
+    st.write(builder.settings.common['data'])
 
     # Global settings
     st.sidebar.markdown('# Data Settings')
-    builder.interface.request_data_settings(st.sidebar)
+    builder.interface.request_data_settings(
+        st.sidebar,
+    )
     st.sidebar.markdown('# View Settings')
     builder.interface.request_view_settings(st.sidebar)
 
@@ -73,6 +78,9 @@ def main(config_fp: str, user_utils: types.ModuleType=None):
     # Data axes
     st.subheader('Data Axes')
     builder.interface.request_data_axes(st)
+
+    # DEBUG
+    st.write(builder.settings.common)
 
     # Aggregate data
     data['aggregated'] = builder.aggregate(
@@ -110,7 +118,7 @@ def main(config_fp: str, user_utils: types.ModuleType=None):
     builder.data_viewer.lineplot(
         df = data['aggregated'],
         totals = data['totals'],
-        **builder.settings.get_local_settings(local_key)
+        **builder.settings.get_settings(local_key)
     )
 
     # View the data directly
