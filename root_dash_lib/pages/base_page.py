@@ -52,11 +52,12 @@ def main(config_fp: str, user_utils: types.ModuleType=None):
     )
 
     # Data filter settings
-    st.subheader('Data Filters')
-    builder.interface.request_filter_settings(
-        st,
-        data['recategorized'],
-    )
+    with st.expander('Data Filters'):
+        st.subheader('Data Filters')
+        builder.interface.request_filter_settings(
+            st,
+            data['recategorized'],
+        )
 
     # Apply data filters
     data['selected'] = builder.filter_data(
@@ -89,19 +90,20 @@ def main(config_fp: str, user_utils: types.ModuleType=None):
     # Lineplot
     local_key = 'lineplot'
     st.header(config.get('lineplot_header','Lineplot'))
-    local_opt_keys, common_opt_keys, unset_opt_keys = builder.settings.get_local_global_and_unset(
-        function = builder.data_viewer.lineplot,
-    )
-    builder.interface.request_view_settings(
-            st,
-            ask_for=unset_opt_keys,
-            selected_settings=builder.settings.local.setdefault('lineplot', {}),
-            tag=local_key,
-    )
-    local_opt_keys, common_opt_keys, unset_opt_keys = builder.settings.get_local_global_and_unset(
-        function = builder.data_viewer.lineplot,
-        local_key=local_key,
-    )
+    with st.expander('Lineplot settings'):
+        local_opt_keys, common_opt_keys, unset_opt_keys = builder.settings.get_local_global_and_unset(
+            function = builder.data_viewer.lineplot,
+        )
+        builder.interface.request_view_settings(
+                st,
+                ask_for=unset_opt_keys,
+                selected_settings=builder.settings.local.setdefault('lineplot', {}),
+                tag=local_key,
+        )
+        local_opt_keys, common_opt_keys, unset_opt_keys = builder.settings.get_local_global_and_unset(
+            function = builder.data_viewer.lineplot,
+            local_key=local_key,
+        )
     builder.data_viewer.lineplot(
         df = data['aggregated'],
         totals = data['totals'],
