@@ -361,6 +361,9 @@ class Interface:
         )
         display_defaults.update(settings_dict)
 
+        # DEBUG
+        st.write(settings_dict)
+
         available_settings = [
             'font_scale',
             'seaborn_style',
@@ -396,7 +399,7 @@ class Interface:
             )
 
         if selected_settings is None:
-            selected_settings = self.settings.common['data']
+            selected_settings = self.settings.common['view']
 
         # Setup the tag
         if tag is None:
