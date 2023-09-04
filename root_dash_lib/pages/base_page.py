@@ -40,7 +40,7 @@ def main(config_fp: str, user_utils: types.ModuleType=None):
     combined_settings = builder.settings.upload_button(st.sidebar)
 
     # DEBUG
-    st.write(builder.settings.common['data'])
+    # st.write(builder.settings.common['data'])
 
     # Global settings
     st.sidebar.markdown('# Data Settings')
@@ -80,7 +80,7 @@ def main(config_fp: str, user_utils: types.ModuleType=None):
     builder.interface.request_data_axes(st)
 
     # DEBUG
-    st.write(builder.settings.common)
+    # st.write(builder.settings.common)
 
     # Aggregate data
     data['aggregated'] = builder.aggregate(

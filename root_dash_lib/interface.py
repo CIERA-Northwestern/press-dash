@@ -2,7 +2,7 @@
 '''
 import copy
 import os
-from typing import Union
+from typing import Union, Tuple
 import warnings
 
 import numpy as np
@@ -69,26 +69,29 @@ class Interface:
 
         # We have to add the data settings to a dictionary piece-by-piece
         # because as soon as they're called the user input exists.
-        if 'aggregation_method' in ask_for:
-            options = display_options.get('aggregation_method', ['count', 'sum'])
-            ind = st_loc.selectbox(
+        key = 'aggregation_method'
+        if key in ask_for:
+            value, ind = selectbox(
+                st_loc,
                 'How do you want to aggregate the data?',
-                range(len(options)),
-                index=display_defaults.get( 'aggregation_method', 0 ),
-                format_func=lambda index: options[index],
+                options = display_options.get(key, ['count', 'sum']),
+                index = display_defaults.get(key + '_ind', 0),
             )
-            selected_settings['aggregation_method_ind'] = ind
-            selected_settings['aggregation_method'] = options[ind]
+            selected_settings[key] = value
+            selected_settings[key + '_ind'] = ind
         else:
             selected_settings['aggregation_method'] = aggregation_method
-        if 'x_column' in ask_for:
-            selected_settings['x_column'] = st_loc.selectbox(
+        key = 'x_column'
+        if key in ask_for:
+            value, ind = selectbox(
+                st_loc,
                 'How do you want to bin the data in time?',
-                display_options.get( 'x_column', self.config['x_columns'] ),
-                index=display_defaults.get( 'x_column', 0 ),
+                options = display_options.get( 'x_column', self.config['x_columns'] ),
+                index = display_defaults.get(key + '_ind', 0),
             )
+            selected_settings[key] = value
+            selected_settings[key + '_ind'] = ind
         if 'y_column' in ask_for:
-
             if selected_settings['aggregation_method'] == 'count':
                 selected_settings['y_column'] = st_loc.selectbox(
                     'What do you want to count unique entries of?',
@@ -605,3 +608,30 @@ class Interface:
 
         return selected_settings
 
+
+def selectbox(
+    st_loc,
+    label: str,
+    options: list[str],
+    index: int = 0,
+    **kwargs
+) -> Tuple[str, int]:
+    '''Wrapper for st.selectbox that returns not just the selected
+    option, but the index of the selected option.
+
+    Args:
+        st_loc: Streamlit object (st or st.sidebar) indicating where to place.
+        label: A short label explaining to the user what this select widget is for.
+        options: Labels for the select options.
+        index: The index of the preselected option.
+    '''
+
+    ind = st_loc.selectbox(
+        label = label,
+        options = range(len(options)),
+        index = index,
+        format_func = lambda index: options[index],
+        **kwargs
+    )
+
+    return options[ind], ind
