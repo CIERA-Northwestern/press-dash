@@ -112,6 +112,7 @@ def main(config_fp: str, user_utils: types.ModuleType=None):
         builder.interface.request_view_settings(
                 st,
                 ask_for=unset_opt_keys,
+                local_key=local_key,
                 selected_settings=builder.settings.local.setdefault('lineplot', {}),
                 tag=local_key,
         )

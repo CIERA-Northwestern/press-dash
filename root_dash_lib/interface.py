@@ -423,56 +423,77 @@ class Interface:
             )
         key = 'yscale'
         if key in ask_for:
-            selected_settings[key] = st_loc.radio(
+            value, ind = selectbox(
+                st_loc,
                 'y scale',
                 options=display_options.get(key, ['linear', 'log']),
-                index=display_defaults.get(key, 0),
+                index = display_defaults.get(key + '_ind', 0),
+                selectbox_or_radio='radio',
                 key=tag + key,
                 horizontal=True,
             )
+            selected_settings[key] = value
+            selected_settings[key + '_ind'] = ind
         key = 'x_lim'
         if key in ask_for:
             lower_col, upper_col = st_loc.columns(2)
             with lower_col:
+                default = display_defaults.get(key, '')
+                if default is None:
+                    default = ''
                 lower_lim = st_loc.text_input(
                     'x lower limit',
-                    value=display_defaults.get( key, '' ),
+                    value=default,
                     key=tag + key + 'lower',
                 )
             with upper_col:
+                default = display_defaults.get(key, '')
+                if default is None:
+                    default = ''
                 upper_lim = st_loc.text_input(
                     'x upper limit',
-                    value=display_defaults.get( key, '' ),
+                    value=default,
                     key=tag + key + 'upper',
                 )
-            if (lower_lim == '') | (upper_lim == ''):
-                selected_settings[key] = None
-            else:
+            try:
+                # This only works if the user entered something well-formed.
                 selected_settings[key] = (float(lower_lim), float(upper_lim))
+            except ValueError:
+                selected_settings[key] = None
         key = 'y_lim'
         if key in ask_for:
             lower_col, upper_col = st_loc.columns(2)
             with lower_col:
+                default = display_defaults.get(key, '')
+                if default is None:
+                    default = ''
                 lower_lim = st_loc.text_input(
                     'y lower limit',
-                    value=display_defaults.get( key, '' ),
+                    value=default,
                     key=tag + key + 'lower',
                 )
             with upper_col:
+                default = display_defaults.get(key, '')
+                if default is None:
+                    default = ''
                 upper_lim = st_loc.text_input(
                     'y upper limit',
-                    value=display_defaults.get( key, '' ),
+                    value=default,
                     key=tag + key + 'upper',
                 )
-            if (lower_lim == '') | (upper_lim == ''):
-                selected_settings[key] = None
-            else:
+            try:
+                # This only works if the user entered something well-formed.
                 selected_settings[key] = (float(lower_lim), float(upper_lim))
+            except ValueError:
+                selected_settings[key] = None
         key = 'xtick_spacing'
         if key in ask_for:
+            default = display_defaults.get(key, '')
+            if default is None:
+                default = ''
             value = st_loc.text_input(
                 'x tick spacing',
-                value=display_defaults.get( key, '' ),
+                value=default,
                 key=tag + key,
             )
             if value == '':
@@ -481,9 +502,12 @@ class Interface:
                 selected_settings[key] = float(value)
         key = 'ytick_spacing'
         if key in ask_for:
+            default = display_defaults.get(key, '')
+            if default is None:
+                default = ''
             value = st_loc.text_input(
                 'y tick spacing',
-                value=display_defaults.get( key, '' ),
+                value=default,
                 key=tag + key,
             )
             if value == '':
@@ -668,6 +692,7 @@ def selectbox(
     label: str,
     options: list[str],
     index: int = 0,
+    selectbox_or_radio: str = 'selectbox',
     **kwargs
 ) -> Tuple[str, int]:
     '''Wrapper for st.selectbox that returns not just the selected
@@ -678,9 +703,11 @@ def selectbox(
         label: A short label explaining to the user what this select widget is for.
         options: Labels for the select options.
         index: The index of the preselected option.
+        selectbox_or_radio: Turn into a wrapper for st.radio by feeding
+            'radio' to this argument.
     '''
 
-    ind = st_loc.selectbox(
+    ind = getattr(st_loc, selectbox_or_radio)(
         label = label,
         options = range(len(options)),
         index = index,
