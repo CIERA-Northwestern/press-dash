@@ -91,25 +91,36 @@ class Interface:
             )
             selected_settings[key] = value
             selected_settings[key + '_ind'] = ind
-        if 'y_column' in ask_for:
+        key = 'y_column'
+        if key in ask_for:
             if selected_settings['aggregation_method'] == 'count':
-                selected_settings['y_column'] = st_loc.selectbox(
+                value, ind = selectbox(
+                    st_loc,
                     'What do you want to count unique entries of?',
-                    display_options.get( 'y_column', self.config['id_columns'] ),
-                    index=display_defaults.get( 'y_column', 0 ),
+                    display_options.get( key, self.config['id_columns'] ),
+                    index=display_defaults.get( key + '_ind', 0 ),
                 )
+                selected_settings[key] = value
+                selected_settings[key + '_ind'] = ind
             elif selected_settings['aggregation_method'] == 'sum':
-                selected_settings['y_column'] = st_loc.selectbox(
+                value, ind = selectbox(
+                    st_loc,
                     'What do you want to sum?',
                     display_options.get( 'y_column', self.config['numerical_columns'] ),
-                    index=display_defaults.get( 'y_column', 0 ),
+                    index=display_defaults.get( key + '_ind', 0 ),
                 )
-        if 'groupby_column' in ask_for:
-            selected_settings['groupby_column'] = st_loc.selectbox(
+                selected_settings[key] = value
+                selected_settings[key + '_ind'] = ind
+        key = 'groupby_column'
+        if key in ask_for:
+            value, ind = selectbox(
+                st_loc,
                 'What do you want to group the data by?',
                 display_options.get( 'groupby_column', self.config['categorical_columns'] ),
-                index=display_defaults.get( 'groupby_column', 0 ),
+                index=display_defaults.get( key + '_ind', 0 ),
             )
+            selected_settings[key] = value
+            selected_settings[key + '_ind'] = ind
 
         return selected_settings
 
