@@ -128,6 +128,7 @@ class Interface:
             self,
             st_loc,
             ask_for: list[str] = [ 'show_total', 'cumulative', 'recategorize', 'combine_single_categories' ],
+            local_key: str = None,
             display_defaults: dict = {},
             selected_settings: dict = None,
             tag: str = None,
@@ -144,6 +145,13 @@ class Interface:
         Returns:
             selected_settings: Current values in the dictionary the settings are stored in.
         '''
+
+        # Update the display defaults with any values that exist in the settings
+        settings_dict = self.settings.get_settings(
+            local_key=local_key,
+            common_to_include=['data',]
+        )
+        display_defaults.update(settings_dict)
 
         if selected_settings is None:
             selected_settings = self.settings.common['data']
@@ -191,6 +199,7 @@ class Interface:
             st_loc,
             df: pd.DataFrame,
             ask_for: list[str] = [ 'text', 'categorical', 'numerical' ],
+            local_key: str = None,
             display_defaults: dict = {},
             display_options: dict = {},
             selected_settings: dict = None,
@@ -210,6 +219,14 @@ class Interface:
         Returns:
             selected_settings: Current values in the dictionary the settings are stored in.
         '''
+
+        # Update the display defaults with any values that exist in the settings
+        settings_dict = self.settings.get_settings(
+            local_key=local_key,
+            common_to_include=['filters',]
+        )
+        display_defaults.update(settings_dict)
+
 
         if selected_settings is None:
             selected_settings = self.settings.common['filters']
@@ -314,6 +331,7 @@ class Interface:
                 'font',
                 'color_palette',
             ],
+            local_key: str = None,
             display_defaults: dict = {},
             display_options: dict = {},
             selected_settings: dict = None,
@@ -335,6 +353,13 @@ class Interface:
         Returns:
             selected_settings: Current values in the dictionary the settings are stored in.
         '''
+
+        # Update the display defaults with any values that exist in the settings
+        settings_dict = self.settings.get_settings(
+            local_key=local_key,
+            common_to_include=['view',]
+        )
+        display_defaults.update(settings_dict)
 
         available_settings = [
             'font_scale',
