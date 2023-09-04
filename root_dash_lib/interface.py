@@ -520,12 +520,15 @@ class Interface:
         fig_width *= 2.
         key = 'seaborn_style'
         if key in ask_for:
-            selected_settings[key] = st_loc.selectbox(
+            value, ind = selectbox(
+                st_loc,
                 'choose seaborn plot style',
                 display_options.get(key, [ 'whitegrid', 'white', 'darkgrid', 'dark', 'ticks', ]),
-                index=display_defaults.get(key, 0),
+                index = display_defaults.get(key + '_ind', 0),
                 key=tag + key,
             )
+            selected_settings[key] = value
+            selected_settings[key + '_ind'] = ind
         key = 'fig_width'
         if key in ask_for:
             selected_settings[key] = st_loc.slider(
@@ -581,20 +584,26 @@ class Interface:
                 )
             key = 'legend_ha'
             if key in ask_for:
-                selected_settings[key] = st_loc.selectbox(
+                value, ind = selectbox(
+                    st_loc,
                     'legend horizontal alignment',
                     [ 'left', 'center', 'right' ],
-                    index=display_defaults.get( key, 2 ),
+                    index = display_defaults.get(key + '_ind', 0),
                     key=tag + key,
                 )
+                selected_settings[key] = value
+                selected_settings[key + '_ind'] = ind
             key = 'legend_va'
             if key in ask_for:
-                selected_settings[key] = st_loc.selectbox(
+                value, ind = selectbox(
+                    st_loc,
                     'legend vertical alignment',
                     [ 'upper', 'center', 'lower' ],
-                    index=display_defaults.get( key, 2 ),
+                    index = display_defaults.get(key + '_ind', 0),
                     key=tag + key,
                 )
+                selected_settings[key] = value
+                selected_settings[key + '_ind'] = ind
         key = 'include_annotations'
         if key in ask_for:
             selected_settings[key] = st_loc.checkbox(
@@ -605,20 +614,26 @@ class Interface:
         if selected_settings.get( 'include_annotations', False ):
             key = 'annotations_ha'
             if key in ask_for:
-                selected_settings[key] = st_loc.selectbox(
+                value, ind = selectbox(
+                    st_loc,
                     'annotations horizontal alignment',
                     [ 'left', 'center', 'right' ],
-                    index=display_defaults.get( key, 0 ),
+                    index = display_defaults.get(key + '_ind', 0),
                     key=tag + key,
                 )
+                selected_settings[key] = value
+                selected_settings[key + '_ind'] = ind
         key = 'color_palette'
         if key in ask_for:
-            selected_settings[key] = st_loc.selectbox(
+            value, ind = selectbox(
+                st_loc,
                 'color palette',
                 display_options.get(key, [ 'deep', 'colorblind', 'dark', 'bright', 'pastel', 'muted', ]),
-                index=display_defaults.get( key, 0 ),
+                index = display_defaults.get(key + '_ind', 0),
                 key=tag + key,
             )
+            selected_settings[key] = value
+            selected_settings[key + '_ind'] = ind
 
         key = 'font'
         if key in ask_for:

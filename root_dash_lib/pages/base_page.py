@@ -40,7 +40,7 @@ def main(config_fp: str, user_utils: types.ModuleType=None):
     combined_settings = builder.settings.upload_button(st.sidebar)
 
     # DEBUG
-    # st.write(builder.settings.common['data'])
+    st.write(combined_settings)
 
     # Global settings
     st.sidebar.markdown('# Data Settings')
@@ -49,6 +49,10 @@ def main(config_fp: str, user_utils: types.ModuleType=None):
     )
     st.sidebar.markdown('# View Settings')
     builder.interface.request_view_settings(st.sidebar)
+
+    # DEBUG
+    st.write('Immediately after requesting view settings.')
+    st.write(builder.interface.settings.common)
 
     # Recategorize data
     selected_settings = builder.settings.common['data']
@@ -123,6 +127,9 @@ def main(config_fp: str, user_utils: types.ModuleType=None):
 
     # View the data directly
     builder.data_viewer.write(data)
+
+    # DEBUG
+    st.write(builder.settings.common)
 
     # Settings download button
     st.sidebar.markdown('# Settings Download')
