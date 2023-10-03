@@ -8,7 +8,7 @@ CONFIG_FP=$1
 USER_NBS=(transform.ipynb)
 
 # How to execute the notebooks
-CONVERT_THEN_EXEC=false
+CONVERT_THEN_EXEC=true
 
 ###############################################################################
 # Probably don't touch below unless you know what you're doing
@@ -30,6 +30,8 @@ CONFIG_DIR=$(dirname $(realpath $CONFIG_FP))
 cd $CONFIG_DIR
 echo "Config/working directory: $CONFIG_DIR"
 echo
+
+echo "User notebooks:" ${USER_NBS[@]}
 
 # Convert and execute the notebooks
 if $CONVERT_THEN_EXEC; then

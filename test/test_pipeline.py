@@ -8,7 +8,6 @@ import shutil
 import subprocess
 import yaml
 
-###############################################################################
 
 class TestPipeline(unittest.TestCase):
 
@@ -17,14 +16,16 @@ class TestPipeline(unittest.TestCase):
         # Get filepath info
         test_dir = os.path.abspath(os.path.dirname(__file__))
         self.root_dir = os.path.dirname(test_dir)
-        self.test_data_dir = os.path.join(self.root_dir, 'test_data', 'test_data_raw_only')
+        self.test_data_dir = os.path.join(self.root_dir, 'test_data',
+                                          'test_data_raw_only')
         root_config_fp = os.path.join(self.root_dir, 'src', 'config.yml')
         self.config_fp = os.path.join(self.test_data_dir, 'config.yml')
         self.timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
         # Set up temporary dirs
         self.temp_dirs = {
-            'processed_data_dir': os.path.join(self.test_data_dir, 'processed_data'),
+            'processed_data_dir': os.path.join(self.test_data_dir,
+                                               'processed_data'),
             'figure_dir': os.path.join(self.test_data_dir, 'figures'),
             'logs_dir': os.path.join(self.root_dir, 'logs'),
         }
@@ -33,7 +34,8 @@ class TestPipeline(unittest.TestCase):
                 shutil.rmtree(temp_dir)
 
         # Set up news data fp
-        self.news_data_fp = os.path.join(self.test_data_dir, 'raw_data', 'News_Report_2023-07-25.csv')
+        self.news_data_fp = os.path.join(self.test_data_dir, 'raw_data',
+                                         'News_Report_2023-07-25.csv')
         self.dup_news_data_fp = self.news_data_fp.replace('07-25', 'null-null')
 
         # Copy and edit config
@@ -61,7 +63,8 @@ class TestPipeline(unittest.TestCase):
             os.remove(self.config_fp)
 
         # Remove any notebooks if they exist
-        notebook_fps = glob.glob(os.path.join(self.test_data_dir, 'transform*.ipynb'))
+        notebook_fps = glob.glob(os.path.join(self.test_data_dir,
+                                              'transform*.ipynb'))
         for notebook_fp in notebook_fps:
             os.remove(notebook_fp)
 
@@ -75,12 +78,15 @@ class TestPipeline(unittest.TestCase):
         # Paths are relative to the config
         os.chdir(os.path.dirname(self.config_fp))
         assert config['data_dir'] == os.path.relpath(self.test_data_dir)
-        assert config['figure_dir'] == os.path.relpath(self.temp_dirs['figure_dir'])
+        assert config['figure_dir'] == os.path.relpath(
+            self.temp_dirs['figure_dir']
+        )
 
     ###############################################################################
 
     def check_processed_data_and_logs(self, ext='.py'):
-        '''This method is re-used a few times to ensure that the requested output is available.'''
+        '''This method is re-used a few times to ensure that the
+        requested output is available.'''
 
         # Check that there are output files
         output_files = [
@@ -89,13 +95,21 @@ class TestPipeline(unittest.TestCase):
             ('counts', 'counts.research_topics.csv',),
             ('press.csv',),
             ('press.exploded.csv',),
-       ]
+        ]
         for output_file in output_files:
-            output_fp = os.path.join(self.temp_dirs['processed_data_dir'], *output_file)
+            output_fp = os.path.join(
+                self.temp_dirs['processed_data_dir'],
+                *output_file
+            )
             assert os.path.isfile(output_fp)
 
         # Check that there's an output NB in the logs
-        transform_fps = glob.glob(os.path.join(self.temp_dirs['logs_dir'], 'transform*{}'.format(ext)))
+        transform_fps = glob.glob(
+            os.path.join(
+                self.temp_dirs['logs_dir'],
+                'transform*{}'.format(ext)
+            )
+        )
         assert len(transform_fps) > 0
 
     ###############################################################################
@@ -117,17 +131,19 @@ class TestPipeline(unittest.TestCase):
         ))
         conversion_subprocess_output = subprocess.run(
             command,
-            shell = True,
-            capture_output = True,
-            cwd = self.test_data_dir,
+            shell=True,
+            capture_output=True,
+            cwd=self.test_data_dir,
         )
         assert conversion_subprocess_output.returncode == 0
 
         execution_subprocess_output = subprocess.run(
-            'python {}.py'.format(os.path.join(self.temp_dirs['logs_dir'], script_fn_base)),
-            shell = True,
-            capture_output = True,
-            cwd = self.test_data_dir,
+            'python {}.py'.format(
+                os.path.join(self.temp_dirs['logs_dir'], script_fn_base)
+            ),
+            shell=True,
+            capture_output=True,
+            cwd=self.test_data_dir,
         )
         assert execution_subprocess_output.returncode == 0
 
@@ -157,9 +173,9 @@ class TestPipeline(unittest.TestCase):
         ))
         subprocess_output = subprocess.run(
             command,
-            shell = True,
-            capture_output = True,
-            cwd = self.test_data_dir,
+            shell=True,
+            capture_output=True,
+            cwd=self.test_data_dir,
         )
 
         # Ensure it ran successfully
@@ -190,15 +206,15 @@ class TestPipeline(unittest.TestCase):
         ))
         subprocess_output = subprocess.run(
             command,
-            shell = True,
-            capture_output = True,
-            cwd = self.test_data_dir,
+            shell=True,
+            capture_output=True,
+            cwd=self.test_data_dir,
         )
 
         # Ensure it ran successfully
         assert subprocess_output.returncode == 0
 
-        self.check_processed_data_and_logs('.ipynb')
+        self.check_processed_data_and_logs('.py')
 
     ###############################################################################
 
