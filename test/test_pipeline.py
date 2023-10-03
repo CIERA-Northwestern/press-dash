@@ -223,6 +223,7 @@ class TestPipeline(unittest.TestCase):
         # Move to the root directory
         os.chdir(self.root_dir)
 
-        subprocess.check_output(['streamlit', './test_dashboard/st_dashboard.py'])
+        subprocess.check_output(['streamlit',
+                                 './test_dashboard/dashboard.py'])
 
 

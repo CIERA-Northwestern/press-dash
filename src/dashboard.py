@@ -5,12 +5,12 @@ config_fn = 'config.yml'
 
 # Ensure the repository is added to the path
 # This should typically be accessible post pip-installation
-# But we add it to the path because when hosted on the web that doesn't work necessarily.
+# But we add it to the path because when hosted on the web
+# that doesn't work necessarily.
 import sys
 root_dir = os.path.dirname(os.path.dirname(__file__))
 if root_dir not in sys.path:
     sys.path.append(root_dir)
-
 
 # Call the main function.
 # Change the import here to whatever page you want to load.
