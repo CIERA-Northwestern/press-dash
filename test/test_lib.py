@@ -7,7 +7,7 @@ import unittest
 import numpy as np
 import pandas as pd
 
-from root_dash_lib.dash_builder import DashBuilder
+from press_dash_lib.dash_builder import DashBuilder
 from .lib_for_tests import press_user_utils, grants_user_utils
 
 

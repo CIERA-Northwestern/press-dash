@@ -15,7 +15,6 @@ setuptools.setup(
     author="CIERA (Zach Hafen-Saavedra)",
     author_email="ciera@northwestern.edu",
     description="Dashboard for exploring and presenting press data related to CIERA.",
-    long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/CIERA-Northwestern/press-dash",
     packages=setuptools.find_packages(),
@@ -31,6 +30,5 @@ setuptools.setup(
         'streamlit',
         'pytest',
         'jupyterlab',
-        'nbconvert',
    ],
 )
