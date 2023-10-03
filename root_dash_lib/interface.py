@@ -64,9 +64,6 @@ class Interface:
         if selected_settings is None:
             selected_settings = self.settings.common['data']
 
-        # DEBUG
-        # st.write(st_loc)
-
         # We have to add the data settings to a dictionary piece-by-piece
         # because as soon as they're called the user input exists.
         key = 'aggregation_method'
@@ -360,9 +357,6 @@ class Interface:
             common_to_include=['view',]
         )
         display_defaults.update(settings_dict)
-
-        # DEBUG
-        st.write(settings_dict)
 
         available_settings = [
             'font_scale',

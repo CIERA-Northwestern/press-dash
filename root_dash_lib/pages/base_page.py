@@ -14,7 +14,8 @@ from .. import dash_builder
 
 importlib.reload(dash_builder)
 
-def main(config_fp: str, user_utils: types.ModuleType=None):
+
+def main(config_fp: str, user_utils: types.ModuleType = None):
     '''This is the main function that runs the dashboard.
 
     Args:
@@ -39,20 +40,13 @@ def main(config_fp: str, user_utils: types.ModuleType=None):
     st.sidebar.markdown('# Settings Upload')
     combined_settings = builder.settings.upload_button(st.sidebar)
 
-    # DEBUG
-    st.write(combined_settings)
-
     # Global settings
     st.sidebar.markdown('# Data Settings')
     builder.interface.request_data_settings(
         st.sidebar,
-   )
+    )
     st.sidebar.markdown('# View Settings')
     builder.interface.request_view_settings(st.sidebar)
-
-    # DEBUG
-    st.write('Immediately after requesting view settings.')
-    st.write(builder.interface.settings.common)
 
     # Recategorize data
     selected_settings = builder.settings.common['data']
@@ -60,8 +54,11 @@ def main(config_fp: str, user_utils: types.ModuleType=None):
         preprocessed_df=data['preprocessed'],
         new_categories=builder.config.get('new_categories', {}),
         recategorize=selected_settings['recategorize'],
-        combine_single_categories=selected_settings.get('combine_single_categories', False),
-   )
+        combine_single_categories=selected_settings.get(
+            'combine_single_categories',
+            False
+        ),
+    )
 
     # Data filter settings
     with st.expander('Data Filters'):
@@ -77,14 +74,11 @@ def main(config_fp: str, user_utils: types.ModuleType=None):
         builder.settings.common['filters']['text'],
         builder.settings.common['filters']['categorical'],
         builder.settings.common['filters']['numerical'],
-   )
+    )
 
     # Data axes
     st.subheader('Data Axes')
     builder.interface.request_data_axes(st)
-
-    # DEBUG
-    # st.write(builder.settings.common)
 
     # Aggregate data
     data['aggregated'] = builder.aggregate(
@@ -93,21 +87,21 @@ def main(config_fp: str, user_utils: types.ModuleType=None):
         builder.settings.common['data']['y_column'],
         builder.settings.common['data']['groupby_column'],
         builder.settings.common['data']['aggregation_method'],
-   )
+    )
     # Aggregate data
     data['totals'] = builder.aggregate(
         data['recategorized'],
         builder.settings.common['data']['x_column'],
         builder.settings.common['data']['y_column'],
         aggregation_method=builder.settings.common['data']['aggregation_method'],
-   )
+    )
 
     # Lineplot
     local_key = 'lineplot'
-    st.header(config.get('lineplot_header','Lineplot'))
+    st.header(config.get('lineplot_header', 'Lineplot'))
     with st.expander('Lineplot settings'):
         local_opt_keys, common_opt_keys, unset_opt_keys = builder.settings.get_local_global_and_unset(
-            function = builder.data_viewer.lineplot,
+            function=builder.data_viewer.lineplot,
         )
         builder.interface.request_view_settings(
                 st,
@@ -128,9 +122,6 @@ def main(config_fp: str, user_utils: types.ModuleType=None):
 
     # View the data directly
     builder.data_viewer.write(data)
-
-    # DEBUG
-    st.write(builder.settings.common)
 
     # Settings download button
     st.sidebar.markdown('# Settings Download')
