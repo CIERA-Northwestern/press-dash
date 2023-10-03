@@ -36,7 +36,7 @@ def standard_setup(
         user_utils=None,
         test_data_subdir='test_data_complete',
         config_fn='config.yml'
-   ):
+    ):
     '''Common function for setting up the data
     '''
 
@@ -45,7 +45,7 @@ def standard_setup(
     self.root_dir = os.path.dirname(test_dir)
     self.data_dir = os.path.join(
         self.root_dir, 'test_data', test_data_subdir,
-   )
+    )
     root_config_fp = os.path.join(self.root_dir, 'test', config_fn)
     self.config_fp = os.path.join(self.data_dir, 'config.yml')
 

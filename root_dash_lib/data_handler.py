@@ -40,7 +40,7 @@ class DataHandler:
             self,
             raw_df: pd.DataFrame,
             config: dict,
-   ) -> Tuple[pd.DataFrame, dict]:
+    ) -> Tuple[pd.DataFrame, dict]:
         '''Clean the data using the stored config and user_utils.
 
         This is one of the only functions where we allow the config
@@ -62,7 +62,7 @@ class DataHandler:
             self,
             cleaned_df: pd.DataFrame,
             config: dict,
-   ) -> Tuple[pd.DataFrame, dict]:
+    ) -> Tuple[pd.DataFrame, dict]:
         '''Preprocess the data using the stored config and user_utils.
         This is one of the only functions where we allow the config
         to be modified. In general the on-the-fly settings are
@@ -85,7 +85,7 @@ class DataHandler:
         groupby_column: dict,
         new_cat_per_g: dict,
         combine_single_categories: bool = False,
-   ) -> pd.Series:
+    ) -> pd.Series:
         '''The actual function doing most of the recategorizing.
 
         Args:
@@ -229,7 +229,7 @@ class DataHandler:
         text_filters: dict[str, str] = {},
         categorical_filters: dict[str, list] = {},
         numerical_filters: dict[str, tuple] = {},
-   ) -> pd.DataFrame:
+    ) -> pd.DataFrame:
         '''Filter what data shows up in the dashboard.
 
         Args:

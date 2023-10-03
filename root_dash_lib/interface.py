@@ -129,7 +129,7 @@ class Interface:
             display_defaults: dict = {},
             selected_settings: dict = None,
             tag: str = None,
-   ) -> dict:
+    ) -> dict:
         '''Request common data settings from the user.
 
         Args:
@@ -201,7 +201,7 @@ class Interface:
             display_options: dict = {},
             selected_settings: dict = None,
             tag: str = None,
-   ) -> dict:
+    ) -> dict:
         '''Request common data settings from the user.
 
         Args:
@@ -707,6 +707,6 @@ def selectbox(
         index = index,
         format_func = lambda index: options[index],
         **kwargs
-   )
+    )
 
     return options[ind], ind

@@ -53,7 +53,7 @@ def load_data(config):
 
     press_office_pattern = os.path.join(
         input_dir, config['press_office_data_file_pattern']
-   )
+    )
     press_office_data_fp = get_fp_of_most_recent_file(press_office_pattern)
 
     ##########################################################################
@@ -96,7 +96,7 @@ def clean_data(raw_df, config):
     cleaned_df = raw_df.drop(
         raw_df.index[raw_df['Date'].dt.year == 1970],
         axis='rows',
-   )
+    )
 
     # Drop weird articles---ancient ones w/o a title or press type
     cleaned_df.dropna(
@@ -104,7 +104,7 @@ def clean_data(raw_df, config):
         how='any',
         subset=['Title', 'Press Types',],
         inplace=True,
-   )
+    )
 
     # Get rid of HTML ampersands
     for str_column in ['Title', 'Research Topics', 'Categories']:
@@ -114,7 +114,7 @@ def clean_data(raw_df, config):
     columns_to_fill = ['Press Mentions', 'People Reached',]
     cleaned_df[columns_to_fill] = cleaned_df[columns_to_fill].fillna(
         value=0
-   )
+    )
     cleaned_df.fillna(value='N/A', inplace=True)
 
     return cleaned_df, config
@@ -146,7 +146,7 @@ def preprocess_data(cleaned_df, config):
     # Get the year, according to the config start date
     preprocessed_df['Year'] = time_series_utils.get_year(
         preprocessed_df['Date'], config['start_of_year']
-   )
+    )
 
     # Tweaks to the press data
     if 'Title (optional)' in preprocessed_df.columns:

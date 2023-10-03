@@ -30,7 +30,7 @@ class Settings:
         st_loc = st,
         label: str = 'Download settings in JSON format.',
         file_name: str = 'dash_settings.json',
-   ):
+    ):
         '''Download the settings as a json.
 
         Args:
@@ -62,7 +62,7 @@ class Settings:
             'Upload settings in JSON format.\n'
             'A settings download button is at the bottom.'
         ),
-   ) -> dict:
+    ) -> dict:
         '''Upload the settings and overwrite the class's values.
 
         Args:
@@ -91,7 +91,7 @@ class Settings:
         self, 
         local_key: str = None, 
         common_to_include: list[str] = ['data', 'filters', 'view']
-   ) -> dict:
+    ) -> dict:
         '''Get the full local settings, including global defaults.
 
         Args:
@@ -116,7 +116,7 @@ class Settings:
         local_key: str = None,
         common_to_include: list[str] = ['data', 'filters', 'view'],
         accounted_for: list[str] = ['self', 'kwarg', 'df', 'total', 'categories'],
-   ) -> Tuple[list[str], list[str], list[str]]:
+    ) -> Tuple[list[str], list[str], list[str]]:
 
         local_opt_keys = list(self.local.get(local_key, {}).keys())
 

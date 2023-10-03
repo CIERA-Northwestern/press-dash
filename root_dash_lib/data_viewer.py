@@ -89,7 +89,7 @@ class DataViewer:
         include_annotations: bool = False,
         annotations_ha: str = 'left',
         **kwargs
-   ) -> matplotlib.figure.Figure:
+    ) -> matplotlib.figure.Figure:
         '''General-purpose matplotlib lineplot.
         This function provides solid defaults with a lot of customization.
         If you want more customization you should probably create your own
@@ -275,7 +275,7 @@ class DataViewer:
         legend_scale: float = 1.,
         include_annotations: bool = False,
         annotations_ha: str = 'left',
-   ):
+    ):
         '''Function to plot the relative contribution of the categories.
 
         Args:

@@ -28,7 +28,7 @@ class Aggregator:
         x_column: str,
         count_column: str,
         groupby_column: str = None,
-   ) -> Union[pd.Series, pd.DataFrame]:
+    ) -> Union[pd.Series, pd.DataFrame]:
         '''Count up stats, e.g. number of articles per year per category.
 
         Args:
@@ -68,7 +68,7 @@ class Aggregator:
         x_column: str,
         weight_column: str,
         groupby_column: str = None,
-   ) -> Union[pd.Series, pd.DataFrame]:
+    ) -> Union[pd.Series, pd.DataFrame]:
         '''Sum up stats, e.g. dollar amount per year.
 
         Args:
