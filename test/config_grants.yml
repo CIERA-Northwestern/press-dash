@@ -1,0 +1,106 @@
+###############################################################################
+# Options
+###############################################################################
+
+# Title of the page
+page_title: CIERA Grants
+
+# Location of the data relative to the config
+data_dir: .
+input_dirname: raw_data
+output_dirname: processed_data
+data_file_pattern: CIERA_awards_data*.csv
+
+# What day of the year to start on.
+# Default is September 1st, start of the Northwestern Financial Year
+year_start: September 1
+
+# Cumulative or yearly
+cumulative: False
+
+# Where to place the filters on the page
+place_filters_in_sidebar: False
+
+# Seaborn color palette to use. More options at https://seaborn.pydata.org/tutorial/color_palettes.html
+color_palette: deep
+
+primary_id_column: CERES Award ID
+
+id_columns:
+  - CERES Award ID
+  - Investigator Employee ID
+  - Subaward ID
+  - Allocation ID
+  - Award Prime Sponsor ID
+  - Prime Sponsor Name
+  - Award Direct Sponsor ID
+  - Direct Sponsor Name
+  - Award Current Dept ID
+  - Award Current Dept Name
+  - Award Dept ID
+  - Award Dept Name
+  - Investigator HR Dept Name
+  - Award Current PI HR Dept Name
+  - Award Current PI Employee ID
+numerical_columns:
+  - Allocation Total Sum Amount
+  - Allocation Authorized Total Amount
+  - Allocation Anticipated Total Amount
+  - Allocation Authorized Direct Amount
+  - Allocation Anticipated Direct Amount
+  - Allocation Authorized F&A Amount
+  - Allocation Anticipated F&A Amount
+  - Cost Share Amount
+x_columns:
+  - Overall Award Reporting Fiscal Year (yyyy)
+  - Award Start Fiscal Year (yyyy)
+  - Award End Fiscal Year (yyyy)
+categorical_columns:
+  # - Investigator Primary Function (myHR)
+  # - Investigator Primary Appt Job Title (myHR)
+  # - Investigator Academic Rank (myHR)
+  # - Investigator Gender (myHR)
+  - Award Dept Name
+  - Award Dept ID
+  - Prime Sponsor Name
+  - Award Prime Sponsor ID
+  - Award Direct Sponsor ID
+  - Direct Sponsor Name
+  - Award Current Dept ID
+  - Award Current Dept Name
+  - Investigator HR Dept Name
+  - Award Current PI HR Dept Name
+  - Award Current PI Gender (myHR)
+  # - Award Current PI Primary Appt Job Title (myHR)
+  # - Award Current PI Primary Function (myHR)
+  # - Award Current PI Academic Rank (myHR)
+text_columns:
+  - Long Title
+  - Investigator First Name
+  - Investigator Last Name
+  - Award Current PI First Name
+  - Award Current PI Last Name
+  - Award Dept Name
+
+###############################################################################
+# Recategorization / Labeling
+###############################################################################
+
+keep_single_categories: False
+
+# Note: If there are contradictory categories the behavior is ill-defined
+new_categories:
+  "Award Department [Award Dept Name]":
+    'CIERA': "'CIERA - Ctr Int Exp Rsch Astr'" # Anything tagged as CIERA is CIERA
+    'P&A': "'Physics & Astronomy' & (not 'CIERA - Ctr Int Exp Rsch Astr')" # Anything tagged as P&A is P&A, unless it's CIERA
+  "Award Department (Interdisciplinary Priority) [Award Dept Name]":
+    'CIERA only': "only 'CIERA - Ctr Int Exp Rsch Astr'" # Stuff with one department
+    'P&A only': "only 'Physics & Astronomy'" # More stuff with one department
+    'CIERA interdisciplinary': "not 'Physics & Astronomy'" # Anything with CIERA and something else
+  # Investigator Primary Function (myHR):
+  #   'Faculty': "'Faculty' | 'Emeritus Faculty'"
+  #   'Staff': "'Staff' & (not ('Faculty' | 'Emeritus Faculty'))"
+  # Award Current PI Primary Function (myHR):
+  #   'Faculty': "'Faculty' | 'Emeritus Faculty'"
+  #   'Staff': "'Staff' & (not ('Faculty' | 'Emeritus Faculty'))"
+

@@ -1,131 +1,169 @@
-import copy
+'''Functions for loading and preprocessing the data, specific to
+the user's data. If you are adapting the dashboard as your own,
+you likely need to alter these functions.
+'''
+import os
 import glob
 import numpy as np
-import os
 import pandas as pd
-import re
-import streamlit as st
-import yaml
 
-import matplotlib
-import matplotlib.pyplot as plt
-import matplotlib.patheffects as path_effects
-import seaborn as sns
+from root_dash_lib import utils
 
-from press_dash_lib import data_utils
 
-################################################################################
+def load_data(config):
+    '''Modify this!
+    
+    This is the main function for loading the data
+    (but save cleaning and preprocessing for later).
+    
+    For compatibility with the existing
+    dashboard, this function should accept a pandas DataFrame and a
+    config dictionary and return the same.
 
-def load_data( config ):
+    Args:
+        config (dict): The configuration dictionary, loaded from a YAML file.
 
-    ################################################################################
+    Returns:
+        raw_df (pandas.DataFrame): The data to be used in the dashboard.
+        config (dict): The configuration dictionary, loaded from a YAML file.
+    '''
+
+    ##########################################################################
     # Filepaths
 
-    input_dir = os.path.join( config['data_dir'], config['input_dirname'] )
+    input_dir = os.path.join(config['data_dir'], config['input_dirname'])
 
-    def get_fp_of_most_recent_file( pattern ):
-        fps = glob.glob( pattern )
-        ind_selected = np.argmax([ os.path.getctime( _ ) for _ in fps ])
+    def get_fp_of_most_recent_file(pattern):
+        '''Get the filepath of the most-recently created file matching
+        the pattern. We just define this here because we use it twice.
+
+        Args:
+            pattern (str): The pattern to match.
+
+        Returns:
+            fp (str): The filepath of the most-recently created file
+                matching the pattern.
+        '''
+        fps = glob.glob(pattern)
+        ind_selected = np.argmax([os.path.getctime(_) for _ in fps])
         return fps[ind_selected]
 
-    data_fp = os.path.join( input_dir, config['website_data_file_pattern'] )
-    data_fp = get_fp_of_most_recent_file( data_fp )
+    data_pattern = os.path.join(input_dir, config['website_data_file_pattern'])
+    data_fp = get_fp_of_most_recent_file(data_pattern)
 
-    press_office_data_fp = os.path.join( input_dir, config['press_office_data_file_pattern'] )
-    press_office_data_fp = get_fp_of_most_recent_file( press_office_data_fp )
+    press_office_pattern = os.path.join(
+        input_dir, config['press_office_data_file_pattern']
+    )
+    press_office_data_fp = get_fp_of_most_recent_file(press_office_pattern)
 
-    ################################################################################
+    ##########################################################################
     # Load data
 
     # Website data
-    df = pd.read_csv( data_fp, parse_dates=[ 'Date', ] )
-    df.set_index( 'id', inplace=True )
+    website_df = pd.read_csv(data_fp, parse_dates=['Date',])
+    website_df.set_index('id', inplace=True)
 
     # Load press data
-    press_df = pd.read_excel( press_office_data_fp )
-    press_df.set_index( 'id', inplace=True )
+    press_df = pd.read_excel(press_office_data_fp)
+    press_df.set_index('id', inplace=True)
 
-    combined_df = df.join( press_df )
+    # Combine the data
+    raw_df = website_df.join(press_df)
 
-    return combined_df
+    return raw_df, config
 
-################################################################################
 
-def load_processed_data( config ):
-    '''Load the merged-but-unprocessed data.
-
-    Args:
-        config (dict): The config dictionary.
-
-    Returns:
-        original_df (pd.DataFrame): The dataframe containing the original data.
-    '''
-
-    output_dir = os.path.join( config['data_dir'], config['output_dirname'] )
-    press_fp = os.path.join( output_dir, config['combined_filename'] )
-    original_df = pd.read_csv( press_fp, index_col=0 )
-
-    original_df[['Press Mentions', 'People Reached']] = original_df[['Press Mentions','People Reached']].fillna( value=0 )
-    original_df.fillna( value='N/A', inplace=True )
-
-    return original_df
-
-################################################################################
-
-def load_exploded_processed_data( config ):
-    '''Load the df data. (df means one row per category.)
-    https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.explode.html
+def clean_data(raw_df, config):
+    '''Modify this!
+    
+    This is the main function for cleaning the data,
+    i.e. getting rid of NaNs, dropping glitches, etc.
+    
+    For compatibility with the existing
+    dashboard, this function should accept a pandas DataFrame and a
+    config dictionary and return the same.
 
     Args:
-        config (dict): The config dictionary.
-        group_by (str): The category to group the data by, e.g. 'Research Topics'.
+        raw_df (pandas.DataFrame): The raw data to be used in the dashboard.
+        config (dict): The configuration dictionary, loaded from a YAML file.
 
     Returns:
-        df (pd.DataFrame): The dataframe containing the df data.
+        cleaned_df (pandas.DataFrame): The cleaned data.
+        config (dict): The (possibly altered) configuration dictionary.
     '''
-
-    base, ext = os.path.splitext( config['combined_filename'] )
-    df_filename = '{}.exploded{}'.format( base, ext )
-    output_dir = os.path.join( config['data_dir'], config['output_dirname'] )
-    df_fp = os.path.join( output_dir, df_filename )
-    df = pd.read_csv( df_fp )
-
-    return df
-
-################################################################################
-
-def preprocess_data( df, config ):
 
     # Drop drafts
-    df.drop( df.index[df['Date'].dt.year == 1970], axis='rows', inplace=True )
+    cleaned_df = raw_df.drop(
+        raw_df.index[raw_df['Date'].dt.year == 1970],
+        axis='rows',
+    )
 
     # Drop weird articles---ancient ones w/o a title or press type
-    df.dropna( axis='rows', how='any', subset=[ 'Title', 'Press Types', ], inplace=True )
+    cleaned_df.dropna(
+        axis='rows',
+        how='any',
+        subset=['Title', 'Press Types',],
+        inplace=True,
+    )
 
     # Get rid of HTML ampersands
-    for str_column in [ 'Title', 'Research Topics', 'Categories' ]:
-        df[str_column] = df[str_column].str.replace( '&amp;', '&' )
-
-    # Get the year, according to the config start date
-    df['Year'] = data_utils.get_year( df['Date'], config['start_of_year'] )
+    for str_column in ['Title', 'Research Topics', 'Categories']:
+        cleaned_df[str_column] = cleaned_df[str_column].str.replace('&amp;', '&')
 
     # Handle NaNs and such
-    df[['Press Mentions', 'People Reached']] = df[['Press Mentions','People Reached']].fillna( value=0 )
-    df.fillna( value='N/A', inplace=True )
+    columns_to_fill = ['Press Mentions', 'People Reached',]
+    cleaned_df[columns_to_fill] = cleaned_df[columns_to_fill].fillna(
+        value=0
+    )
+    cleaned_df.fillna(value='N/A', inplace=True)
+
+    return cleaned_df, config
+
+
+def preprocess_data(cleaned_df, config):
+    '''Modify this!
+    
+    This is the main function for doing preprocessing, e.g. 
+    adding new columns, renaming them, etc.
+    
+    For compatibility with the existing
+    dashboard, this function should accept a pandas DataFrame and a
+    config dictionary and return the same.
+
+    Args:
+        cleaned_df (pandas.DataFrame): The raw data to be used in the dashboard.
+        config (dict): The configuration dictionary, loaded from a YAML file.
+
+    Returns:
+        processed_df (pandas.DataFrame): The processed data.
+        config (dict): The (possibly altered) configuration dictionary.
+    '''
+
+    preprocessed_df = cleaned_df.copy()
+
+    # Get the year, according to the config start date
+    preprocessed_df['Year'] = utils.get_year(
+        preprocessed_df['Date'], config['start_of_year']
+    )
 
     # Tweaks to the press data
-    if 'Title (optional)' in df.columns:
-        df.drop( 'Title (optional)', axis='columns', inplace=True )
-    for column in [ 'Press Mentions', 'People Reached' ]:
-        df[column] = df[column].astype( 'Int64' )
+    if 'Title (optional)' in preprocessed_df.columns:
+        preprocessed_df.drop('Title (optional)', axis='columns', inplace=True)
+    for column in ['Press Mentions', 'People Reached']:
+        preprocessed_df[column] = preprocessed_df[column].astype('Int64')
 
     # Now explode the data
     for group_by_i in config['groupings']:
-        df[group_by_i] = df[group_by_i].str.split( '|' )
-        df = df.explode( group_by_i )
+        preprocessed_df[group_by_i] = preprocessed_df[group_by_i].str.split('|')
+        preprocessed_df = preprocessed_df.explode(group_by_i)
 
-    # Exploding the data results in duplicate IDs, so let's set up some new, unique IDs.
-    df['id'] = df.index
-    df.set_index( np.arange( len(df) ), inplace=True )
+    # Exploding the data results in duplicate IDs,
+    # so let's set up some new, unique IDs.
+    preprocessed_df['id'] = preprocessed_df.index
+    preprocessed_df.set_index(np.arange(len(preprocessed_df)), inplace=True)
 
-    return df, config
+    # This flag exists just to demonstrate you can modify the config
+    # during the user functions
+    config['data_preprocessed'] = True
+
+    return preprocessed_df, config

@@ -1,7 +1,13 @@
-import setuptools
+'''This is the install script used by pip to install the package,
+i.e. enable your Python version to find and import the package.
+Setup can accept a wide variety of options, but for the purpose
+of installing via "pip install -e .", the only required options
+are the name of the package and the packages to be included (`install_requires`).
 
-with open("README.md", "r") as fh:
-    long_description = fh.read()
+**If you plan on running your dashboard on streamlit.io/cloud,
+you must also include the necessary packages in the `requirements.txt` file.**
+'''
+import setuptools
 
 setuptools.setup(
     name="press_dash_lib",
@@ -13,25 +19,18 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/CIERA-Northwestern/press-dash",
     packages=setuptools.find_packages(),
-    classifiers=[
-        "Programming Language :: Python :: 3",
-        "Operating System :: OS Independent",
-    ],
     install_requires = [
         'numpy',
         'pandas',
         'openpyxl',
         'matplotlib',
         'seaborn',
-        'sympy',
         'nbconvert',
         'nbformat',
         'PyYAML',
         'streamlit',
         'pytest',
-        'ipython',
-        'jupyter',
         'jupyterlab',
-        'jupyter_contrib_nbextensions',
-    ],
+        'nbconvert',
+   ],
 )

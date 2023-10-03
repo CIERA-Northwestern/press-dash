@@ -22,11 +22,12 @@ On the other end of things, if you are comfortable with routine use of git, code
 The dashboard has a plethora of features that can be interacted with via a web interface.
 If the dashboard is currently live at [ciera-press-zach](https://ciera-press-zach.streamlit.app), you can use the dashboard without any additional effort.
 One of the main features is the application of filters and the ability to download the edited data and images.
+While the interface should be relatively intuitive, a helpful tip is that you can reset your choices by refreshing the page.
 
 ## Level 1: Updating the Configuration and Data
 
-For many applications the data is light-weight enough that you can do the pre-processing as part of running the dashboard.
-If the dashboard is also hosted on the web you can edit the configuration and data without ever needing to download anything.
+When the dashboard is hosted on the web in some cases you can edit the configuration and data without ever needing to download anything and view the updated dashboard without ever needing to download anything.
+This is possible for dashboards where the computations are sufficiently light to be wrapped into the interactive dashboard.
 
 ### Editing the Config
 
@@ -59,9 +60,10 @@ The process for downloading the code is as follows:
 
 Running the dashboard requires Python.
 If you do not have Python on your computer it is recommended you download and install [Miniconda](https://docs.conda.io/en/main/miniconda.html).
+Note that macs typically have a pre-existing Python installation, but this installation is not set up to install new packages easily, and the below instructions may not work.
+Therefore it is still recommended that you install via miniconda even if your system has Python pre-installed.
 
-With Python installed, 
-open the directory containing the code (the root directory) in your terminal or command prompt.
+Open the directory containing the code (the root directory) in your terminal or command prompt.
 If youre a mac user and you've never used a terminal or command prompt before
 you can do this by right clicking the extracted folder and selecting "New Terminal at Folder" ([more info](https://support.apple.com/guide/terminal/open-new-terminal-windows-and-tabs-trmlb20c7888/mac); [Windows Terminal is the windows equivalent](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/windows-commands)).
 
@@ -106,9 +108,18 @@ For convenience, the main command you need to download the code with git is
 git clone git@github.com:CIERA-Northwestern/press-dash.git`
 ```
 
+### If you edit anything, edit `<short name>_dash_lib/user_utils.py`
+
+This file contains two functions essential to working with arbitrary data:
+
+1. `load_data`, which the user must edit to ensure it loads the data into a DataFrame.
+2. `preprocess_data`, which will make alterations to the loaded data.
+
+Just by changing these two functions and the config you can adapt the pipeline to a wide variety of purposes.
+
 ### Editing the Pipeline
 
-If you want to change how the data is processed, edit `src/transform.ipynb`.
+If you want to change the more intensive data-processing, edit `src/transform.ipynb`.
 The data-processing pipeline runs this notebook when you execute the bash script `./src/pipeline.sh`,
 and saves the output in the logs.
 It is recommended to use the config whenever possible for any new variables introduced.
@@ -143,27 +154,39 @@ The repository is structured as follows:
 ```
 press-dash/
 │
-├── README.md                  # Documentation for the project
+├── README.md                   # Documentation for the project
 ├── __init__.py
-├── src                        # Source code directory
+├── src                         # Source code directory
 │   ├── __init__.py
 |   ├── config.yml              # Configuration file for the dashboard
 │   ├── dashboard.py            # Script for interactive dashboard
 │   ├── pipeline.sh             # Shell script for running data pipeline
 │   └── transform.ipynb         # Jupyter notebook for data transformation
-├── root_dash_lib              # Custom library directory
+├── root_dash_lib               # Custom library directory
 │   ├── __init__.py
-│   └── streamlit_utils.py      # Utility functions for the dashboard
-├── setup.py                   # Script for packaging the project
-├── requirements.txt           # List of project dependencies
-├── data                       # Data storage directory
+│   ├── user_utils.py           # Utilities specific to the dashboard. Must be edited.
+│   ├── dash_utils.py           # Utilities for creating widgets and accepting input.
+│   ├── data_utils.py           # Utilities for general-purpose data handling
+│   ├── plot_utils.py           # Utilities for plotting data.
+│   ├── time_series_utils.py    # Utilities for working with time series.
+│   └── pages                   # Dashboard page templates.
+│       ├── __init__.py
+│       ├── base_page.py       # The default dashboard setup. High flexibility.
+│       └── panels_page.py      # A multi-panel dashboard example.
+├── setup.py                    # Script for packaging the project
+├── requirements.txt            # List of project dependencies
+├── data                        # Data storage directory
 │   ├── raw_data                # Raw data directory
 │   └── processed_data          # Processed data directory
 ├── test                       # Test directory
 │   ├── __init__.py
+|   ├── config.yml              # Configuration file for the tests.
 │   ├── test_pipeline.py        # Unit tests for data pipeline
-│   └── test_streamlit.py       # Unit tests for the dashboard
-├── conftest.py                # Configuration for test suite
+│   ├── test_streamlit.py       # Unit tests for the dashboard
+│   └── lib_for_tests           # Used to load the default test dataset,
+│       ├── __init__.py         # enabling users to change the code and check
+│       └── press_data_utils.py     # if their changes broke any functionality.
+├── conftest.py                 # Configuration for test suite
 └── test_data                   # Test datasets
 ```
 
@@ -185,19 +208,69 @@ You may also consider changing the metadata in `setup.py`.
 You can deploy your app on the web using Streamlit sharing.
 Visit [Streamlit Sharing](https://streamlit.io/sharing) for more information.
 
+**Note:** you cannot deploy a streamlit app where the source is a repository owned by the organization, unless you can log into that organization's github account.
+This is true even if you have full read/write access to the organization's repositories.
+Instead you must create a fork of the repository you want to deploy, and point streamlit.io to that fork.
+
 ## Level 5: Additional Features
+
+### Using and Editing Multiple Dashboards
+
+It is recommended that your repositories that use this dashboard template are a fork of the template.
+Unfortunately you cannot have multiple official forks of a single repository, nor can you have a private fork, which is necessary for dashboards with sensitive data.
+However, you can create a "manual" fork in both cases, as described below.
+
+1. **Create a New Repository**: In your GitHub/Atlassian account, create a new repository. The repository can be set to "Private" if you wish.
+
+2. **Clone the Original Repository**: Clone the public repository to your local machine and navigate to the cloned repository directory.
+
+   ```bash
+   git clone https://github.com/zhafen/root-dash.git
+   cd your-public-repo
+   ```
+
+3. **Change the setup for the remote repositories**: Designate the repository you cloned from as `upstream`, and create a new origin with the url of your private repository.
+
+   ```bash
+   git remote rename origin upstream
+   git remote add origin https://github.com/<your-username>/<your-private-repo>.git
+   ```
+
+4. **Check the result**: If done correctly, the output of `git remote -v` should be
+
+    ```bash
+    git remote -v
+    ```
+
+    > ```
+    > origin  git@github.com:<your-username>.git (fetch)
+    > origin  git@github.com:<your-username>.git (push)
+    > upstream        git@github.com:zhafen/root-dash.git (fetch)
+    > upstream        git@github.com:zhafen/root-dash.git (push)
+    > ```
+
+4. **Push to the Private Repository**: Push all branches and tags to your new private repository:
+
+   ```bash
+   git push origin --all
+   git push origin --tags
+   ```
 
 ### Continuous Integration
 
 Continuous integration (automated testing) is an excellent way to check if your dashboard is likely to function for other users.
-You can enable continuous integration [via GitHub Actions](https://docs.github.com/en/actions/automating-builds-and-tests/about-continuous-integration), including adding a badge showing the status of your tests.
-Continuous integration can be tested locally using [act](https://github.com/nektos/act).
+You can enable continuous integration [via GitHub Actions](https://docs.github.com/en/actions/automating-builds-and-tests/about-continuous-integration) (also available in a tab at the top of your github repo), including adding a badge showing the status of your tests
+(shown at the top of this page).
 Some tests don't work on continuous integration,
 and are disabled until the underlying issues are addressed.
+Continuous integration can be tested locally using [act](https://github.com/nektos/act),
+which may be helpful if the issues that occur during continuous integration are system specific.
 
 ### Deploying a Private App
 Streamlit has the option to deploy your code without sharing it publicly.
 More information can be found [in this section of the Streamlit Sharing documentation](https://docs.streamlit.io/streamlit-community-cloud/share-your-app#make-your-app-public-or-private).
 
+
+---
 
 ChatGPT was used in the construction of this document.
