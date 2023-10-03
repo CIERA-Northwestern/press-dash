@@ -3,7 +3,7 @@ import pytest
 def pytest_addoption(parser):
     parser.addoption(
         "--skip-nbconvert", action="store_true", default=False, help="skip nbconvert tests"
-    )
+   )
 
 def pytest_configure(config):
     config.addinivalue_line("markers", "nbconvert: mark as employing nbconvert")

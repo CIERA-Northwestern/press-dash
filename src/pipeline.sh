@@ -43,11 +43,11 @@ if $CONVERT_THEN_EXEC; then
         SCRIPT_FN=${USER_NB_BASENAME/.ipynb/.$TIMESTAMP}
 
         # Convert to a python script
-        ( jupyter nbconvert \
+        (jupyter nbconvert \
             --to script \
             $(realpath $SRC_DIR/$USER_NB) \
             --output=$SCRIPT_FN\
-            --output-dir=$LOGS_DIR ) \
+            --output-dir=$LOGS_DIR) \
             > $LOGS_DIR/convert.$SCRIPT_FN.out \
             2> $LOGS_DIR/convert.$SCRIPT_FN.err
 
@@ -64,7 +64,7 @@ else
     # Clean up any temporary notebooks
     # (NBs created as a workaround to issues specifying execution directory)
     cleanup() {
-        if [ "$CONFIG_DIR" != "$SRC_DIR" ]; then
+        if ["$CONFIG_DIR" != "$SRC_DIR"]; then
             echo 'Cleaning up temporary notebooks...'
             for USER_NB in ${USER_NBS[@]}; do
                 SCRIPT_FN=${USER_NB_BASENAME/.ipynb/.$TIMESTAMP}
@@ -85,16 +85,16 @@ else
         # a good way to change directory for nbconvert execute.
         echo "Considering copying..."
         COPIED_NB_FP=$CONFIG_DIR/$SCRIPT_FN
-        if [ "$CONFIG_DIR" != "$SRC_DIR" ]; then
+        if ["$CONFIG_DIR" != "$SRC_DIR"]; then
             echo "Copying $USER_NB to $COPIED_NB_FP"
             cp $SRC_DIR/$USER_NB $COPIED_NB_FP
         fi
 
-        ( jupyter nbconvert \
+        (jupyter nbconvert \
             --to notebook \
             --execute $COPIED_NB_FP \
             --output=$SCRIPT_FN \
-            --output-dir=$LOGS_DIR ) \
+            --output-dir=$LOGS_DIR) \
             > $LOGS_DIR/execute.$SCRIPT_FN.out \
             2> $LOGS_DIR/execute.$SCRIPT_FN.err
     done

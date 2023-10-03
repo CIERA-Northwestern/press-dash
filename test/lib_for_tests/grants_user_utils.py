@@ -7,7 +7,7 @@ import os
 import pandas as pd
 
 
-def load_data( config ):
+def load_data(config):
     '''This is the main function for loading the data
     (but save cleaning and preprocessing for later).
     
@@ -23,18 +23,18 @@ def load_data( config ):
     '''
 
     # Get possible files
-    input_dir = os.path.join( config['data_dir'], config['input_dirname'] )
-    pattern = os.path.join( input_dir, config['data_file_pattern'] )
-    data_fps = glob.glob( pattern )
+    input_dir = os.path.join(config['data_dir'], config['input_dirname'])
+    pattern = os.path.join(input_dir, config['data_file_pattern'])
+    data_fps = glob.glob(pattern)
 
-    if len( data_fps ) == 0:
-        raise IOError( 'No files found matching pattern {}'.format( pattern ) )
+    if len(data_fps) == 0:
+        raise IOError('No files found matching pattern {}'.format(pattern))
 
     # Select the most recent file
-    ind_selected = np.argmax([ os.path.getctime( _ ) for _ in data_fps ])
+    ind_selected = np.argmax([os.path.getctime(_) for _ in data_fps])
     data_fp = data_fps[ind_selected]
 
-    raw_df = pd.read_csv( data_fp, sep='\t', encoding='UTF-16' )
+    raw_df = pd.read_csv(data_fp, sep='\t', encoding='UTF-16')
 
     return raw_df, config
 
@@ -60,7 +60,7 @@ def clean_data(raw_df, config):
     for date_column in config.get('date_columns',[]):
         dates = pd.to_datetime(cleaned_df[date_column])
         zero_inds = cleaned_df.index[dates < pd.to_datetime('2000-01-01')]
-        cleaned_df = cleaned_df.drop( zero_inds )
+        cleaned_df = cleaned_df.drop(zero_inds)
 
     return cleaned_df, config
 
@@ -91,28 +91,28 @@ def preprocess_data(cleaned_df, config):
     for date_column in config.get('date_columns',[]):
 
         # Convert to datetime
-        preprocessed_df[date_column] = pd.to_datetime( preprocessed_df[date_column] )
+        preprocessed_df[date_column] = pd.to_datetime(preprocessed_df[date_column])
 
         # Get date bins
         start_year = preprocessed_df[date_column].min().year - 1
         end_year = preprocessed_df[date_column].max().year + 1
         date_bins = pd.date_range(
-            '{} {}'.format( config['year_start'], start_year ),
-            pd.Timestamp.now() + pd.offsets.DateOffset( years=1 ),
-            freq = pd.offsets.DateOffset( years=1 ),
+            '{} {}'.format(config['year_start'], start_year),
+            pd.Timestamp.now() + pd.offsets.DateOffset(years=1),
+            freq = pd.offsets.DateOffset(years=1),
         )
         date_bin_labels = date_bins.year[:-1]
 
         # Column name
-        year_column = date_column.replace( 'Date', 'Year' )
+        year_column = date_column.replace('Date', 'Year')
         if 'time_bin_columns' not in config:
             config['time_bin_columns'] = []
         # To avoid overwriting the year column, we append a label to the end
         if year_column in config['time_bin_columns']:
             year_column += ' (Custom)'
-        config['time_bin_columns'].append( year_column )
+        config['time_bin_columns'].append(year_column)
 
         # Do the actual binning
-        preprocessed_df[year_column] = pd.cut( preprocessed_df[date_column], date_bins, labels=date_bin_labels ) 
+        preprocessed_df[year_column] = pd.cut(preprocessed_df[date_column], date_bins, labels=date_bin_labels) 
 
     return preprocessed_df, config

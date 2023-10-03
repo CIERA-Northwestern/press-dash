@@ -31,7 +31,7 @@ class Interface:
     def request_data_axes(
             self,
             st_loc,
-            ask_for: list[str] = [ 'aggregation_method', 'x_column', 'y_column', 'groupby_column'],
+            ask_for: list[str] = ['aggregation_method', 'x_column', 'y_column', 'groupby_column'],
             local_key: str = None,
             display_defaults: dict = {},
             display_options: dict = {},
@@ -86,7 +86,7 @@ class Interface:
             value, ind = selectbox(
                 st_loc,
                 'How do you want to bin the data in time?',
-                options = display_options.get( 'x_column', self.config['x_columns'] ),
+                options = display_options.get('x_column', self.config['x_columns']),
                 index = display_defaults.get(key + '_ind', 0),
             )
             selected_settings[key] = value
@@ -97,8 +97,8 @@ class Interface:
                 value, ind = selectbox(
                     st_loc,
                     'What do you want to count unique entries of?',
-                    display_options.get( key, self.config['id_columns'] ),
-                    index=display_defaults.get( key + '_ind', 0 ),
+                    display_options.get(key, self.config['id_columns']),
+                    index=display_defaults.get(key + '_ind', 0),
                 )
                 selected_settings[key] = value
                 selected_settings[key + '_ind'] = ind
@@ -106,8 +106,8 @@ class Interface:
                 value, ind = selectbox(
                     st_loc,
                     'What do you want to sum?',
-                    display_options.get( 'y_column', self.config['numerical_columns'] ),
-                    index=display_defaults.get( key + '_ind', 0 ),
+                    display_options.get('y_column', self.config['numerical_columns']),
+                    index=display_defaults.get(key + '_ind', 0),
                 )
                 selected_settings[key] = value
                 selected_settings[key + '_ind'] = ind
@@ -116,8 +116,8 @@ class Interface:
             value, ind = selectbox(
                 st_loc,
                 'What do you want to group the data by?',
-                display_options.get( 'groupby_column', self.config['categorical_columns'] ),
-                index=display_defaults.get( key + '_ind', 0 ),
+                display_options.get('groupby_column', self.config['categorical_columns']),
+                index=display_defaults.get(key + '_ind', 0),
             )
             selected_settings[key] = value
             selected_settings[key + '_ind'] = ind
@@ -127,12 +127,12 @@ class Interface:
     def request_data_settings(
             self,
             st_loc,
-            ask_for: list[str] = [ 'show_total', 'cumulative', 'recategorize', 'combine_single_categories' ],
+            ask_for: list[str] = ['show_total', 'cumulative', 'recategorize', 'combine_single_categories'],
             local_key: str = None,
             display_defaults: dict = {},
             selected_settings: dict = None,
             tag: str = None,
-    ) -> dict:
+   ) -> dict:
         '''Request common data settings from the user.
 
         Args:
@@ -164,23 +164,23 @@ class Interface:
 
         key = 'show_total'
         if key in ask_for:
-            selected_settings[key] = st_loc.checkbox(    
+            selected_settings[key] = st_loc.checkbox(   
                 'show total',
-                value=display_defaults.get( key, True ),
+                value=display_defaults.get(key, True),
                 key=tag + key
             )
         key = 'cumulative'
         if key in ask_for:
             selected_settings[key] = st_loc.checkbox(
                 'use cumulative values',
-                value=display_defaults.get( key, False ),
+                value=display_defaults.get(key, False),
                 key=tag + key
             )
         key = 'recategorize'
         if key in ask_for:
             selected_settings[key] = st_loc.checkbox(
                 'use combined categories (avoids double counting; definitions can be edited in the config)',
-                value=display_defaults.get( key, False ),
+                value=display_defaults.get(key, False),
                 key=tag + key
             )
             if selected_settings.get('recategorize', False):
@@ -188,7 +188,7 @@ class Interface:
                 if key in ask_for:
                     selected_settings[key] = st_loc.checkbox(
                         'group all undefined categories as "Other"',
-                        value=display_defaults.get( key, False ),
+                        value=display_defaults.get(key, False),
                         key=tag + key
                     )
 
@@ -198,13 +198,13 @@ class Interface:
             self,
             st_loc,
             df: pd.DataFrame,
-            ask_for: list[str] = [ 'text', 'categorical', 'numerical' ],
+            ask_for: list[str] = ['text', 'categorical', 'numerical'],
             local_key: str = None,
             display_defaults: dict = {},
             display_options: dict = {},
             selected_settings: dict = None,
             tag: str = None,
-    ) -> dict:
+   ) -> dict:
         '''Request common data settings from the user.
 
         Args:
@@ -330,7 +330,7 @@ class Interface:
                 'fig_height',
                 'font',
                 'color_palette',
-            ],
+           ],
             local_key: str = None,
             display_defaults: dict = {},
             display_options: dict = {},
@@ -388,10 +388,10 @@ class Interface:
             'annotations_ha',
             'font',
             'color_palette'
-        ]
+       ]
         if ask_for == 'all':
             ask_for = available_settings
-        unavailable_settings = [ _ for _ in ask_for if _ not in available_settings ]
+        unavailable_settings = [_ for _ in ask_for if _ not in available_settings]
         if len(unavailable_settings) > 0:
             warnings.warn(
                 'The following settings were requested, but this function does'
@@ -411,14 +411,14 @@ class Interface:
         if key in ask_for:
             selected_settings[key] = st_loc.text_input(
                 'x label',
-                value=display_defaults.get( key, '' ),
+                value=display_defaults.get(key, ''),
                 key=tag + key,
             )
         key = 'y_label'
         if key in ask_for:
             selected_settings[key] = st_loc.text_input(
                 'y label',
-                value=display_defaults.get( key, '' ),
+                value=display_defaults.get(key, ''),
                 key=tag + key,
             )
         key = 'yscale'
@@ -536,7 +536,7 @@ class Interface:
                 'font scale',
                 0.1,
                 2.,
-                value=display_defaults.get( key, 1. ),
+                value=display_defaults.get(key, 1.),
                 key=tag + key,
             )
         fig_width, fig_height = matplotlib.rcParams['figure.figsize']
@@ -547,7 +547,7 @@ class Interface:
             value, ind = selectbox(
                 st_loc,
                 'choose seaborn plot style',
-                display_options.get(key, [ 'whitegrid', 'white', 'darkgrid', 'dark', 'ticks', ]),
+                display_options.get(key, ['whitegrid', 'white', 'darkgrid', 'dark', 'ticks',]),
                 index = display_defaults.get(key + '_ind', 0),
                 key=tag + key,
             )
@@ -559,7 +559,7 @@ class Interface:
                 'figure width',
                 0.1*fig_width,
                 2.*fig_width,
-                value=display_defaults.get( key, fig_width ),
+                value=display_defaults.get(key, fig_width),
                 key=tag + key,
             )
         key = 'fig_height'
@@ -568,24 +568,24 @@ class Interface:
                 'figure height',
                 0.1*fig_height,
                 2.*fig_height,
-                value=display_defaults.get( key, fig_height ),
+                value=display_defaults.get(key, fig_height),
                 key=tag + key,
             )
         key = 'include_legend'
         if key in ask_for:
             selected_settings[key] = st_loc.checkbox(
                 'include legend',
-                value=display_defaults.get( key, True ),
+                value=display_defaults.get(key, True),
                 key=tag + key,
             )
-        if selected_settings.get( 'include_legend', False ):
+        if selected_settings.get('include_legend', False):
             key = 'legend_scale'
             if key in ask_for:
                 selected_settings[key] = st_loc.slider(
                     'legend scale',
                     0.1,
                     2.,
-                    value=display_defaults.get( key, 1. ),
+                    value=display_defaults.get(key, 1.),
                     key=tag + key,
                 )
             key = 'legend_x'
@@ -594,7 +594,7 @@ class Interface:
                     'legend x',
                     0.,
                     1.5,
-                    value=display_defaults.get( key, 1. ),
+                    value=display_defaults.get(key, 1.),
                     key=tag + key,
                 )
             key = 'legend_y'
@@ -603,7 +603,7 @@ class Interface:
                     'legend y',
                     0.,
                     1.5,
-                    value=display_defaults.get( key, 1. ),
+                    value=display_defaults.get(key, 1.),
                     key=tag + key,
                 )
             key = 'legend_ha'
@@ -611,7 +611,7 @@ class Interface:
                 value, ind = selectbox(
                     st_loc,
                     'legend horizontal alignment',
-                    [ 'left', 'center', 'right' ],
+                    ['left', 'center', 'right'],
                     index = display_defaults.get(key + '_ind', 0),
                     key=tag + key,
                 )
@@ -622,7 +622,7 @@ class Interface:
                 value, ind = selectbox(
                     st_loc,
                     'legend vertical alignment',
-                    [ 'upper', 'center', 'lower' ],
+                    ['upper', 'center', 'lower'],
                     index = display_defaults.get(key + '_ind', 0),
                     key=tag + key,
                 )
@@ -632,16 +632,16 @@ class Interface:
         if key in ask_for:
             selected_settings[key] = st_loc.checkbox(
                 'include annotations',
-                value=display_defaults.get( key, False ),
+                value=display_defaults.get(key, False),
                 key=tag + key,
             )
-        if selected_settings.get( 'include_annotations', False ):
+        if selected_settings.get('include_annotations', False):
             key = 'annotations_ha'
             if key in ask_for:
                 value, ind = selectbox(
                     st_loc,
                     'annotations horizontal alignment',
-                    [ 'left', 'center', 'right' ],
+                    ['left', 'center', 'right'],
                     index = display_defaults.get(key + '_ind', 0),
                     key=tag + key,
                 )
@@ -652,7 +652,7 @@ class Interface:
             value, ind = selectbox(
                 st_loc,
                 'color palette',
-                display_options.get(key, [ 'deep', 'colorblind', 'dark', 'bright', 'pastel', 'muted', ]),
+                display_options.get(key, ['deep', 'colorblind', 'dark', 'bright', 'pastel', 'muted',]),
                 index = display_defaults.get(key + '_ind', 0),
                 key=tag + key,
             )
@@ -661,25 +661,25 @@ class Interface:
 
         key = 'font'
         if key in ask_for:
-            original_font = copy.copy( plt.rcParams['font.family'] )[0]
+            original_font = copy.copy(plt.rcParams['font.family'])[0]
             # This can be finicky, so we'll wrap it in a try/except
             try:
                 ## Get all installed fonts
                 font_fps = font_manager.findSystemFonts(fontpaths=None, fontext='ttf')
-                fonts = [ os.path.splitext( os.path.basename( _ ) )[0] for _ in font_fps ]
+                fonts = [os.path.splitext(os.path.basename(_))[0] for _ in font_fps]
                 ## Get the default font
                 default_font = font_manager.FontProperties(family='Sans Serif')
-                default_font_fp = font_manager.findfont( default_font )
-                default_index = int( np.where( np.array( font_fps ) == default_font_fp )[0][0] )
+                default_font_fp = font_manager.findfont(default_font)
+                default_index = int(np.where(np.array(font_fps) == default_font_fp)[0][0])
                 ## Make the selection
                 font_ind = st_loc.selectbox(
                     'Select font',
-                    np.arange( len( fonts ) ),
+                    np.arange(len(fonts)),
                     index=default_index,
                     format_func=lambda x: fonts[x],
                     key=tag + key,
                 )
-                font = font_manager.FontProperties( fname=font_fps[font_ind] )
+                font = font_manager.FontProperties(fname=font_fps[font_ind])
                 selected_settings[key] = font.get_name()
             except:
                 selected_settings[key] = original_font
@@ -713,6 +713,6 @@ def selectbox(
         index = index,
         format_func = lambda index: options[index],
         **kwargs
-    )
+   )
 
     return options[ind], ind

@@ -27,5 +27,5 @@ setuptools.setup(
         'jupyter',
         'jupyterlab',
         'jupyter_contrib_nbextensions',
-    ],
+   ],
 )

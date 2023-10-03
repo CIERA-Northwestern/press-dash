@@ -46,7 +46,7 @@ def main(config_fp: str, user_utils: types.ModuleType=None):
     st.sidebar.markdown('# Data Settings')
     builder.interface.request_data_settings(
         st.sidebar,
-    )
+   )
     st.sidebar.markdown('# View Settings')
     builder.interface.request_view_settings(st.sidebar)
 
@@ -58,10 +58,10 @@ def main(config_fp: str, user_utils: types.ModuleType=None):
     selected_settings = builder.settings.common['data']
     data['recategorized'] = builder.recategorize_data(
         preprocessed_df=data['preprocessed'],
-        new_categories=builder.config.get( 'new_categories', {} ),
+        new_categories=builder.config.get('new_categories', {}),
         recategorize=selected_settings['recategorize'],
-        combine_single_categories=selected_settings.get( 'combine_single_categories', False),
-    )
+        combine_single_categories=selected_settings.get('combine_single_categories', False),
+   )
 
     # Data filter settings
     with st.expander('Data Filters'):
@@ -77,7 +77,7 @@ def main(config_fp: str, user_utils: types.ModuleType=None):
         builder.settings.common['filters']['text'],
         builder.settings.common['filters']['categorical'],
         builder.settings.common['filters']['numerical'],
-    )
+   )
 
     # Data axes
     st.subheader('Data Axes')
@@ -93,14 +93,14 @@ def main(config_fp: str, user_utils: types.ModuleType=None):
         builder.settings.common['data']['y_column'],
         builder.settings.common['data']['groupby_column'],
         builder.settings.common['data']['aggregation_method'],
-    )
+   )
     # Aggregate data
     data['totals'] = builder.aggregate(
         data['recategorized'],
         builder.settings.common['data']['x_column'],
         builder.settings.common['data']['y_column'],
         aggregation_method=builder.settings.common['data']['aggregation_method'],
-    )
+   )
 
     # Lineplot
     local_key = 'lineplot'
@@ -124,7 +124,7 @@ def main(config_fp: str, user_utils: types.ModuleType=None):
         df = data['aggregated'],
         totals = data['totals'],
         **builder.settings.get_settings(local_key)
-    )
+   )
 
     # View the data directly
     builder.data_viewer.write(data)

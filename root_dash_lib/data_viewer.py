@@ -50,7 +50,7 @@ class DataViewer:
             )
 
         if data_key not in data:
-            st.write('{} not found in data'.format( data_key ))
+            st.write('{} not found in data'.format(data_key))
             return
 
         shown_df = data[data_key]
@@ -89,7 +89,7 @@ class DataViewer:
         include_annotations: bool = False,
         annotations_ha: str = 'left',
         **kwargs
-    ) -> matplotlib.figure.Figure:
+   ) -> matplotlib.figure.Figure:
         '''General-purpose matplotlib lineplot.
         This function provides solid defaults with a lot of customization.
         If you want more customization you should probably create your own
@@ -132,7 +132,7 @@ class DataViewer:
 
         # Modify data if cumulative
         if cumulative:
-            df = df.cumsum( axis='rows' )
+            df = df.cumsum(axis='rows')
             if totals is not None:
                 totals = totals.cumsum()
 
@@ -142,14 +142,14 @@ class DataViewer:
             categories = df.columns
         if category_colors is None:
             color_palette = sns.color_palette()
-            category_colors = { key: color_palette[i] for i, key in enumerate( categories ) }
+            category_colors = { key: color_palette[i] for i, key in enumerate(categories) }
 
-        sns.set( font=font, style=seaborn_style )
+        sns.set(font=font, style=seaborn_style)
         plot_context = sns.plotting_context("notebook")
 
         fig = plt.figure(figsize=(fig_width, fig_height))
         ax = plt.gca()
-        for j, category_j in enumerate( categories ):
+        for j, category_j in enumerate(categories):
 
             ys = df[category_j]
 
@@ -177,8 +177,8 @@ class DataViewer:
                 text = ax.annotate(
                     text = category_j,
                     xy = (1, label_y),
-                    xycoords = matplotlib.transforms.blended_transform_factory( ax.transAxes, ax.transData ),
-                    xytext = (-5 + 10 * ( annotations_ha == 'left'), 0),
+                    xycoords = matplotlib.transforms.blended_transform_factory(ax.transAxes, ax.transData),
+                    xytext = (-5 + 10 * (annotations_ha == 'left'), 0),
                     va = 'center',
                     ha = annotations_ha,
                     textcoords = 'offset points',
@@ -186,7 +186,7 @@ class DataViewer:
                 text.set_path_effects([
                     patheffects.Stroke(linewidth=2.5, foreground='w'),
                     patheffects.Normal(),
-                ])
+               ])
 
         if totals is not None:
             ax.plot(
@@ -234,7 +234,7 @@ class DataViewer:
                 loc = '{} {}'.format(legend_va, legend_ha),
                 framealpha = 1.,
                 fontsize = plot_context['legend.fontsize'] * legend_scale,
-                ncol = len( categories ) // 4 + 1
+                ncol = len(categories) // 4 + 1
             )
 
         # Labels, inc. size
@@ -275,7 +275,7 @@ class DataViewer:
         legend_scale: float = 1.,
         include_annotations: bool = False,
         annotations_ha: str = 'left',
-    ):
+   ):
         '''Function to plot the relative contribution of the categories.
 
         Args:
@@ -308,11 +308,11 @@ class DataViewer:
             fig (matplotlib.figure.Figure): The figure containing the plot.
         '''
 
-        sns.set( font=font, style=seaborn_style )
+        sns.set(font=font, style=seaborn_style)
         plot_context = sns.plotting_context("notebook")
 
         if cumulative:
-            df = df.cumsum( axis='rows' )
+            df = df.cumsum(axis='rows')
             if totals is not None:
                 totals = totals.cumsum()
 
@@ -322,38 +322,38 @@ class DataViewer:
             categories = df.columns
         if category_colors is None:
             color_palette = sns.color_palette()
-            category_colors = { key: color_palette[i] for i, key in enumerate( categories ) }
+            category_colors = { key: color_palette[i] for i, key in enumerate(categories) }
 
         # Get data
-        sum_total = df.sum( axis='columns' )
-        fractions = df.mul( 1./sum_total, axis='rows' ).fillna( value=0. )
+        sum_total = df.sum(axis='columns')
+        fractions = df.mul(1./sum_total, axis='rows').fillna(value=0.)
         
-        fig = plt.figure( figsize=( fig_width, fig_height ) )
+        fig = plt.figure(figsize=(fig_width, fig_height))
         ax = plt.gca()
         
         stack = ax.stackplot(
             xs,
             fractions.values.transpose(),
             linewidth = 0.3,
-            colors = [ category_colors[category_j] for category_j in categories ],
+            colors = [category_colors[category_j] for category_j in categories],
             labels = categories,
         )
 
         # Add labels
         if include_annotations:
-            for j, poly_j in enumerate( stack ):
+            for j, poly_j in enumerate(stack):
 
                 # The y labels are centered in the middle of the last band
                 vertices = poly_j.get_paths()[0].vertices
                 xs = vertices[:,0]
                 end_vertices = vertices[:,1][xs == xs.max()]
-                label_y = 0.5 * ( end_vertices.min() + end_vertices.max() )
+                label_y = 0.5 * (end_vertices.min() + end_vertices.max())
 
                 text = ax.annotate(
                     text = fractions.columns[j],
-                    xy = ( 1, label_y ),
-                    xycoords = matplotlib.transforms.blended_transform_factory( ax.transAxes, ax.transData ),
-                    xytext = ( -5 + 10 * ( annotations_ha == 'left' ), 0 ),
+                    xy = (1, label_y),
+                    xycoords = matplotlib.transforms.blended_transform_factory(ax.transAxes, ax.transData),
+                    xytext = (-5 + 10 * (annotations_ha == 'left'), 0),
                     va = 'center',
                     ha = annotations_ha,
                     textcoords = 'offset points',
@@ -361,7 +361,7 @@ class DataViewer:
                 text.set_path_effects([
                     patheffects.Stroke(linewidth=2.5, foreground='w'),
                     patheffects.Normal(),
-                ])
+               ])
 
         # Limits
         if x_lim is None:
@@ -389,7 +389,7 @@ class DataViewer:
                 loc = '{} {}'.format(legend_va, legend_ha),
                 framealpha = 1.,
                 fontsize = plot_context['legend.fontsize'] * legend_scale,
-                ncol = len( categories ) // 4 + 1
+                ncol = len(categories) // 4 + 1
             )
 
         # Labels, inc. size

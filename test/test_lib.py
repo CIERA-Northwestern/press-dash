@@ -36,7 +36,7 @@ def standard_setup(
         user_utils=None,
         test_data_subdir='test_data_complete',
         config_fn='config.yml'
-    ):
+   ):
     '''Common function for setting up the data
     '''
 
@@ -45,7 +45,7 @@ def standard_setup(
     self.root_dir = os.path.dirname(test_dir)
     self.data_dir = os.path.join(
         self.root_dir, 'test_data', test_data_subdir,
-    )
+   )
     root_config_fp = os.path.join(self.root_dir, 'test', config_fn)
     self.config_fp = os.path.join(self.data_dir, 'config.yml')
 
@@ -161,14 +161,14 @@ class TestRecategorize(unittest.TestCase):
             'Press Types': [
                 'Northwestern Press', 'CIERA Press', 'External Press',
                 'CIERA Press', 'CIERA Press',
-            ],
-            'Year': [2015, 2015, 2014, 2014, 2015, ],
+           ],
+            'Year': [2015, 2015, 2014, 2014, 2015,],
         }
         df = pd.DataFrame(data)
 
         new_categories = {
             'Northwestern Press (Inclusive)': (
-                "'Northwestern Press' | ( 'Northwestern Press' & 'CIERA Press')"
+                "'Northwestern Press' | ('Northwestern Press' & 'CIERA Press')"
             )
         }
 
@@ -181,10 +181,10 @@ class TestRecategorize(unittest.TestCase):
         # Build up expected data
         expected = pd.DataFrame(
             data={
-                'id': [1, 2, 3, ],
+                'id': [1, 2, 3,],
                 'Press Types': [
                     'Northwestern Press (Inclusive)', 'Other', 'CIERA Press',
-                ],
+               ],
                 'Year': [2015, 2014, 2015],
             },
         )
@@ -209,7 +209,7 @@ class TestRecategorize(unittest.TestCase):
             'Exoplanets & The Solar System',
             'Galaxies & Cosmology',
             'N/A',
-        ]
+       ]
         for group in not_included_groups:
             is_group = cleaned_df[group_by].str.contains(group)
             is_compact = recategorized_df == 'Compact Objects'
@@ -259,14 +259,14 @@ class TestRecategorize(unittest.TestCase):
             'Exoplanets & The Solar System',
             'Galaxies & Cosmology',
             'N/A',
-        ]
+       ]
         for group in not_included_groups:
             is_group = cleaned_df[group_by].str.contains(group)
             is_compact = recategorized[group_by] == 'Compact Objects'
             assert (is_group.values & is_compact.values).sum() == 0
 
         # Check that none of the singles categories shows up in other
-        for group in pd.unique( self.data['preprocessed'][group_by] ):
+        for group in pd.unique(self.data['preprocessed'][group_by]):
             is_group = cleaned_df[group_by] == group
             is_other = recategorized[group_by] == 'Other'
             is_bad = (is_group.values & is_other.values)
@@ -285,10 +285,10 @@ class TestRecategorize(unittest.TestCase):
         new_categories = self.builder.config['new_categories']
         new_categories['Also Research Topics [Research Topics]'] = {
             'Compact Objects': (
-                "only ('Life & Death of Stars' | 'Gravitational Waves & Multi-Messenger Astronomy' | 'Black Holes & Dead Stars' )"
+                "only ('Life & Death of Stars' | 'Gravitational Waves & Multi-Messenger Astronomy' | 'Black Holes & Dead Stars')"
             ),
             'Cosmological Populations': (
-                "only ('Galaxies & Cosmology' | 'Stellar Dynamics & Stellar Populations' )"
+                "only ('Galaxies & Cosmology' | 'Stellar Dynamics & Stellar Populations')"
             ),
         }
         recategorized_df = self.builder.data_handler.recategorize_data(
@@ -304,10 +304,10 @@ class TestRecategorize(unittest.TestCase):
         # Check that this still works for columns with similar names 
         new_categories['Also Research Topics (with parenthesis) [Research Topics]'] = {
             'Compact Objects': (
-                "only ('Life & Death of Stars' | 'Gravitational Waves & Multi-Messenger Astronomy' | 'Black Holes & Dead Stars' )"
+                "only ('Life & Death of Stars' | 'Gravitational Waves & Multi-Messenger Astronomy' | 'Black Holes & Dead Stars')"
             ),
             'Cosmological Populations': (
-                "only ('Galaxies & Cosmology' | 'Stellar Dynamics & Stellar Populations' )"
+                "only ('Galaxies & Cosmology' | 'Stellar Dynamics & Stellar Populations')"
             ),
         }
         recategorized_df = self.builder.data_handler.recategorize_data(
@@ -330,17 +330,17 @@ class TestFilterData(unittest.TestCase):
         if os.path.isfile(self.config_fp):
             os.remove(self.config_fp)
 
-    def test_filter_data( self ):
+    def test_filter_data(self):
 
         search_str = ''
         categorical_filters = {
-            'Research Topics': [ 'Galaxies & Cosmology', ],
-            'Press Types': [ 'External Press', ],
-            'Categories': [ 'Science', 'Event', ],
+            'Research Topics': ['Galaxies & Cosmology',],
+            'Press Types': ['External Press',],
+            'Categories': ['Science', 'Event',],
         }
         range_filters = {
-            'Year': [ 2016, 2023 ], 
-            'Press Mentions': [ 0, 10 ], 
+            'Year': [2016, 2023], 
+            'Press Mentions': [0, 10], 
         }
 
         selected = self.builder.data_handler.filter_data(
@@ -350,23 +350,23 @@ class TestFilterData(unittest.TestCase):
             range_filters
         )
 
-        assert np.invert( selected['Research Topics'] == 'Galaxies & Cosmology' ).sum() == 0
-        assert np.invert( selected['Press Types'] == 'External Press' ).sum() == 0
-        assert np.invert( ( selected['Categories'] == 'Science' ) | ( selected['Categories'] == 'Event' ) ).sum() == 0
-        assert np.invert( ( 2016 <= selected['Year'] ) & ( selected['Year'] <= 2023 ) ).sum() == 0
-        assert np.invert( ( 0 <= selected['Press Mentions'] ) & ( selected['Press Mentions'] <= 10 ) ).sum() == 0
+        assert np.invert(selected['Research Topics'] == 'Galaxies & Cosmology').sum() == 0
+        assert np.invert(selected['Press Types'] == 'External Press').sum() == 0
+        assert np.invert((selected['Categories'] == 'Science') | (selected['Categories'] == 'Event')).sum() == 0
+        assert np.invert((2016 <= selected['Year']) & (selected['Year'] <= 2023)).sum() == 0
+        assert np.invert((0 <= selected['Press Mentions']) & (selected['Press Mentions'] <= 10)).sum() == 0
 
     
-class TestAggregate( unittest.TestCase ):
+class TestAggregate(unittest.TestCase):
 
-    def setUp( self ):
-        standard_setup( self )
+    def setUp(self):
+        standard_setup(self)
 
-    def tearDown( self ):
-        if os.path.isfile( self.config_fp ):
-            os.remove( self.config_fp )
+    def tearDown(self):
+        if os.path.isfile(self.config_fp):
+            os.remove(self.config_fp)
 
-    def test_count( self ):
+    def test_count(self):
 
         selected_df = self.data['preprocessed']
 
@@ -384,26 +384,26 @@ class TestAggregate( unittest.TestCase ):
 
         test_year = 2015
         test_group = 'Galaxies & Cosmology'
-        expected = len( pd.unique(
+        expected = len(pd.unique(
             selected_df.loc[(
-                ( selected_df['Year'] == test_year ) &
-                ( selected_df[self.group_by] == test_group )
+                (selected_df['Year'] == test_year) &
+                (selected_df[self.group_by] == test_group)
             ),'id']
-        ) )
+        ))
         assert counts.loc[test_year,test_group] == expected
 
         # Total count
         test_year = 2015
-        expected = len( pd.unique(
+        expected = len(pd.unique(
             selected_df.loc[(
-                ( selected_df['Year'] == test_year )
+                (selected_df['Year'] == test_year)
             ),'id']
-        ) )
+        ))
         assert total.loc[test_year][0] == expected
 
     ###############################################################################
 
-    def test_sum_press_mentions( self ):
+    def test_sum_press_mentions(self):
 
         selected_df = self.data['preprocessed']
         weighting = 'Press Mentions'
@@ -423,27 +423,27 @@ class TestAggregate( unittest.TestCase ):
         test_year = 2015
         test_group = 'Galaxies & Cosmology'
         subselected = selected_df.loc[(
-            ( selected_df['Year'] == test_year ) &
-            ( selected_df[self.group_by] == test_group )
+            (selected_df['Year'] == test_year) &
+            (selected_df[self.group_by] == test_group)
         )]
-        subselected = subselected.drop_duplicates( subset='id' )
-        subselected = subselected.replace( 'N/A', 0, )
+        subselected = subselected.drop_duplicates(subset='id')
+        subselected = subselected.replace('N/A', 0,)
         expected = subselected['Press Mentions'].sum()
         assert sums.loc[test_year,test_group] == expected
 
         # Total count
         test_year = 2015
         subselected = selected_df.loc[(
-            ( selected_df['Year'] == test_year )
+            (selected_df['Year'] == test_year)
         )]
-        subselected = subselected.drop_duplicates( subset='id' )
-        subselected = subselected.replace( 'N/A', 0, )
+        subselected = subselected.drop_duplicates(subset='id')
+        subselected = subselected.replace('N/A', 0,)
         expected = subselected['Press Mentions'].sum()
         assert total.loc[test_year][0] == expected
 
     ###############################################################################
 
-    def test_sum_press_mentions_nonzero( self ):
+    def test_sum_press_mentions_nonzero(self):
 
         selected_df = self.data['preprocessed']
         weighting = 'Press Mentions'
@@ -464,11 +464,11 @@ class TestAggregate( unittest.TestCase ):
         test_year = 2021
         test_group = 'Gravitational Waves & Multi-Messenger Astronomy'
         subselected = selected_df.loc[(
-            ( selected_df['Year'] == test_year ) &
-            ( selected_df[self.group_by] == test_group )
+            (selected_df['Year'] == test_year) &
+            (selected_df[self.group_by] == test_group)
         )]
-        subselected = subselected.drop_duplicates( subset='id' )
-        subselected = subselected.replace( 'N/A', 0 )
+        subselected = subselected.drop_duplicates(subset='id')
+        subselected = subselected.replace('N/A', 0)
         expected = subselected['Press Mentions'].sum()
         assert expected > 0
         assert sums.loc[test_year,test_group] == expected
@@ -476,31 +476,31 @@ class TestAggregate( unittest.TestCase ):
         # Total count
         test_year = 2021
         subselected = selected_df.loc[(
-            ( selected_df['Year'] == test_year )
+            (selected_df['Year'] == test_year)
         )]
-        subselected = subselected.drop_duplicates( subset='id' )
-        subselected = subselected.replace( 'N/A', 0 )
+        subselected = subselected.drop_duplicates(subset='id')
+        subselected = subselected.replace('N/A', 0)
         expected = subselected['Press Mentions'].sum()
         assert totals.loc[test_year][0] == expected
 
 ###############################################################################
 
-class TestStreamlit( unittest.TestCase ):
+class TestStreamlit(unittest.TestCase):
 
-    def setUp( self ):
+    def setUp(self):
         standard_setup(self, press_user_utils)
 
-    def tearDown( self ):
-        if os.path.isfile( self.config_fp ):
-            os.remove( self.config_fp )
+    def tearDown(self):
+        if os.path.isfile(self.config_fp):
+            os.remove(self.config_fp)
 
     ###############################################################################
 
-    def test_base_page( self ):
+    def test_base_page(self):
 
         import root_dash_lib.pages.base_page as base_page
 
-        base_page.main( self.config_fp )
+        base_page.main(self.config_fp)
 
         # Set the environment variable to signal the app to stop
         os.environ["STOP_STREAMLIT"] = "1"
@@ -509,9 +509,9 @@ class TestStreamlit( unittest.TestCase ):
 
 ###############################################################################
 
-class TestStreamlitGrants( unittest.TestCase ):
+class TestStreamlitGrants(unittest.TestCase):
 
-    def setUp( self ):
+    def setUp(self):
         standard_setup(
             self,
             grants_user_utils,
@@ -519,13 +519,13 @@ class TestStreamlitGrants( unittest.TestCase ):
             'config_grants.yml',
         )
 
-    def tearDown( self ):
-        if os.path.isfile( self.config_fp ):
-            os.remove( self.config_fp )
+    def tearDown(self):
+        if os.path.isfile(self.config_fp):
+            os.remove(self.config_fp)
 
     ###############################################################################
 
-    def test_base_page( self ):
+    def test_base_page(self):
 
         import root_dash_lib.pages.base_page as base_page
 

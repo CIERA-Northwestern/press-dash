@@ -13,7 +13,7 @@ def recategorize_data(
         new_categories,
         recategorize=True,
         combine_single_categories=False
-    ):
+   ):
     '''Recategorize the data, i.e. combine existing categories into new ones.
     The end result is one category per article, so no articles are double-counted.
     However, if the new categories are ill-defined they can contradict one another
@@ -35,30 +35,30 @@ def recategorize_data(
     
     # Get the condensed data frame
     # This is probably dropping stuff that shouldn't be dropped!!!!!!!
-    recategorized = df.drop_duplicates( subset='id', keep='first' )
-    recategorized.set_index( 'id', inplace=True )
+    recategorized = df.drop_duplicates(subset='id', keep='first')
+    recategorized.set_index('id', inplace=True)
 
     for groupby_column, new_categories_per_grouping in new_categories.items():
 
         # Look for columns that are re-definitions of existing columns
         # This regex looks for anything in front of anything else in brackets
-        search = re.findall( r'(.*?)\s\[(.+)\]', groupby_column )
-        if len( search ) == 0:
+        search = re.findall(r'(.*?)\s\[(.+)\]', groupby_column)
+        if len(search) == 0:
             new_column = groupby_column
-        elif len( search ) == 1:
+        elif len(search) == 1:
             new_column, groupby_column = search[0]
         else:
-            raise KeyError( 'New categories cannot have multiple sets of brackets.' )
+            raise KeyError('New categories cannot have multiple sets of brackets.')
 
         recategorized_groupby = recategorize_data_per_grouping(
             df,
             groupby_column,
-            copy.deepcopy( new_categories_per_grouping ),
+            copy.deepcopy(new_categories_per_grouping),
             combine_single_categories
         )
         recategorized[new_column] = recategorized_groupby
 
-    recategorized.reset_index( inplace=True )
+    recategorized.reset_index(inplace=True)
     return recategorized
 
 ################################################################################
@@ -68,7 +68,7 @@ def recategorize_data_per_grouping(
         groupby_column,
         new_categories_per_grouping,
         combine_single_categories=False
-    ):
+   ):
     '''The actual function doing most of the recategorizing.
 
     Args:
@@ -81,11 +81,11 @@ def recategorize_data_per_grouping(
     '''
 
     # Get the formatted data used for the categories
-    dummies = pd.get_dummies( df[groupby_column] )
+    dummies = pd.get_dummies(df[groupby_column])
     dummies['id'] = df['id']
-    dummies_grouped = dummies.groupby( 'id' )
+    dummies_grouped = dummies.groupby('id')
     bools = dummies_grouped.sum() >= 1
-    n_cats = bools.sum( axis='columns' )
+    n_cats = bools.sum(axis='columns')
     if bools.values.max() > 1:
         raise ValueError(
             'Categorization cannot proceed---' +
@@ -94,9 +94,9 @@ def recategorize_data_per_grouping(
 
     # Setup return arr
     base_categories = bools.columns
-    recategorized_dtype = np.array( new_categories_per_grouping.keys() ).dtype
-    recategorized = np.full( len(bools), fill_value='Other', dtype=recategorized_dtype )
-    recategorized = pd.Series( recategorized, index=bools.index, name=groupby_column )
+    recategorized_dtype = np.array(new_categories_per_grouping.keys()).dtype
+    recategorized = np.full(len(bools), fill_value='Other', dtype=recategorized_dtype)
+    recategorized = pd.Series(recategorized, index=bools.index, name=groupby_column)
 
     if not combine_single_categories:
         # Do all the single-category entries
@@ -112,29 +112,29 @@ def recategorize_data_per_grouping(
         not_included_cats = []
         for base_category in base_categories:
             if base_category not in category_definition:
-                not_included_cats.append( base_category )
+                not_included_cats.append(base_category)
                 continue
             category_definition = category_definition.replace(
-                "'{}'".format( base_category ),
-                "row['{}']".format( base_category )
+                "'{}'".format(base_category),
+                "row['{}']".format(base_category)
             )
         # Handle the not-included categories
         if 'only' in category_definition:
             category_definition = (
-                '(' + category_definition + ') & ( not ( ' +
+                '(' + category_definition + ') & (not (' +
                 ' | '.join(
-                    [ "row['{}']".format( cat ) for cat in not_included_cats ]
-                ) + ' ) )'
+                    ["row['{}']".format(cat) for cat in not_included_cats]
+                ) + '))'
             )
-            category_definition = category_definition.replace( 'only', '' )
-        is_new_cat = bools.apply( lambda row: eval( category_definition ), axis='columns' )
+            category_definition = category_definition.replace('only', '')
+        is_new_cat = bools.apply(lambda row: eval(category_definition), axis='columns')
         recategorized[is_new_cat] = category_key
         
     return recategorized
 
 ################################################################################
 
-def filter_data( df, search_str, search_col, categorical_filters, numerical_filters ):
+def filter_data(df, search_str, search_col, categorical_filters, numerical_filters):
     '''Filter what data shows up in the dashboard.
 
     Args:
@@ -150,19 +150,19 @@ def filter_data( df, search_str, search_col, categorical_filters, numerical_filt
 
     # # Search filter
     if search_str != '':
-        is_included = df[search_col].str.extract( '(' + search_str + ')', flags=re.IGNORECASE ).notna().values[:,0]
+        is_included = df[search_col].str.extract('(' + search_str + ')', flags=re.IGNORECASE).notna().values[:,0]
     else:
-        is_included = np.ones( len( df ), dtype=bool )
+        is_included = np.ones(len(df), dtype=bool)
 
     # Categories filter
     for cat_filter_col, selected_cats in categorical_filters.items():
-        is_included = is_included & df[cat_filter_col].isin( selected_cats )
+        is_included = is_included & df[cat_filter_col].isin(selected_cats)
 
     # Range filters
     for num_filter_col, column_range in numerical_filters.items():
         is_included = is_included & (
-            ( column_range[0] <= df[num_filter_col] ) &
-            ( df[num_filter_col] <= column_range[1] )
+            (column_range[0] <= df[num_filter_col]) &
+            (df[num_filter_col] <= column_range[1])
         )
 
     selected_df = df.loc[is_included]

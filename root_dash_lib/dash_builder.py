@@ -13,7 +13,7 @@ from . import user_utils as default_user_utils
 from . import settings, interface, data_handler, aggregator, data_viewer
 
 # We need to reload all the individual pieces if we want changes in them to propagate
-for module in [ settings, interface, data_handler, aggregator, data_viewer ]:
+for module in [settings, interface, data_handler, aggregator, data_viewer]:
     importlib.reload(module)
 
 class DashBuilder:
@@ -29,7 +29,7 @@ class DashBuilder:
         self,
         config_fp: str,
         user_utils: types.ModuleType = None,
-    ):
+   ):
 
         if user_utils is None:
             user_utils = default_user_utils
@@ -146,7 +146,7 @@ class DashBuilder:
         text_filters: dict[str, str] = {},
         categorical_filters: dict[str, list] = {},
         numerical_filters: dict[str, tuple] = {},
-    ) -> pd.DataFrame:
+   ) -> pd.DataFrame:
         '''Filter what data shows up in the dashboard.
 
         Args:
@@ -176,7 +176,7 @@ class DashBuilder:
         y_column: str,
         groupby_column: str = None,
         aggregation_method: str = 'count',
-    ) -> Union[pd.Series, pd.DataFrame]:
+   ) -> Union[pd.Series, pd.DataFrame]:
         '''Aggregate stats.
 
         Args:

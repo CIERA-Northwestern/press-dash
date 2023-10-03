@@ -10,7 +10,7 @@ from . import plot_utils
 
 ################################################################################
 
-def get_year( date, start_of_year='January 1', years_min=None, years_max=None ):
+def get_year(date, start_of_year='January 1', years_min=None, years_max=None):
     '''Get the year from a date, with a user-specified start date
     for the year.
 
@@ -30,20 +30,20 @@ def get_year( date, start_of_year='January 1', years_min=None, years_max=None ):
     if years_max is None:
         years_max = date.max().year + 1
     date_bins = pd.date_range(
-        '{} {}'.format( start_of_year, years_min ),
-        pd.Timestamp.now() + pd.offsets.DateOffset( years=1 ),
-        freq = pd.offsets.DateOffset( years=1 ),
-    )
+        '{} {}'.format(start_of_year, years_min),
+        pd.Timestamp.now() + pd.offsets.DateOffset(years=1),
+        freq = pd.offsets.DateOffset(years=1),
+   )
     date_bin_labels = date_bins.year[:-1]
 
     # The actual binning
-    years = pd.cut( date, date_bins, labels=date_bin_labels ).astype( 'Int64' )
+    years = pd.cut(date, date_bins, labels=date_bin_labels).astype('Int64')
 
     return years
 
 ################################################################################
 
-def aggregate( selected_df, time_bin_column, y_column, groupby_column, count_or_sum ):
+def aggregate(selected_df, time_bin_column, y_column, groupby_column, count_or_sum):
     '''Aggregate. Wrapper function for other functions for the sake of caching.
 
     Args:
@@ -59,11 +59,11 @@ def aggregate( selected_df, time_bin_column, y_column, groupby_column, count_or_
     '''
 
     if count_or_sum == 'Count':
-        return count( selected_df, time_bin_column, y_column, groupby_column )
+        return count(selected_df, time_bin_column, y_column, groupby_column)
     elif count_or_sum == 'Sum':
-        return sum( selected_df, time_bin_column, y_column, groupby_column )
+        return sum(selected_df, time_bin_column, y_column, groupby_column)
     else:
-        raise KeyError( 'How did you get here?' )
+        raise KeyError('How did you get here?')
 
 ################################################################################
 
@@ -83,7 +83,7 @@ def view_time_series(
         filetag = None,
         tag = '',
         df_tag = 'selected',
-    ):
+   ):
 
     if tag != '':
         tag += ':'
@@ -93,10 +93,10 @@ def view_time_series(
 
     # Tag for the file
     if filetag is None:
-        filetag = '{}.{}.{}'.format( *[
-            _.lower().replace( ' ', '_' )
-            for _ in [ time_bin_column, y_column, groupby_column ]
-        ] )
+        filetag = '{}.{}.{}'.format(*[
+            _.lower().replace(' ', '_')
+            for _ in [time_bin_column, y_column, groupby_column]
+       ])
 
     if view == 'lineplot':
         # st.spinner provides a visual indicator that the data is loading
@@ -107,18 +107,18 @@ def view_time_series(
                 **lineplot_kw
             )
 
-            st.pyplot( fig )
+            st.pyplot(fig)
         # Add a download button for the image
         # The image is saved as PDF, enabling arbitrary resolution
-        fn = 'lineplot.{}.pdf'.format( filetag )
+        fn = 'lineplot.{}.pdf'.format(filetag)
         img = io.BytesIO()
-        fig.savefig( img, format='pdf', bbox_inches='tight' )
+        fig.savefig(img, format='pdf', bbox_inches='tight')
         download_kw = {
             'label': "Download Figure",
             'data': img,
             'file_name': fn,
             'mime': "text/pdf",
-            'key': '{}lineplot'.format( tag ),
+            'key': '{}lineplot'.format(tag),
         }
 
     elif view == 'stackplot':
@@ -128,57 +128,57 @@ def view_time_series(
                 total,
                 **stackplot_kw
             )
-            st.pyplot( fig )
+            st.pyplot(fig)
 
         # Add a download button for the image
-        fn = 'stackplot.{}.pdf'.format( filetag )
+        fn = 'stackplot.{}.pdf'.format(filetag)
         img = io.BytesIO()
-        fig.savefig( img, format='pdf', bbox_inches='tight' )
+        fig.savefig(img, format='pdf', bbox_inches='tight')
         download_kw = {
             'label': "Download Figure",
             'data': img,
             'file_name': fn,
             'mime': "text/pdf",
-            'key': '{}stackplot'.format( tag ),
+            'key': '{}stackplot'.format(tag),
         }
 
     elif view == 'data':
 
-        def view_data( df_tag ):
+        def view_data(df_tag):
             if df_tag == 'original':
-                st.markdown( 'This table contains all {} selected entries, prior to pre-processing.'.format( len( df ) ) )
-                ids = getattr( df, config['primary_id_column'] )
-                show_df = df.loc[ids.isin( selected_df['id'] )]
+                st.markdown('This table contains all {} selected entries, prior to pre-processing.'.format(len(df)))
+                ids = getattr(df, config['primary_id_column'])
+                show_df = df.loc[ids.isin(selected_df['id'])]
             elif df_tag == 'preprocessed':
-                st.markdown( 'This table contains all {} selected entries, after pre-processing and prior to any recategorization.'.format( len( preprocessed_df ) ) )
-                show_df = preprocessed_df.loc[preprocessed_df['id'].isin( selected_df['id'] )]
+                st.markdown('This table contains all {} selected entries, after pre-processing and prior to any recategorization.'.format(len(preprocessed_df)))
+                show_df = preprocessed_df.loc[preprocessed_df['id'].isin(selected_df['id'])]
             elif df_tag == 'recategorized':
-                st.markdown( 'This table contains all {} selected entries, after recategorization.'.format( len( selected_df ) ) )
+                st.markdown('This table contains all {} selected entries, after recategorization.'.format(len(selected_df)))
                 show_df = selected_df
             elif df_tag == 'aggregated':
                 show_df = aggregated_df
 
-            st.write( show_df )
+            st.write(show_df)
 
             return show_df
 
         # The selected data is shown in a table,
         # so that the user can always see the raw data being plotted
-        st.header( 'Selected Data' )
+        st.header('Selected Data')
         with st.spinner():
-            show_df = view_data( df_tag )
+            show_df = view_data(df_tag)
 
         # Add a download button for the data
-        fn = 'data.{}.csv'.format( filetag )
+        fn = 'data.{}.csv'.format(filetag)
         f = io.BytesIO()
-        selected_df.to_csv( f )
+        selected_df.to_csv(f)
         download_kw = {
             'label': "Download Selected Data",
             'data': f,
             'file_name': fn,
             'mime': "text/plain",
-            'key': 'data.{}'.format( filetag ),
-            'key': '{}data'.format( tag ),
+            'key': 'data.{}'.format(filetag),
+            'key': '{}data'.format(tag),
         }
 
         # Return here because we're also return the show_df

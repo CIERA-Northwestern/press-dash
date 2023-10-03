@@ -40,7 +40,7 @@ class DataHandler:
             self,
             raw_df: pd.DataFrame,
             config: dict,
-    ) -> Tuple[pd.DataFrame, dict]:
+   ) -> Tuple[pd.DataFrame, dict]:
         '''Clean the data using the stored config and user_utils.
 
         This is one of the only functions where we allow the config
@@ -62,7 +62,7 @@ class DataHandler:
             self,
             cleaned_df: pd.DataFrame,
             config: dict,
-    ) -> Tuple[pd.DataFrame, dict]:
+   ) -> Tuple[pd.DataFrame, dict]:
         '''Preprocess the data using the stored config and user_utils.
         This is one of the only functions where we allow the config
         to be modified. In general the on-the-fly settings are
@@ -85,7 +85,7 @@ class DataHandler:
         groupby_column: dict,
         new_cat_per_g: dict,
         combine_single_categories: bool = False,
-    ) -> pd.Series:
+   ) -> pd.Series:
         '''The actual function doing most of the recategorizing.
 
         Args:
@@ -150,9 +150,9 @@ class DataHandler:
             if 'only' in category_definition:
                 category_definition = (
                     '(' + category_definition + ') &'
-                    '( not ( ' + ' | '.join(
+                    '(not (' + ' | '.join(
                         ["row['{}']".format(cat) for cat in not_included_cats]
-                    ) + ' ) )'
+                    ) + '))'
                 )
                 category_definition = category_definition.replace('only', '')
             is_new_cat = bools.apply(
@@ -196,30 +196,30 @@ class DataHandler:
         
         # Get the condensed data frame
         # This is probably dropping stuff that shouldn't be dropped!!!!!!!
-        recategorized = preprocessed_df.drop_duplicates( subset='id', keep='first' )
+        recategorized = preprocessed_df.drop_duplicates(subset='id', keep='first')
         recategorized = recategorized.set_index('id')
 
         for groupby_column, new_categories_per_grouping in new_categories.items():
 
             # Look for columns that are re-definitions of existing columns
             # This regex looks for anything in front of anything else in brackets
-            search = re.findall( r'(.*?)\s\[(.+)\]', groupby_column )
-            if len( search ) == 0:
+            search = re.findall(r'(.*?)\s\[(.+)\]', groupby_column)
+            if len(search) == 0:
                 new_column = groupby_column
-            elif len( search ) == 1:
+            elif len(search) == 1:
                 new_column, groupby_column = search[0]
             else:
-                raise KeyError( 'New categories cannot have multiple sets of brackets.' )
+                raise KeyError('New categories cannot have multiple sets of brackets.')
 
             recategorized_groupby = self.recategorize_data_per_grouping(
                 preprocessed_df,
                 groupby_column,
-                copy.deepcopy( new_categories_per_grouping ),
+                copy.deepcopy(new_categories_per_grouping),
                 combine_single_categories
             )
             recategorized[new_column] = recategorized_groupby
 
-        recategorized.reset_index( inplace=True )
+        recategorized.reset_index(inplace=True)
 
         return recategorized
 
@@ -229,7 +229,7 @@ class DataHandler:
         text_filters: dict[str, str] = {},
         categorical_filters: dict[str, list] = {},
         numerical_filters: dict[str, tuple] = {},
-    ) -> pd.DataFrame:
+   ) -> pd.DataFrame:
         '''Filter what data shows up in the dashboard.
 
         Args:
@@ -243,22 +243,22 @@ class DataHandler:
         '''
 
         # Initialized
-        is_included = np.ones( len( recategorized_df ), dtype=bool )
+        is_included = np.ones(len(recategorized_df), dtype=bool)
 
         # Text filter
         for text_filter_col, search_str in text_filters.items():
-            is_matching = recategorized_df[text_filter_col].str.extract( '(' + search_str + ')', flags=re.IGNORECASE ).notna().values[:,0]
+            is_matching = recategorized_df[text_filter_col].str.extract('(' + search_str + ')', flags=re.IGNORECASE).notna().values[:,0]
             is_included = is_included & is_matching
 
         # Categories filter
         for cat_filter_col, selected_cats in categorical_filters.items():
-            is_included = is_included & recategorized_df[cat_filter_col].isin( selected_cats )
+            is_included = is_included & recategorized_df[cat_filter_col].isin(selected_cats)
 
         # Range filters
         for num_filter_col, column_range in numerical_filters.items():
             is_included = is_included & (
-                ( column_range[0] <= recategorized_df[num_filter_col] ) &
-                ( recategorized_df[num_filter_col] <= column_range[1] )
+                (column_range[0] <= recategorized_df[num_filter_col]) &
+                (recategorized_df[num_filter_col] <= column_range[1])
             )
 
         selected_df = recategorized_df.loc[is_included]

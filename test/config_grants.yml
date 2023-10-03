@@ -92,15 +92,15 @@ keep_single_categories: False
 new_categories:
   "Award Department [Award Dept Name]":
     'CIERA': "'CIERA - Ctr Int Exp Rsch Astr'" # Anything tagged as CIERA is CIERA
-    'P&A': "'Physics & Astronomy' & ( not 'CIERA - Ctr Int Exp Rsch Astr' )" # Anything tagged as P&A is P&A, unless it's CIERA
+    'P&A': "'Physics & Astronomy' & (not 'CIERA - Ctr Int Exp Rsch Astr')" # Anything tagged as P&A is P&A, unless it's CIERA
   "Award Department (Interdisciplinary Priority) [Award Dept Name]":
     'CIERA only': "only 'CIERA - Ctr Int Exp Rsch Astr'" # Stuff with one department
     'P&A only': "only 'Physics & Astronomy'" # More stuff with one department
     'CIERA interdisciplinary': "not 'Physics & Astronomy'" # Anything with CIERA and something else
   # Investigator Primary Function (myHR):
   #   'Faculty': "'Faculty' | 'Emeritus Faculty'"
-  #   'Staff': "'Staff' & ( not ( 'Faculty' | 'Emeritus Faculty' ) )"
+  #   'Staff': "'Staff' & (not ('Faculty' | 'Emeritus Faculty'))"
   # Award Current PI Primary Function (myHR):
   #   'Faculty': "'Faculty' | 'Emeritus Faculty'"
-  #   'Staff': "'Staff' & ( not ( 'Faculty' | 'Emeritus Faculty' ) )"
+  #   'Staff': "'Staff' & (not ('Faculty' | 'Emeritus Faculty'))"
 
