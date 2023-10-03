@@ -142,7 +142,7 @@ def preprocess_data(cleaned_df, config):
     preprocessed_df = cleaned_df.copy()
 
     # Get the year, according to the config start date
-    preprocessed_df['Year'] = time_series_utils.get_year(
+    preprocessed_df['Year'] = utils.get_year(
         preprocessed_df['Date'], config['start_of_year']
     )
 

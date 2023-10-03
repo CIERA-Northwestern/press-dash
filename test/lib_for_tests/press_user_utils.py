@@ -7,7 +7,7 @@ import glob
 import numpy as np
 import pandas as pd
 
-from root_dash_lib import time_series_utils
+from root_dash_lib import utils
 
 
 def load_data(config):
@@ -144,7 +144,7 @@ def preprocess_data(cleaned_df, config):
     config['page_title'] = 'Modified Page Title'
 
     # Get the year, according to the config start date
-    preprocessed_df['Year'] = time_series_utils.get_year(
+    preprocessed_df['Year'] = utils.get_year(
         preprocessed_df['Date'], config['start_of_year']
     )
 
