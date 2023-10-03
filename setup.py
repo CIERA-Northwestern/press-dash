@@ -30,5 +30,6 @@ setuptools.setup(
         'streamlit',
         'pytest',
         'jupyterlab',
+	'root-dash',
    ],
 )
