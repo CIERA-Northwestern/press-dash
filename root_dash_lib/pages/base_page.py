@@ -82,7 +82,7 @@ def main(config_fp: str, user_utils: types.ModuleType = None):
 
     # Aggregate data
     data['aggregated'] = builder.aggregate(
-        data['recategorized'],
+        data['selected'],
         builder.settings.common['data']['x_column'],
         builder.settings.common['data']['y_column'],
         builder.settings.common['data']['groupby_column'],
@@ -90,7 +90,7 @@ def main(config_fp: str, user_utils: types.ModuleType = None):
     )
     # Aggregate data
     data['totals'] = builder.aggregate(
-        data['recategorized'],
+        data['selected'],
         builder.settings.common['data']['x_column'],
         builder.settings.common['data']['y_column'],
         aggregation_method=builder.settings.common['data']['aggregation_method'],
@@ -118,7 +118,7 @@ def main(config_fp: str, user_utils: types.ModuleType = None):
         df = data['aggregated'],
         totals = data['totals'],
         **builder.settings.get_settings(local_key)
-   )
+    )
 
     # View the data directly
     builder.data_viewer.write(data)
