@@ -43,12 +43,12 @@ primary_id_column: index
 id_columns: # Unique identifiers
   - id
   - Title
-weight_columns: # Numeric columns that can be summed
+numerical_columns: # Numeric columns that can be summed
   - Press Mentions
   - People Reached
 date_columns: # Dates
   - Date
-time_bin_columns: # The value of these columns indicates what time bin the data should be grouped into
+x_columns: # Data will be binned by these along the x-axis
   - Year # For example, a value of 2019 would be grouped into the 2019-2020 financial year
 categorical_columns: # Categorical columns that can be grouped, e.g. all Press Types=="Science" articles
   - Research Topics
@@ -68,16 +68,16 @@ new_categories:
   # Press types are defined hierarchicaly.
   Press Types:
     'External Press (Inclusive)': "'External Press'" # Anything tagged as External Press will be included in this category
-    'Northwestern Press (Inclusive)': "'Northwestern Press' & ( not 'External Press' )" # Anything tagged with Northwestern Press but not External Press will be included in this category
+    'Northwestern Press (Inclusive)': "'Northwestern Press' & (not 'External Press')" # Anything tagged with Northwestern Press but not External Press will be included in this category
     # CIERA press is left undefined, so it defaults to showing up as usual, provided it is not also tagged with Northwestern Press or External Press.
   # Research topics are defined as falling into one of three main categories: Exploding & Dead Stars, Astrophysical Populations, and Exoplanets & the Solar System.
   Research Topics:
-    'Compact Objects': "only ('Life & Death of Stars' | 'Gravitational Waves & Multi-Messenger Astronomy' | 'Black Holes & Dead Stars' )"
-    'Cosmological Populations': "only ('Galaxies & Cosmology' | 'Stellar Dynamics & Stellar Populations' )"
+    'Compact Objects': "only ('Life & Death of Stars' | 'Gravitational Waves & Multi-Messenger Astronomy' | 'Black Holes & Dead Stars')"
+    'Cosmological Populations': "only ('Galaxies & Cosmology' | 'Stellar Dynamics & Stellar Populations')"
   # Article categories are grouped into research, outreach, and achievements & events, with research and outreach categorization superseeding achievements & events.
   Categories:
-    'Research': "('Science' | 'Data Science & Computing') & ( not ( 'Education' | 'Outreach' ) )"
-    'Outreach': "('Education' | 'Outreach' ) & ( not ( 'Science' | 'Data Science & Computing' ) )"
+    'Research': "('Science' | 'Data Science & Computing') & (not ('Education' | 'Outreach'))"
+    'Outreach': "('Education' | 'Outreach') & (not ('Science' | 'Data Science & Computing'))"
     'Achievements & Events': "only ('Achievement' | 'Event' | 'Interdisciplinary')"
   # You can use the same source category for multiple new categories by placing the source column in brackets.
   "Multi-messenger Astro vs everything else [Research Topics]":

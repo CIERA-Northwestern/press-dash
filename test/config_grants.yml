@@ -42,7 +42,7 @@ id_columns:
   - Investigator HR Dept Name
   - Award Current PI HR Dept Name
   - Award Current PI Employee ID
-weight_columns:
+numerical_columns:
   - Allocation Total Sum Amount
   - Allocation Authorized Total Amount
   - Allocation Anticipated Total Amount
@@ -51,7 +51,7 @@ weight_columns:
   - Allocation Authorized F&A Amount
   - Allocation Anticipated F&A Amount
   - Cost Share Amount
-time_bin_columns:
+x_columns:
   - Overall Award Reporting Fiscal Year (yyyy)
   - Award Start Fiscal Year (yyyy)
   - Award End Fiscal Year (yyyy)
@@ -92,15 +92,15 @@ keep_single_categories: False
 new_categories:
   "Award Department [Award Dept Name]":
     'CIERA': "'CIERA - Ctr Int Exp Rsch Astr'" # Anything tagged as CIERA is CIERA
-    'P&A': "'Physics & Astronomy' & ( not 'CIERA - Ctr Int Exp Rsch Astr' )" # Anything tagged as P&A is P&A, unless it's CIERA
+    'P&A': "'Physics & Astronomy' & (not 'CIERA - Ctr Int Exp Rsch Astr')" # Anything tagged as P&A is P&A, unless it's CIERA
   "Award Department (Interdisciplinary Priority) [Award Dept Name]":
     'CIERA only': "only 'CIERA - Ctr Int Exp Rsch Astr'" # Stuff with one department
     'P&A only': "only 'Physics & Astronomy'" # More stuff with one department
     'CIERA interdisciplinary': "not 'Physics & Astronomy'" # Anything with CIERA and something else
   # Investigator Primary Function (myHR):
   #   'Faculty': "'Faculty' | 'Emeritus Faculty'"
-  #   'Staff': "'Staff' & ( not ( 'Faculty' | 'Emeritus Faculty' ) )"
+  #   'Staff': "'Staff' & (not ('Faculty' | 'Emeritus Faculty'))"
   # Award Current PI Primary Function (myHR):
   #   'Faculty': "'Faculty' | 'Emeritus Faculty'"
-  #   'Staff': "'Staff' & ( not ( 'Faculty' | 'Emeritus Faculty' ) )"
+  #   'Staff': "'Staff' & (not ('Faculty' | 'Emeritus Faculty'))"
 
