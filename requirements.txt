@@ -13,3 +13,4 @@ ipython
 jupyter
 jupyterlab
 jupyter_contrib_nbextensions
+root-dash
