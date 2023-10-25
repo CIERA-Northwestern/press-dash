@@ -20,7 +20,7 @@ On the other end of things, if you are comfortable with routine use of git, code
 ## Level 0: Using the Dashboard Online
 
 The dashboard has a plethora of features that can be interacted with via a web interface.
-If the dashboard is currently live at [ciera-press-zach](https://ciera-press-zach.streamlit.app), you can use the dashboard without any additional effort.
+If the dashboard is currently live at [ciera-press](https://ciera-press.streamlit.app/), you can use the dashboard without any additional effort.
 One of the main features is the application of filters and the ability to download the edited data and images.
 While the interface should be relatively intuitive, a helpful tip is that you can reset your choices by refreshing the page.
 
