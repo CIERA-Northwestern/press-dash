@@ -73,7 +73,7 @@ def load_data(config):
     # # Combine the data
     # raw_df = website_df.join(press_df)
 
-    return raw_df, config
+    return website_df, config
 
 
 def clean_data(raw_df, config):
