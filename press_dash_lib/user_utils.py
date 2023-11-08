@@ -95,11 +95,16 @@ def clean_data(raw_df, config):
         config (dict): The (possibly altered) configuration dictionary.
     '''
 
-    # Drop drafts
-    cleaned_df = raw_df.drop(
-        raw_df.index[raw_df['Date'].dt.year == 1970],
-        axis='rows',
-    )
+    raw_df['Date'] = pd.to_datetime(raw_df['Date'], errors='coerce')
+
+    # Drop rows where 'Date' year is 1970
+    cleaned_df = raw_df[raw_df['Date'].dt.year != 1970]
+
+    # # Drop drafts
+    # cleaned_df = raw_df.drop(
+    #     raw_df.index[raw_df['Date'].dt.year == 1970],
+    #     axis='rows',
+    # )
 
     # Drop weird articles---ancient ones w/o a title or press type
     cleaned_df.dropna(
