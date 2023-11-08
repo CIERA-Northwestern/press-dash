@@ -15,6 +15,6 @@ if root_dir not in sys.path:
 # Call the main function.
 # Change the import here to whatever page you want to load.
 import importlib
-from root_dash_lib.pages import base_page
+from press_dash_lib.pages import base_page
 importlib.reload(base_page)
 base_page.main(os.path.join(config_dir, config_fn))
