@@ -129,6 +129,7 @@ class DataViewer:
         Returns:
             fig: The figure containing the plot.
         '''
+        df.index = df.index + 1
 
         # Modify data if cumulative
         if cumulative:
