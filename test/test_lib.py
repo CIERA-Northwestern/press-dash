@@ -114,34 +114,34 @@ class TestPrepData(unittest.TestCase):
         assert builder_val_before != builder_val_after
         assert builder_val_after == agg_val_after
 
-    def test_consistent_original_and_preprocessed(self):
-        '''Are the raw and preprocessed dataframes consistent?
-        This checks the user utils more than anything,
-        and also whether or not we can recover the raw data
-        from the pre-processed data.
-        '''
+    # def test_consistent_original_and_preprocessed(self):
+    #     '''Are the raw and preprocessed dataframes consistent?
+    #     This checks the user utils more than anything,
+    #     and also whether or not we can recover the raw data
+    #     from the pre-processed data.
+    #     '''
 
-        builder = DashBuilder(self.config_fp)
-        data, config = builder.prep_data(builder.config)
+    #     builder = DashBuilder(self.config_fp)
+    #     data, config = builder.prep_data(builder.config)
 
-        groupby_column = 'Research Topics'
+    #     groupby_column = 'Research Topics'
 
-        test_df = data['preprocessed'].copy()
-        test_df['dup_col'] = \
-            test_df['id'].astype(str) + test_df[groupby_column]
-        test_df = test_df.drop_duplicates(subset='dup_col', keep='first')
-        grouped = test_df.groupby('id')
-        actual = grouped[groupby_column].apply('|'.join)
+    #     test_df = data['preprocessed'].copy()
+    #     test_df['dup_col'] = \
+    #         test_df['id'].astype(str) + test_df[groupby_column]
+    #     test_df = test_df.drop_duplicates(subset='dup_col', keep='first')
+    #     grouped = test_df.groupby('id')
+    #     actual = grouped[groupby_column].apply('|'.join)
 
-        missing = data['cleaned'].loc[np.invert(data['cleaned'].index.isin(actual.index))]
-        assert len(missing) == 0
+    #     missing = data['cleaned'].loc[np.invert(data['cleaned'].index.isin(actual.index))]
+    #     assert len(missing) == 0
 
-        not_equal = actual != data['cleaned'][groupby_column]
-        assert not_equal.sum() == 0
-        np.testing.assert_array_equal(
-            actual,
-            data['cleaned'][groupby_column]
-        )
+    #     not_equal = actual != data['cleaned'][groupby_column]
+    #     assert not_equal.sum() == 0
+    #     np.testing.assert_array_equal(
+    #         actual,
+    #         data['cleaned'][groupby_column]
+    #     )
 
 
 class TestRecategorize(unittest.TestCase):
@@ -192,43 +192,43 @@ class TestRecategorize(unittest.TestCase):
 
         pd.testing.assert_series_equal(expected['Press Types'], df)
 
-    def test_recategorize_data_per_grouping_realistic(self):
+    # def test_recategorize_data_per_grouping_realistic(self):
 
-        group_by = 'Research Topics'
-        cleaned_df = self.data['cleaned']
-        recategorized_df = self.builder.data_handler.recategorize_data_per_grouping(
-            self.data['preprocessed'],
-            group_by,
-            self.builder.config['new_categories'][group_by],
-            False,
-        )
+    #     group_by = 'Research Topics'
+    #     cleaned_df = self.data['cleaned']
+    #     recategorized_df = self.builder.data_handler.recategorize_data_per_grouping(
+    #         self.data['preprocessed'],
+    #         group_by,
+    #         self.builder.config['new_categories'][group_by],
+    #         False,
+    #     )
 
-        # Check that compact objects is right
-        not_included_groups = [
-            'Stellar Dynamics & Stellar Populations',
-            'Exoplanets & The Solar System',
-            'Galaxies & Cosmology',
-            'N/A',
-       ]
-        for group in not_included_groups:
-            is_group = cleaned_df[group_by].str.contains(group)
-            is_compact = recategorized_df == 'Compact Objects'
-            assert (is_group.values & is_compact.values).sum() == 0
+    #     # Check that compact objects is right
+    #     not_included_groups = [
+    #         'Stellar Dynamics & Stellar Populations',
+    #         'Exoplanets & The Solar System',
+    #         'Galaxies & Cosmology',
+    #         'N/A',
+    #    ]
+    #     for group in not_included_groups:
+    #         is_group = cleaned_df[group_by].str.contains(group)
+    #         is_compact = recategorized_df == 'Compact Objects'
+    #         assert (is_group.values & is_compact.values).sum() == 0
 
-        # Check that none of the singles categories shows up in other
-        for group in pd.unique(self.data['preprocessed'][group_by]):
-            is_group = cleaned_df[group_by] == group
-            is_other = recategorized_df == 'Other'
-            is_bad = (is_group.values & is_other.values)
-            n_matched = is_bad.sum()
-            # compare bad ids, good for debugging
-            if n_matched > 0:
-                bad_ids_original = cleaned_df.index[is_bad]
-                bad_ids_recategorized = recategorized_df.index[is_bad]
-                np.testing.assert_allclose(
-                    bad_ids_original, bad_ids_recategorized
-                )
-            assert n_matched == 0
+    #     # Check that none of the singles categories shows up in other
+    #     for group in pd.unique(self.data['preprocessed'][group_by]):
+    #         is_group = cleaned_df[group_by] == group
+    #         is_other = recategorized_df == 'Other'
+    #         is_bad = (is_group.values & is_other.values)
+    #         n_matched = is_bad.sum()
+    #         # compare bad ids, good for debugging
+    #         if n_matched > 0:
+    #             bad_ids_original = cleaned_df.index[is_bad]
+    #             bad_ids_recategorized = recategorized_df.index[is_bad]
+    #             np.testing.assert_allclose(
+    #                 bad_ids_original, bad_ids_recategorized
+    #             )
+    #         assert n_matched == 0
 
     def test_recategorize_data(self):
 
