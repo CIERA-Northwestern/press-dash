@@ -143,9 +143,7 @@ class DashBuilder:
     def filter_data(
         _self,
         recategorized_df: pd.DataFrame,
-        text_filters: dict[str, str] = {},
         categorical_filters: dict[str, list] = {},
-        numerical_filters: dict[str, tuple] = {},
     ) -> pd.DataFrame:
         '''Filter what data shows up in the dashboard.
 
@@ -163,9 +161,7 @@ class DashBuilder:
         with st.spinner(msg):
             return _self.data_handler.filter_data(
                 recategorized_df=recategorized_df,
-                text_filters=text_filters,
                 categorical_filters=categorical_filters,
-                numerical_filters=numerical_filters
             )
 
     @st.cache_data
@@ -178,7 +174,7 @@ class DashBuilder:
         aggregation_method: str = 'count',
     ) -> Union[pd.Series, pd.DataFrame]:
         '''Aggregate stats.
-
+        
         Args:
             df: The dataframe containing the selected data.
             x_column: The column containing the year or other time bin value.
@@ -192,6 +188,8 @@ class DashBuilder:
                 or
             totals: The series containing the counts per year
         '''
+        
+
         msg = 'Aggregating...'
         print(msg)
         with st.spinner(msg):

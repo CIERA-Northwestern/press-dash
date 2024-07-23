@@ -61,11 +61,18 @@ def load_data(config):
 
     # Website data
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
-    website_df = pd.read_csv('report.csv')
+    website_df = pd.read_csv('News_Report_Main.csv', encoding_errors='ignore')
     website_df.set_index('id', inplace=True)
+
+
+
+    for i in ['Press Mentions', 'Top Outlets', 'People Reached']:
+        if i not in website_df.columns:
+            website_df[i] = None
+    
     # website_df = pd.read_csv(data_fp, parse_dates=['Date',])
     # website_df.set_index('id', inplace=True)
-
+    
     # # Load press data
     # press_df = pd.read_excel(press_office_data_fp)
     # press_df.set_index('id', inplace=True)
@@ -99,7 +106,7 @@ def clean_data(raw_df, config):
 
     # Drop rows where 'Date' year is 1970
     cleaned_df = raw_df[raw_df['Date'].dt.year != 1970]
-
+    
     # # Drop drafts
     # cleaned_df = raw_df.drop(
     #     raw_df.index[raw_df['Date'].dt.year == 1970],

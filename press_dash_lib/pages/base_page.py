@@ -32,7 +32,7 @@ def main(config_fp: str, user_utils: types.ModuleType = None):
 
     # Set the title that shows up at the top of the dashboard
     st.title(builder.config.get('page_title','Dashboard'))
-
+    
     # Prep data
     data, config = builder.prep_data(builder.config)
     builder.config.update(config)
@@ -60,25 +60,26 @@ def main(config_fp: str, user_utils: types.ModuleType = None):
         ),
     )
 
-    # Data filter settings
-    with st.expander('Data Filters'):
-        st.subheader('Data Filters')
-        builder.interface.request_filter_settings(
-            st,
-            data['recategorized'],
-        )
+    # Data axes
+    # entered search category passed down to filter settings for further specification
+    st.subheader('Data Axes')
+    builder.interface.request_data_axes(st)
 
+    # catches specified groupby category
+    category_specific = builder.settings.get_settings(common_to_include=['data'])
+    
+    # filters data as per specs
+    builder.interface.process_filter_settings(
+        st,
+        data['recategorized'],
+        value=category_specific['groupby_column']
+    )
+    
     # Apply data filters
     data['selected'] = builder.filter_data(
         data['recategorized'],
-        builder.settings.common['filters']['text'],
         builder.settings.common['filters']['categorical'],
-        builder.settings.common['filters']['numerical'],
     )
-
-    # Data axes
-    st.subheader('Data Axes')
-    builder.interface.request_data_axes(st)
 
     # Aggregate data
     data['aggregated'] = builder.aggregate(
@@ -99,6 +100,7 @@ def main(config_fp: str, user_utils: types.ModuleType = None):
     # Lineplot
     local_key = 'lineplot'
     st.header(config.get('lineplot_header', 'Lineplot'))
+    st.text("Note: some data entries may correspond to multiple categories, and so may be contribute to dataset of each.\n As such, the all categories combined may exceed the total, which only counts each entry once***")
     with st.expander('Lineplot settings'):
         local_opt_keys, common_opt_keys, unset_opt_keys = builder.settings.get_local_global_and_unset(
             function=builder.data_viewer.lineplot,

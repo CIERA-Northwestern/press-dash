@@ -13,7 +13,7 @@ figure_dir: ../data/figures
 start_of_year: September 1
 
 # Aesthetic options
-page_title: 'Press Data'
+page_title: 'Press Data Test'
 # Seaborn color palette to use. More options at https://seaborn.pydata.org/tutorial/color_palettes.html
 color_palette: deep
 
@@ -41,8 +41,8 @@ groupings:
 # The anything that's in a given grouping can be analyzed similarly.
 primary_id_column: index
 id_columns: # Unique identifiers
-  - id
   - Title
+  - id
 numerical_columns: # Numeric columns that can be summed
   - Press Mentions
   - People Reached

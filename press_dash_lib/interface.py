@@ -112,12 +112,13 @@ class Interface:
         if key in ask_for:
             value, ind = selectbox(
                 st_loc,
-                'What do you want to group the data by?',
-                display_options.get('groupby_column', self.config['categorical_columns']),
+                'What do you want to categorize the data by?',
+                options=display_options.get('groupby_column', self.config['categorical_columns']),
                 index=display_defaults.get(key + '_ind', 0),
             )
-            selected_settings[key] = value
-            selected_settings[key + '_ind'] = ind
+            
+        selected_settings[key] = value
+        selected_settings[key + '_ind'] = ind
 
         return selected_settings
 
@@ -191,14 +192,14 @@ class Interface:
 
         return selected_settings
 
-    def request_filter_settings(
+    def process_filter_settings(
             self,
             st_loc,
             df: pd.DataFrame,
             ask_for: list[str] = ['text', 'categorical', 'numerical'],
             local_key: str = None,
             display_defaults: dict = {},
-            display_options: dict = {},
+            value: str = None,
             selected_settings: dict = None,
             tag: str = None,
     ) -> dict:
@@ -233,88 +234,25 @@ class Interface:
             tag = ''
         else:
             tag += ':'
-
-        key = 'text'
-        if key in ask_for:
-            current = selected_settings.setdefault(key, {})
-            # Select which columns to filter on
-            if len(current) == 0:
-                multiselect_default = []
-            else:
-                multiselect_default = list(current)
-            filter_columns = st_loc.multiselect(
-                'What columns do you want to search? (case insensitive; not a smart search)',
-                options=display_options.get(key, self.config['text_columns']),
-                default=multiselect_default,
-                key=tag + key
-            )
-            for col in filter_columns:
-                # Check the current values then the passed-in defaults
-                # for a default
-                default = current.get(col,'')
-                default = display_defaults.get(key, {}).get(col, default)
-                selected_settings[key][col] = st_loc.text_input(
-                    '"{}" column: What do you want to search for?'.format(col),
-                    value=default,
-                    key=tag + key + ':' + col
-                )
-
+        
         key = 'categorical'
         if key in ask_for:
             current = selected_settings.setdefault(key, {})
-            # Select which columns to filter on
-            if len(current) == 0:
-                multiselect_default = []
-            else:
-                multiselect_default = list(current)
-            filter_columns = st_loc.multiselect(
-                'What categorical columns do you want to filter on?',
-                options=display_options.get(key, self.config['categorical_columns']),
-                default=multiselect_default,
-                key=tag + key
+            key=tag + key
+            
+            
+            possible_columns = pd.unique(df[value])
+            # Check the current values then the passed-in defaults
+            # for a default
+            default = current.get(value, possible_columns)
+            default = display_defaults.get(key, {}).get(value, default)
+            selected_settings[key][value] = st_loc.multiselect(
+                '"{}" column: What groups to include?'.format(value),
+                possible_columns,
+                default=default,
+                key=tag + key + ':' + value
             )
-            for col in filter_columns:
-                possible_columns = pd.unique(df[col])
-                # Check the current values then the passed-in defaults
-                # for a default
-                default = current.get(col, possible_columns)
-                default = display_defaults.get(key, {}).get(col, default)
-                selected_settings[key][col] = st_loc.multiselect(
-                    '"{}" column: What groups to include?'.format(col),
-                    possible_columns,
-                    default=default,
-                    key=tag + key + ':' + col
-                )
-
-        key = 'numerical'
-        if key in ask_for:
-            current = selected_settings.setdefault(key, {})
-            # Select which columns to filter on
-            if len(current) == 0:
-                multiselect_default = []
-            else:
-                multiselect_default = list(current)
-            filter_columns = st_loc.multiselect(
-                'What numerical columns do you want to filter on?',
-                options=display_options.get(key, self.config['numerical_columns']),
-                default=multiselect_default,
-                key=tag + key
-            )
-            for col in filter_columns:
-                value_min = df[col].min()
-                value_max = df[col].max()
-                # Check the current values then the passed-in defaults
-                # for a default
-                default = current.get(col, (value_min, value_max))
-                default = display_defaults.get(key, {}).get(col, default)
-                selected_settings[key][col] = st_loc.slider(
-                    '"{}" column: What range to include?'.format(col),
-                    min_value=default[0],
-                    max_value=default[1],
-                    value=default,
-                    key=tag + key + ':' + col
-                )
-
+                
         return selected_settings
 
     def request_view_settings(
@@ -381,7 +319,10 @@ class Interface:
             'include_annotations',
             'annotations_ha',
             'font',
-            'color_palette'
+            'color_palette',
+            'category_colors',
+            'totals',
+            'kwargs'
        ]
         if ask_for == 'all':
             ask_for = available_settings
@@ -579,7 +520,7 @@ class Interface:
                     'legend scale',
                     0.1,
                     2.,
-                    value=display_defaults.get(key, 1.),
+                    value=display_defaults.get(key, 1.32),
                     key=tag + key,
                 )
             key = 'legend_x'
@@ -588,7 +529,7 @@ class Interface:
                     'legend x',
                     0.,
                     1.5,
-                    value=display_defaults.get(key, 1.),
+                    value=display_defaults.get(key, 0.),
                     key=tag + key,
                 )
             key = 'legend_y'
@@ -597,7 +538,7 @@ class Interface:
                     'legend y',
                     0.,
                     1.5,
-                    value=display_defaults.get(key, 1.),
+                    value=display_defaults.get(key, 1.4),
                     key=tag + key,
                 )
             key = 'legend_ha'
