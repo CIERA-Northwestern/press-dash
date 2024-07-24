@@ -61,7 +61,7 @@ def load_data(config):
 
     # Website data
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
-    website_df = pd.read_csv('News_Report_Main.csv', encoding_errors='ignore')
+    website_df = pd.read_csv('report.csv')
     website_df.set_index('id', inplace=True)
 
 
