@@ -7,7 +7,7 @@ import glob
 import numpy as np
 import pandas as pd
 
-from press_dash_lib import utils
+from root_dash_lib import utils
 
 
 def load_data(config):
