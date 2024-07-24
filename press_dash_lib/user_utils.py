@@ -31,56 +31,46 @@ def load_data(config):
     ##########################################################################
     # Filepaths
 
-    # input_dir = os.path.join(config['data_dir'], config['input_dirname'])
+    input_dir = os.path.join(config['data_dir'], config['input_dirname'])
 
-    # def get_fp_of_most_recent_file(pattern):
-    #     '''Get the filepath of the most-recently created file matching
-    #     the pattern. We just define this here because we use it twice.
+    def get_fp_of_most_recent_file(pattern):
+        '''Get the filepath of the most-recently created file matching
+        the pattern. We just define this here because we use it twice.
 
-    #     Args:
-    #         pattern (str): The pattern to match.
+        Args:
+            pattern (str): The pattern to match.
 
-    #     Returns:
-    #         fp (str): The filepath of the most-recently created file
-    #             matching the pattern.
-    #     '''
-    #     fps = glob.glob(pattern)
-    #     ind_selected = np.argmax([os.path.getctime(_) for _ in fps])
-    #     return fps[ind_selected]
+        Returns:
+            fp (str): The filepath of the most-recently created file
+                matching the pattern.
+        '''
+        fps = glob.glob(pattern)
+        ind_selected = np.argmax([os.path.getctime(_) for _ in fps])
+        return fps[ind_selected]
 
-    # data_pattern = os.path.join(input_dir, config['website_data_file_pattern'])
-    # data_fp = get_fp_of_most_recent_file(data_pattern)
+    data_pattern = os.path.join(input_dir, config['website_data_file_pattern'])
+    data_fp = get_fp_of_most_recent_file(data_pattern)
 
-    # press_office_pattern = os.path.join(
-    #     input_dir, config['press_office_data_file_pattern']
-    # )
-    # press_office_data_fp = get_fp_of_most_recent_file(press_office_pattern)
+    press_office_pattern = os.path.join(
+        input_dir, config['press_office_data_file_pattern']
+    )
+    press_office_data_fp = get_fp_of_most_recent_file(press_office_pattern)
 
     ##########################################################################
     # Load data
 
     # Website data
-    os.chdir(os.path.dirname(os.path.abspath(__file__)))
-    website_df = pd.read_csv('report.csv')
+    website_df = pd.read_csv(data_fp, parse_dates=['Date',])
     website_df.set_index('id', inplace=True)
 
+    # Load press data
+    press_df = pd.read_excel(press_office_data_fp)
+    press_df.set_index('id', inplace=True)
 
+    # Combine the data
+    raw_df = website_df.join(press_df)
 
-    for i in ['Press Mentions', 'Top Outlets', 'People Reached']:
-        if i not in website_df.columns:
-            website_df[i] = None
-    
-    # website_df = pd.read_csv(data_fp, parse_dates=['Date',])
-    # website_df.set_index('id', inplace=True)
-    
-    # # Load press data
-    # press_df = pd.read_excel(press_office_data_fp)
-    # press_df.set_index('id', inplace=True)
-
-    # # Combine the data
-    # raw_df = website_df.join(press_df)
-
-    return website_df, config
+    return raw_df, config
 
 
 def clean_data(raw_df, config):
