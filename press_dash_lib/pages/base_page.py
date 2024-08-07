@@ -64,13 +64,13 @@ def main(config_fp: str, user_utils: types.ModuleType = None):
     )
 
     # Identify year bounds for any range calculations
-    min_year = int(data['preprocessed']["Calendar Year"].min())
-    max_year = int(data['preprocessed']["Calendar Year"].max())
+    min_year = 2014
+    max_year = int(data['recategorized']["Calendar Year"].max(axis=0))
     years_to_display = list(range(min_year,max_year+1, 1))
 
     # for fiscal year range calcs
-    min_year_fisc = int(data['preprocessed']["Fiscal Year"].min())
-    max_year_fisc = int(data['preprocessed']["Fiscal Year"].max())
+    min_year_fisc = 2013
+    max_year_fisc = int(data['recategorized']["Fiscal Year"].max(axis=0))
     years_to_display_fisc = list(range(min_year_fisc, max_year_fisc+1, 1))
 
     # Data axes
