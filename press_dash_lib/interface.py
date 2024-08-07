@@ -145,12 +145,12 @@ class Interface:
     def request_data_settings(
             self,
             st_loc,
-            ask_for: list[str] = ['show_total', 'cumulative', 'recategorize', 'combine_single_categories'],
+            ask_for: list[str] = ['cumulative', 'recategorize', 'combine_single_categories'],
             local_key: str = None,
             display_defaults: dict = {},
             selected_settings: dict = None,
             tag: str = None,
-    ):
+    ) -> dict:
         '''Request common data settings from the user.
 
         Args:
@@ -217,7 +217,7 @@ class Interface:
             self,
             st_loc,
             df: pd.DataFrame,
-            ask_for: list[str] = ['categorical', 'date'],
+            ask_for: list[str] = ['categorical'],
             local_key: str = None,
             display_defaults: dict = {},
             value: str = None,

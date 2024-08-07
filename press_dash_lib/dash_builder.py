@@ -172,8 +172,6 @@ class DashBuilder:
         y_column: str,
         groupby_column: str = None,
         aggregation_method: str = 'count',
-        start_year: int = None,
-        years_display: list[int] = None,
     ) -> Union[pd.Series, pd.DataFrame]:
         '''Aggregate stats.
         
@@ -191,7 +189,6 @@ class DashBuilder:
             totals: The series containing the counts per year
         '''
         
-
         msg = 'Aggregating...'
         print(msg)
         with st.spinner(msg):

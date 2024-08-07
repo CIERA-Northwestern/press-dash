@@ -142,8 +142,6 @@ class DataViewer:
         # Set defaults
         xs = df.index
 
-        
-
         if categories is None:
             categories = df.columns
         if category_colors is None:

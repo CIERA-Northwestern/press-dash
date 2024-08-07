@@ -42,14 +42,10 @@ def main(config_fp: str, user_utils: types.ModuleType = None):
 
     # Global settings
     #st.sidebar.markdown('# Data Settings')
-    setting_check, toggle = builder.interface.request_data_settings(
-        st.sidebar,
-    )
+    setting_check, toggle = builder.interface.request_data_settings(st.sidebar)
 
     st.sidebar.markdown('# View Settings')
-    builder.interface.request_view_settings(
-        st.sidebar
-    )
+    builder.interface.request_view_settings(st.sidebar)
 
     # Recategorize data
     selected_settings = builder.settings.common['data']
