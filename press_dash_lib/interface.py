@@ -14,6 +14,8 @@ import matplotlib.pyplot as plt
 import matplotlib.font_manager as font_manager
 import seaborn as sns
 
+from press_dash_lib import utils
+
 from .settings import Settings
 
 class Interface:
@@ -31,6 +33,8 @@ class Interface:
     def request_data_axes(
             self,
             st_loc,
+            max_year,
+            min_year,
             ask_for: list[str] = ['aggregation_method', 'x_column', 'y_column', 'groupby_column'],
             local_key: str = None,
             display_defaults: dict = {},
@@ -86,6 +90,22 @@ class Interface:
                 options = display_options.get('x_column', self.config['x_columns']),
                 index = display_defaults.get(key + '_ind', 0),
             )
+            
+            if value == 'Year Spotlight':
+                value2, ind2 = selectbox(
+                    st_loc,
+                    'what year do you want to spotlight?',
+                    options = list(range(min_year, (max_year+1), 1))
+                )
+                value = value + ':' + str(value2)
+            if value == 'Month across all Years':
+                value2, ind2 = selectbox(
+                    st_loc,
+                    'what month do you want to spotlight?',
+                    options= ['January', 'February', 'March', 'April', 'May', 'June', 'July','August','September','October','November','December']
+                )
+                value = value + ':' + value2
+            
             selected_settings[key] = value
             selected_settings[key + '_ind'] = ind
         key = 'y_column'
@@ -130,7 +150,7 @@ class Interface:
             display_defaults: dict = {},
             selected_settings: dict = None,
             tag: str = None,
-    ) -> dict:
+    ):
         '''Request common data settings from the user.
 
         Args:
@@ -154,19 +174,20 @@ class Interface:
         if selected_settings is None:
             selected_settings = self.settings.common['data']
 
+
+        toggled_on = st_loc.toggle(
+            label='show total',
+            value=True,
+        )
+
+        st_loc.markdown('# Data Settings')
+
         # Setup the tag
         if tag is None:
             tag = ''
         else:
             tag += ':'
-
-        key = 'show_total'
-        if key in ask_for:
-            selected_settings[key] = st_loc.checkbox(   
-                'show total',
-                value=display_defaults.get(key, True),
-                key=tag + key
-            )
+        
         key = 'cumulative'
         if key in ask_for:
             selected_settings[key] = st_loc.checkbox(
@@ -190,13 +211,13 @@ class Interface:
                         key=tag + key
                     )
 
-        return selected_settings
+        return selected_settings, toggled_on
 
     def process_filter_settings(
             self,
             st_loc,
             df: pd.DataFrame,
-            ask_for: list[str] = ['text', 'categorical', 'numerical'],
+            ask_for: list[str] = ['categorical', 'date'],
             local_key: str = None,
             display_defaults: dict = {},
             value: str = None,
@@ -252,7 +273,7 @@ class Interface:
                 default=default,
                 key=tag + key + ':' + value
             )
-                
+
         return selected_settings
 
     def request_view_settings(
@@ -271,6 +292,8 @@ class Interface:
             display_options: dict = {},
             selected_settings: dict = None,
             tag: str = None,
+            default_x: str = '',
+            default_y: str = '',
         ):
         '''Generic and common figure settings.
 
@@ -346,14 +369,14 @@ class Interface:
         if key in ask_for:
             selected_settings[key] = st_loc.text_input(
                 'x label',
-                value=display_defaults.get(key, ''),
+                value=display_defaults.get(key, default_x),
                 key=tag + key,
             )
         key = 'y_label'
         if key in ask_for:
             selected_settings[key] = st_loc.text_input(
                 'y label',
-                value=display_defaults.get(key, ''),
+                value=display_defaults.get(key, default_y),
                 key=tag + key,
             )
         key = 'yscale'

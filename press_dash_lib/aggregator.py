@@ -49,6 +49,7 @@ class Aggregator:
                 index=x_column,
                 values=count_column,
                 aggfunc='nunique',
+                fill_value=0
             )
             totals.fillna(value=0, inplace=True)
             return totals
@@ -57,6 +58,7 @@ class Aggregator:
                 index=x_column,
                 columns=groupby_column,
                 values=count_column,
+                fill_value=0,
                 aggfunc='nunique',
             )
             counts.fillna(value=0, inplace=True)

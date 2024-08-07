@@ -372,13 +372,13 @@ class TestAggregate(unittest.TestCase):
 
         counts = self.builder.agg.count(
             selected_df,
-            'Year',
+            'Fiscal Year',
             'id',
             self.group_by
         )
         total = self.builder.agg.count(
             selected_df,
-            'Year',
+            'Fiscal Year',
             'id',
         )
 
@@ -386,7 +386,7 @@ class TestAggregate(unittest.TestCase):
         test_group = 'Galaxies & Cosmology'
         expected = len(pd.unique(
             selected_df.loc[(
-                (selected_df['Year'] == test_year) &
+                (selected_df['Fiscal Year'] == test_year) &
                 (selected_df[self.group_by] == test_group)
             ),'id']
         ))
@@ -396,7 +396,7 @@ class TestAggregate(unittest.TestCase):
         test_year = 2015
         expected = len(pd.unique(
             selected_df.loc[(
-                (selected_df['Year'] == test_year)
+                (selected_df['Fiscal Year'] == test_year)
             ),'id']
         ))
         assert total.loc[test_year][0] == expected
@@ -410,20 +410,20 @@ class TestAggregate(unittest.TestCase):
 
         sums = self.builder.agg.sum(
             selected_df,
-            'Year',
+            'Fiscal Year',
             weighting,
             self.group_by,
         )
         total = self.builder.agg.sum(
             selected_df,
-            'Year',
+            'Fiscal Year',
             weighting,
         )
 
         test_year = 2015
         test_group = 'Galaxies & Cosmology'
         subselected = selected_df.loc[(
-            (selected_df['Year'] == test_year) &
+            (selected_df['Fiscal Year'] == test_year) &
             (selected_df[self.group_by] == test_group)
         )]
         subselected = subselected.drop_duplicates(subset='id')
@@ -434,7 +434,7 @@ class TestAggregate(unittest.TestCase):
         # Total count
         test_year = 2015
         subselected = selected_df.loc[(
-            (selected_df['Year'] == test_year)
+            (selected_df['Fiscal Year'] == test_year)
         )]
         subselected = subselected.drop_duplicates(subset='id')
         subselected = subselected.replace('N/A', 0,)
@@ -450,13 +450,13 @@ class TestAggregate(unittest.TestCase):
 
         sums = self.builder.agg.sum(
             selected_df,
-            'Year',
+            'Fiscal Year',
             weighting,
             self.group_by,
         )
         totals = self.builder.agg.sum(
             selected_df,
-            'Year',
+            'Fiscal Year',
             weighting,
         )
 
@@ -464,7 +464,7 @@ class TestAggregate(unittest.TestCase):
         test_year = 2021
         test_group = 'Gravitational Waves & Multi-Messenger Astronomy'
         subselected = selected_df.loc[(
-            (selected_df['Year'] == test_year) &
+            (selected_df['Fiscal Year'] == test_year) &
             (selected_df[self.group_by] == test_group)
         )]
         subselected = subselected.drop_duplicates(subset='id')
@@ -476,7 +476,7 @@ class TestAggregate(unittest.TestCase):
         # Total count
         test_year = 2021
         subselected = selected_df.loc[(
-            (selected_df['Year'] == test_year)
+            (selected_df['Fiscal Year'] == test_year)
         )]
         subselected = subselected.drop_duplicates(subset='id')
         subselected = subselected.replace('N/A', 0)

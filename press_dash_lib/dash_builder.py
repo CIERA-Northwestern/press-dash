@@ -172,6 +172,8 @@ class DashBuilder:
         y_column: str,
         groupby_column: str = None,
         aggregation_method: str = 'count',
+        start_year: int = None,
+        years_display: list[int] = None,
     ) -> Union[pd.Series, pd.DataFrame]:
         '''Aggregate stats.
         
@@ -200,6 +202,7 @@ class DashBuilder:
                     count_column=y_column,
                     groupby_column=groupby_column,
                 )
+
             elif aggregation_method == 'sum':
                 return _self.agg.sum(
                     df=df,
@@ -209,3 +212,4 @@ class DashBuilder:
                 )
             else:
                 raise KeyError('Requested aggregation method "{}" is not available.'.format(aggregation_method))
+                
