@@ -6,7 +6,7 @@ import types
 
 from typing import Tuple
 
-
+import calendar
 import numpy as np
 import pandas as pd
 import streamlit as st
@@ -145,7 +145,7 @@ class DataViewer:
         if categories is None:
             categories = df.columns
         if category_colors is None:
-            color_palette = sns.color_palette()
+            color_palette = sns.color_palette(n_colors=len(categories))
             category_colors = { key: color_palette[i] for i, key in enumerate(categories) }
 
         sns.set(font=font, style=seaborn_style)
@@ -153,6 +153,11 @@ class DataViewer:
 
         fig = plt.figure(figsize=(fig_width, fig_height))
         ax = plt.gca()
+
+        if df.index.name == 'Month':
+            plt.xticks(xs, [calendar.month_abbr[i] for i in xs])
+        if df.index.name == 'Fiscal Month':
+            plt.xticks(xs, ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'])
         for j, category_j in enumerate(categories):
 
             ys = df[category_j]
@@ -325,7 +330,7 @@ class DataViewer:
         if categories is None:
             categories = df.columns
         if category_colors is None:
-            color_palette = sns.color_palette()
+            color_palette = sns.color_palette(n_colors=len(categories))
             category_colors = { key: color_palette[i] for i, key in enumerate(categories) }
 
         # Get data
