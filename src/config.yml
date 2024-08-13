@@ -50,7 +50,8 @@ date_columns: # Dates
 x_columns: # Data will be binned by these along the x-axis
   - Fiscal Year # For example, a value of 2019 would be grouped into the 2019-2020 financial year
   - Calendar Year
-  - Year Spotlight
+  - Year Spotlight(Calendar Year)
+  - Year Spotlight(Fiscal Year)
   - Month across all Years
 
 # NOTE: do not change ORDER of config options for x_columns; some of processing relies on specific index in the list (see Base Page); changing that

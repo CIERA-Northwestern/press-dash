@@ -60,19 +60,19 @@ def main(config_fp: str, user_utils: types.ModuleType = None):
     )
 
     # Identify year bounds for any range calculations
-    min_year = 2014
-    max_year = 2023
+    min_year = data['preprocessed']['Calendar Year'].min()
+    max_year = data['preprocessed']['Calendar Year'].max()
     years_to_display = list(range(min_year,max_year+1, 1))
 
     # for fiscal year range calcs
-    min_year_fisc = 2013
-    max_year_fisc = 2022
+    min_year_fisc = data['preprocessed']['Fiscal Year'].min()
+    max_year_fisc = data['preprocessed']['Fiscal Year'].max()
     years_to_display_fisc = list(range(min_year_fisc, max_year_fisc+1, 1))
-
+    
     # Data axes
     # entered search category passed down to filter settings for further specification
     st.subheader('Data Axes')
-    axes_object = builder.interface.request_data_axes(st, max_year, min_year)
+    axes_object = builder.interface.request_data_axes(st, data['preprocessed'])
 
     # catches specified groupby category
     category_specific = builder.settings.get_settings(common_to_include=['data'])
@@ -92,12 +92,16 @@ def main(config_fp: str, user_utils: types.ModuleType = None):
 
     months_to_num = {'January':1, 'February':2, 'March':3,'April':4,'May':5,'June':6,'July':7,'August':8,'September':9,'October':10,'November':11,'December':12}
     # filters by year binning method
-    if axes_object['x_column_ind'] == 2:
+    if (axes_object['x_column_ind'] == 2):
         # tosses all entries that do not fall in specified calendar year
         year = int(axes_object['x_column'].split(':')[1])
         data['time_adjusted'] = data['selected'][data['selected']['Date'].dt.year == year]
         builder.settings.common['data']['x_column'] = 'Month'
-    elif axes_object['x_column_ind'] == 3:
+    elif (axes_object['x_column_ind'] == 3):
+        fisc_year = int(axes_object['x_column'].split(':')[1])
+        data['time_adjusted'] = data['selected'][data['selected']['Fiscal Year'] == fisc_year]
+        builder.settings.common['data']['x_column'] = 'Fiscal Month'
+    elif axes_object['x_column_ind'] == 4:
         # tosses all entries that do not fall in specified month across all years
         month = str(axes_object['x_column'].split(':')[1])
         data['time_adjusted'] = data['selected'][data['selected']['Date'].dt.month == months_to_num[month]]
@@ -131,7 +135,7 @@ def main(config_fp: str, user_utils: types.ModuleType = None):
         data['aggregated'] = data['aggregated'].T
         data['totals'] = data['totals'].T
 
-        if builder.settings.common['data']['x_column'] == 'Month':
+        if (builder.settings.common['data']['x_column'] == 'Month') or (builder.settings.common['data']['x_column'] == 'Fiscal Month'):
             for month in months_to_num.values():
                 if month not in data['aggregated'].columns:
                     data['aggregated'].insert(month-1, month, [0 for i in range(len(data['aggregated'].index))])

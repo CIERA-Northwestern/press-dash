@@ -33,8 +33,7 @@ class Interface:
     def request_data_axes(
             self,
             st_loc,
-            max_year,
-            min_year,
+            df,
             ask_for: list[str] = ['aggregation_method', 'x_column', 'y_column', 'groupby_column'],
             local_key: str = None,
             display_defaults: dict = {},
@@ -91,11 +90,18 @@ class Interface:
                 index = display_defaults.get(key + '_ind', 0),
             )
             
-            if value == 'Year Spotlight':
+            if value == 'Year Spotlight(Calendar Year)':
                 value2, ind2 = selectbox(
                     st_loc,
                     'what year do you want to spotlight?',
-                    options = list(range(min_year, (max_year+1), 1))
+                    options = list(range(df['Calendar Year'].min(), df['Calendar Year'].max()+1, 1))
+                )
+                value = value + ':' + str(value2)
+            if value == 'Year Spotlight(Fiscal Year)':
+                value2, ind2 = selectbox(
+                    st_loc,
+                    'what year do you want to spotlight?',
+                    options = list(range(df['Fiscal Year'].min(), df['Fiscal Year'].max()+1, 1))
                 )
                 value = value + ':' + str(value2)
             if value == 'Month across all Years':

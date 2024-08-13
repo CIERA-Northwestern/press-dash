@@ -153,6 +153,14 @@ def preprocess_data(cleaned_df, config):
     preprocessed_df['Calendar Year'] = preprocessed_df['Date'].dt.year
     preprocessed_df['Month'] = preprocessed_df['Date'].dt.month
 
+    # For Fiscal Month visualizations
+    def month_fisc_converter(month:int, forward=True):
+        month_to_fisc = [9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7, 8]
+        return month_to_fisc.index(month)+1
+    
+    preprocessed_df['Fiscal Month'] = preprocessed_df['Month'].map(month_fisc_converter)
+
+
     # Tweaks to the press data
     if 'Title (optional)' in preprocessed_df.columns:
         preprocessed_df.drop('Title (optional)', axis='columns', inplace=True)
