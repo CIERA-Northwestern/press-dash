@@ -60,15 +60,16 @@ def load_data(config):
     # Load data
 
     # Website data
-    website_df = pd.read_csv(data_fp, parse_dates=['Date',])
+    website_df = pd.read_csv(data_fp, parse_dates=['Date',], encoding_errors='ignore')
     website_df.set_index('id', inplace=True)
 
-    # Load press data
-    press_df = pd.read_excel(press_office_data_fp)
-    press_df.set_index('id', inplace=True)
+    # if not combined
+    #press_df = pd.read_excel(press_office_data_fp)
+    #press_df.set_index('id', inplace=True)
+    # raw_df = website_df.join(press_df)
 
-    # Combine the data
-    raw_df = website_df.join(press_df)
+    # if combined
+    raw_df = website_df
 
     return raw_df, config
 
