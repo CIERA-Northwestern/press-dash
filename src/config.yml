@@ -13,7 +13,7 @@ figure_dir: ../data/figures
 start_of_year: September 1
 
 # Aesthetic options
-page_title: 'Press Data'
+page_title: 'Press-Data'
 # Seaborn color palette to use. More options at https://seaborn.pydata.org/tutorial/color_palettes.html
 color_palette: deep
 
