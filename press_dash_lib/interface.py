@@ -8,6 +8,7 @@ import warnings
 import numpy as np
 import pandas as pd
 import streamlit as st
+import calendar
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -34,6 +35,8 @@ class Interface:
             self,
             st_loc,
             df,
+            min_year,
+            max_year,
             ask_for: list[str] = ['aggregation_method', 'x_column', 'y_column', 'groupby_column'],
             local_key: str = None,
             display_defaults: dict = {},
@@ -90,27 +93,25 @@ class Interface:
                 index = display_defaults.get(key + '_ind', 0),
             )
             
-            if value == 'Year Spotlight(Calendar Year)':
-                value2, ind2 = selectbox(
-                    st_loc,
-                    'what year do you want to spotlight?',
-                    options = list(range(df['Calendar Year'].min(), df['Calendar Year'].max()+1, 1))
-                )
-                value = value + ':' + str(value2)
-            if value == 'Year Spotlight(Fiscal Year)':
-                value2, ind2 = selectbox(
-                    st_loc,
-                    'what year do you want to spotlight?',
-                    options = list(range(df['Fiscal Year'].min(), df['Fiscal Year'].max()+1, 1))
-                )
-                value = value + ':' + str(value2)
-            if value == 'Month across all Years':
-                value2, ind2 = selectbox(
-                    st_loc,
-                    'what month do you want to spotlight?',
-                    options= ['January', 'February', 'March', 'April', 'May', 'June', 'July','August','September','October','November','December']
-                )
-                value = value + ':' + value2
+            if value == 'Year(Flexible)':
+                month_dict = {'January(Calendar Year)':1, 'February':2, 'March':3,'April(Reporting Year)':4,'May':5,'June':6,'July':7,'August':8,'September(Fiscal Year)':9,'October':10,'November':11,'December':12}
+                col1, col2 = st_loc.columns(2)
+                with col1:
+                    value_month, ind_month = selectbox(
+                        st_loc, 
+                        'starting month for twelve-month recording period',
+                        options = list(month_dict.keys())
+                    )
+                    value = value + ':' + str(month_dict[value_month])
+                with col2:
+                    if month_dict[value_month] >= 9:
+                        min_year = min_year - 1
+                    start_year, end_year = st_loc.select_slider(
+                            'years to view',
+                            options=list(range(min_year,max_year+1)),
+                            value=(min_year, max_year),
+                    )
+                    value = value + ':' + str(start_year) + ':' + str(end_year)
             
             selected_settings[key] = value
             selected_settings[key + '_ind'] = ind
@@ -351,6 +352,8 @@ class Interface:
             'color_palette',
             'category_colors',
             'totals',
+            'month_reindex',
+            'year_reindex',
             'kwargs'
        ]
         if ask_for == 'all':
