@@ -1,7 +1,5 @@
 # CIERA Press Dashboard
 
-[![Installation and Tests](https://github.com/CIERA-Northwestern/press-dash/actions/workflows/installation_and_tests.yml/badge.svg)](https://github.com/CIERA-Northwestern/press-dash/actions/workflows/installation_and_tests.yml)
-
 This dashboard provides a way for interested individuals to explore data regarding press and news related to CIERA.
 
 Instructions are provided below for various levels of usage.
@@ -26,14 +24,21 @@ While the interface should be relatively intuitive, a helpful tip is that you ca
 
 ## Level 1: Updating the Configuration and Data
 
-When the dashboard is hosted on the web in some cases you can edit the configuration and data without ever needing to download anything and view the updated dashboard without ever needing to download anything.
+When the dashboard is hosted on the web in some cases you can edit the configuration and data without ever needing to download anything and view the updated dashboard without ever needing to download anything. 
 This is possible for dashboards where the computations are sufficiently light to be wrapped into the interactive dashboard.
+Surface-level modifications as described above can be implemented in two locations: 
+- 1. config.yml
+- 2. user_utils.py
 
 ### Editing the Config
 
 Some options are only available in the `config.yml` file found in the `src` directory (`./src/config.yml` if you are in the root directory, i.e. [here](https://github.com/CIERA-Northwestern/press-dash/blob/main/src/config.yml)).
 You can edit this on github by clicking on the edit button in the upper right, provided you are logged in with an account that has the necessary permissions.
 Locally this can be edited with TextEdit (mac), Notepad (Windows), or your favorite code editor.
+The config file allows modifications to data groupings, categorization schema, and other ways of binning information. Changing it allows for new metrics by which to bin, but be careful - if changes are not reflected in the dataset, the program will raise an error!
+
+### user_utils.py
+for those with more experience programming, file `user_utils.py`, found in `press_dash_lib` directory (`./press_dash_lib/user_utils.py` from root), provides a greater degree of control over dashboard operation, while still abstracting away the more technical elements. Here, you may address edge cases, change file settings, and introduce new processing methods. 
 
 ### Updating the Data
 

@@ -164,7 +164,9 @@ class DataViewer:
         
         if not is_empty:
             if df.index.name == 'Reindexed Month':
-                plt.xticks(xs, [calendar.month_abbr[month_reindex[i-1]] for i in xs])
+                months_names_list = [calendar.month_abbr[month_reindex[i-1]] for i in xs]
+                months_names_list[0] = f"{months_names_list[0]} {year_reindex[0]}"
+                plt.xticks(xs, months_names_list)
             elif df.index.name == 'Reindexed Year':
                 plt.xticks(xs, year_reindex)
         for j, category_j in enumerate(categories):
@@ -266,6 +268,29 @@ class DataViewer:
         st.write(fig)
 
         return fig
+
+
+    def barplot(
+        self,
+        df: pd.DataFrame,
+        x_label: str = None,
+        y_label: str = None,
+        categories: list[str] = None,
+        
+    ):
+        '''
+        palette = sns.color_palette(palette='tab10', n_colors=len(df))
+        color_set = []
+        print(len(df))
+        for i in palette:
+            color_tuple = (int(i[0]*255), int(i[1]*255), int(i[2]*255))
+            color_set.append("#%02x%02x%02x" % color_tuple)
+        print(color_set)
+        print(len(color_set))
+        '''
+        print(df.index) 
+        st.bar_chart(df, y='Aggregate', x_label=x_label, y_label=y_label, color="Aggregate")
+
 
     def stackplot(
         self,

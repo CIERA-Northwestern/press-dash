@@ -149,6 +149,7 @@ class Interface:
 
         return selected_settings
 
+
     def request_data_settings(
             self,
             st_loc,
@@ -176,25 +177,30 @@ class Interface:
             local_key=local_key,
             common_to_include=['data',]
         )
+        
         display_defaults.update(settings_dict)
 
         if selected_settings is None:
             selected_settings = self.settings.common['data']
-
-
-        toggled_on = st_loc.toggle(
-            label='show total',
-            value=True,
-        )
-
-        st_loc.markdown('# Data Settings')
-
+        
         # Setup the tag
         if tag is None:
             tag = ''
         else:
             tag += ':'
         
+        key = 'data_options'
+        options = ['No Total', 'Only Total', 'Standard', 'Year Aggregate']
+        selected_settings[key] = st_loc.radio(
+            'Plotting Options',
+            options,
+            index = 2,
+            key = tag+key
+        )
+
+
+        st_loc.markdown("# Data ")
+
         key = 'cumulative'
         if key in ask_for:
             selected_settings[key] = st_loc.checkbox(
@@ -205,7 +211,7 @@ class Interface:
         key = 'recategorize'
         if key in ask_for:
             selected_settings[key] = st_loc.checkbox(
-                'use combined categories (avoids double counting; definitions can be edited in the config)',
+                'use combined categories (avoids double-counting entries)',
                 value=display_defaults.get(key, False),
                 key=tag + key
             )
@@ -218,7 +224,7 @@ class Interface:
                         key=tag + key
                     )
 
-        return selected_settings, toggled_on
+        return selected_settings
 
     def process_filter_settings(
             self,
@@ -652,7 +658,6 @@ class Interface:
                 selected_settings[key] = original_font
 
         return selected_settings
-
 
 def selectbox(
     st_loc,

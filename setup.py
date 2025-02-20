@@ -12,7 +12,7 @@ import setuptools
 setuptools.setup(
     name="press_dash_lib",
     version="0.1",
-    author="CIERA (Zach Hafen-Saavedra)",
+    author="CIERA",
     author_email="ciera@northwestern.edu",
     description="Dashboard for exploring and presenting press data related to CIERA.",
     long_description_content_type="text/markdown",
