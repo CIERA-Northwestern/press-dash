@@ -4,9 +4,7 @@
 
 
 # Location of the data relative to the config
-data_dir: ../data
-# Location of the figures relative to the config
-figure_dir: ../data/figures
+data_dir: ./data
 
 # What day of the year to start on.
 # Default is September 1st, start of the Northwestern Financial Year
@@ -25,7 +23,6 @@ color_palette: deep
 
 # Filetree options
 input_dirname: raw_data
-output_dirname: processed_data
 website_data_file_pattern: News_Report*.csv
 press_office_data_file_pattern: press_office*.xls*
 combined_filename: press.csv

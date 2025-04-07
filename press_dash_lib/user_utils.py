@@ -148,11 +148,13 @@ def preprocess_data(cleaned_df, config):
     preprocessed_df = cleaned_df.copy()
 
     # Get the year, according to the config start date
+    '''
     preprocessed_df['Fiscal Year'] = utils.get_year(
         preprocessed_df['Date'], config['start_of_year']
     )
     preprocessed_df['Calendar Year'] = preprocessed_df['Date'].dt.year
-
+    '''
+    
     # Tweaks to the press data
     if 'Title (optional)' in preprocessed_df.columns:
         preprocessed_df.drop('Title (optional)', axis='columns', inplace=True)
@@ -160,14 +162,25 @@ def preprocess_data(cleaned_df, config):
         preprocessed_df[column] = preprocessed_df[column].astype('Int64')
 
     # Now explode the data
+    '''
     for group_by_i in config['groupings']:
         preprocessed_df[group_by_i] = preprocessed_df[group_by_i].str.split('|')
         preprocessed_df = preprocessed_df.explode(group_by_i)
+    '''
 
     # Exploding the data results in duplicate IDs,
     # so let's set up some new, unique IDs.
     preprocessed_df['id'] = preprocessed_df.index
     preprocessed_df.set_index(np.arange(len(preprocessed_df)), inplace=True)
+
+    def legacy(date):
+        if date.year < 2014:
+            return "LEGACY"
+        else:
+            return "CURRENT"
+    
+    preprocessed_df['Legacy'] = preprocessed_df['Date'].apply(legacy)
+
 
     # This flag exists just to demonstrate you can modify the config
     # during the user functions

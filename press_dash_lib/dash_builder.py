@@ -57,8 +57,8 @@ class DashBuilder:
         # Check if we're in the directory the script is in,
         # which should also be the directory the config is in.
         # If not, move into that directory
-        if os.getcwd() != config_dir:
-            os.chdir(config_dir)
+        #if os.getcwd() != config_dir:
+        #    os.chdir(config_dir)
 
         with open(config_fn, "r", encoding='UTF-8') as file:
             config = yaml.load(file, Loader=yaml.FullLoader)
@@ -100,7 +100,8 @@ class DashBuilder:
             data['preprocessed'], config = _self.data_handler.preprocess_data(data['cleaned'], config)
 
             return data, config
- 
+
+    '''
     @st.cache_data
     def recategorize_data(
             _self,
@@ -109,7 +110,7 @@ class DashBuilder:
             recategorize: bool = True,
             combine_single_categories: bool = False,
         ) -> pd.DataFrame:
-        '''Recategorize the data, i.e. combine existing categories into new ones.
+        Recategorize the data, i.e. combine existing categories into new ones.
         The end result is one category per article, so no articles are double-counted.
         However, if the new categories are ill-defined they can contradict one another
         and lead to inconsistencies.
@@ -128,7 +129,7 @@ class DashBuilder:
         Returns:
             recategorized: The dataframe containing the recategorized data.
                 One entry per article.
-        '''
+        
         msg = 'Recategorizing data...'
         print(msg)
         with st.spinner(msg):
@@ -138,12 +139,13 @@ class DashBuilder:
                 recategorize=recategorize,
                 combine_single_categories=combine_single_categories,
             )
+    '''
 
     @st.cache_data
     def filter_data(
         _self,
-        recategorized_df: pd.DataFrame,
-        categorical_filters: dict[str, list] = {},
+        preprocessed_df: pd.DataFrame,
+        filters: dict,
     ) -> pd.DataFrame:
         '''Filter what data shows up in the dashboard.
 
@@ -160,8 +162,8 @@ class DashBuilder:
         print(msg)
         with st.spinner(msg):
             return _self.data_handler.filter_data(
-                recategorized_df=recategorized_df,
-                categorical_filters=categorical_filters,
+                preprocessed_df=preprocessed_df,
+                filters=filters,
             )
 
     @st.cache_data
@@ -189,6 +191,7 @@ class DashBuilder:
             totals: The series containing the counts per year
         '''
         
+
         msg = 'Aggregating...'
         print(msg)
         with st.spinner(msg):
@@ -199,7 +202,6 @@ class DashBuilder:
                     count_column=y_column,
                     groupby_column=groupby_column,
                 )
-
             elif aggregation_method == 'sum':
                 return _self.agg.sum(
                     df=df,
@@ -209,4 +211,3 @@ class DashBuilder:
                 )
             else:
                 raise KeyError('Requested aggregation method "{}" is not available.'.format(aggregation_method))
-                

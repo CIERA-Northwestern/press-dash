@@ -78,7 +78,11 @@ class DataHandler:
         return self.user_utils.preprocess_data(
             cleaned_df, config
         )
+    
 
+    # Recategorization stuff
+    # v
+    '''
     def recategorize_data_per_grouping(
         self,
         preprocessed_df: pd.DataFrame,
@@ -86,7 +90,7 @@ class DataHandler:
         new_cat_per_g: dict,
         combine_single_categories: bool = False,
     ) -> pd.Series:
-        '''The actual function doing most of the recategorizing.
+        The actual function doing most of the recategorizing.
 
         Args:
             preprocessed_df: The dataframe containing the data to recategorize.
@@ -100,12 +104,12 @@ class DataHandler:
 
         Returns:
             recategorized_series: The new categories.
-        '''
+        
 
         # Get the formatted data used for the categories
         dummies = pd.get_dummies(preprocessed_df[groupby_column])
-        dummies['id'] = preprocessed_df['id']
-        dummies_grouped = dummies.groupby('id')
+        dummies['Title'] = preprocessed_df['Title']
+        dummies_grouped = dummies.groupby('Title')
         bools = dummies_grouped.sum() >= 1
         n_cats = bools.sum(axis='columns')
         if bools.values.max() > 1:
@@ -155,6 +159,7 @@ class DataHandler:
                     ) + '))'
                 )
                 category_definition = category_definition.replace('only', '')
+
             is_new_cat = bools.apply(
                 lambda row: eval(category_definition), axis='columns'
             )
@@ -169,7 +174,7 @@ class DataHandler:
             recategorize: bool = True,
             combine_single_categories: bool = False,
         ) -> pd.DataFrame:
-        '''Recategorize the data, i.e. combine existing categories into new ones.
+        'Recategorize the data, i.e. combine existing categories into new ones.
         The end result is one category per article, so no articles are double-counted.
         However, if the new categories are ill-defined they can contradict one another
         and lead to inconsistencies.
@@ -185,7 +190,7 @@ class DataHandler:
         Returns:
             recategorized: The dataframe containing the recategorized data.
                 One entry per article.
-        '''
+        
 
         # We include the automatic return to help with data caching.
         if not recategorize:
@@ -196,8 +201,8 @@ class DataHandler:
         
         # Get the condensed data frame
         # This is probably dropping stuff that shouldn't be dropped!!!!!!!
-        recategorized = preprocessed_df.drop_duplicates(subset='id', keep='first')
-        recategorized = recategorized.set_index('id')
+        recategorized = preprocessed_df.drop_duplicates(subset='Title', keep='first')
+        recategorized = recategorized.set_index('Title')
 
         for groupby_column, new_categories_per_grouping in new_categories.items():
 
@@ -211,22 +216,24 @@ class DataHandler:
             else:
                 raise KeyError('New categories cannot have multiple sets of brackets.')
 
+
             recategorized_groupby = self.recategorize_data_per_grouping(
                 preprocessed_df,
                 groupby_column,
                 copy.deepcopy(new_categories_per_grouping),
                 combine_single_categories
             )
+
             recategorized[new_column] = recategorized_groupby
 
         recategorized.reset_index(inplace=True)
 
         return recategorized
-
+'''
     def filter_data(
         self,
-        recategorized_df: pd.DataFrame,
-        categorical_filters: dict[str, list] = {},
+        preprocessed_df: pd.DataFrame,
+        filters: dict,
     ) -> pd.DataFrame:
         '''Filter what data shows up in the dashboard.
 
@@ -237,14 +244,14 @@ class DataHandler:
         Returns:
             selected_df: The dataframe containing the selected data.
         '''
-
         # Initialized
-        is_included = np.ones(len(recategorized_df), dtype=bool)
+        is_included = np.ones(len(preprocessed_df), dtype=bool)
+        categorical_filters = filters['categorical']
 
         # Categories filter
         for cat_filter_col, selected_cats in categorical_filters.items():
-            is_included = is_included & recategorized_df[cat_filter_col].isin(selected_cats)
+            is_included = is_included & preprocessed_df[cat_filter_col].isin(selected_cats)
 
-        selected_df = recategorized_df.loc[is_included]
+        selected_df = preprocessed_df.loc[is_included]
 
         return selected_df
